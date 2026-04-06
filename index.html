@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locro Solidario - IPEM 146</title>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<header>
+  <h1>Gran Locro 10/05/2026</h1>
+  <h2>IPEM 146 "Centenario"</h2>
+  <p>
+    <strong>Cada aporte, por pequeño que sea, suma para alcanzar un gran objetivo.</strong><br>
+    Con tu colaboración hacés posible la elaboración de este locro y fortalecés el espíritu de nuestra escuela.<br>
+    <strong>Juntos podemos hacer la diferencia.</strong>
+  </p>
+</header>
+
+<div class="main">
+
+  <!-- FORMULARIO -->
+  <div class="container">
+    <form onsubmit="enviarDatos(event)">
+
+      <label>Nombre y apellido</label>
+      <input type="text" id="nombre" required>
+
+      <label>Teléfono</label>
+      <input type="number" id="telefono" required>
+
+      <label>Tipo</label>
+      <select id="tipo" onchange="mostrarCampos()" required>
+        <option value="">Seleccionar</option>
+        <option value="ingredientes">Ingredientes</option>
+        <option value="dinero">Dinero</option>
+        <option value="porciones">Porciones</option>
+      </select>
+
+      <div id="ingredientes" style="display:none;">
+        <label>Ingrediente</label>
+        <select id="ingrediente">
+          <option>Maíz</option>
+          <option>Porotos</option>
+          <option>Carne</option>
+          <option>Chorizo</option>
+          <option>Panceta</option>
+          <option>Zapallo</option>
+          <option>Cebolla</option>
+          <option>Condimentos</option>
+        </select>
+
+        <label>Cantidad (kg)</label>
+        <input type="number" id="cantidadKg" step="0.1">
+      </div>
+
+      <div id="dinero" style="display:none;">
+        <label>Monto</label>
+        <input type="number" id="monto">
+      </div>
+
+      <div id="porciones" style="display:none;">
+        <label>Porciones</label>
+        <input type="number" id="porcionesInput">
+      </div>
+
+      <button id="btnEnviar">Enviar</button>
+      <div class="mensaje" id="mensaje"></div>
+
+    </form>
+  </div>
+
+  <!-- ESTADO -->
+  <div class="container">
+    <h2>Estado de Ingredientes</h2>
+    <div id="estadoIngredientes"></div>
+  </div>
+
+</div>
+
+<script>
+
+// MAYÚSCULAS
+document.getElementById("nombre").addEventListener("input", function(){
+  this.value = this.value.toUpperCase();
+});
+
+// URLS
+const URL = "https://script.google.com/macros/s/AKfycbyHhEYb-cLtwJZ-TCHh_R_JJWnwHw_f_saudBEGTbUXcbXey2MgeFwP39iQdBOagosaYA/exec";
+
+// OBJETIVOS
+const objetivos = {
+  Maíz:10, Porotos:8, Carne:15, Chorizo:6,
+  Panceta:5, Zapallo:10, Cebolla:4, Condimentos:2
+};
+
+// UI HELPERS
+function mostrarMensaje(texto, color="white"){
+  const m = document.getElementById("mensaje");
+  m.innerText = texto;
+  m.style.color = color;
+  m.style.opacity = "1";
+
+  setTimeout(()=> m.style.opacity="0", 9000);
+  setTimeout(()=>{
+    m.innerText="";
+    m.style.opacity="1";
+  },10000);
+}
+
+// MOSTRAR CAMPOS
+function mostrarCampos(){
+  let tipo = document.getElementById("tipo").value;
+
+  document.getElementById("ingredientes").style.display="none";
+  document.getElementById("dinero").style.display="none";
+  document.getElementById("porciones").style.display="none";
+
+  if(tipo==="ingredientes") document.getElementById("ingredientes").style.display="block";
+  if(tipo==="dinero") document.getElementById("dinero").style.display="block";
+  if(tipo==="porciones") document.getElementById("porciones").style.display="block";
+}
+
+// ENVIAR
+async function enviarDatos(e){
+  e.preventDefault();
+
+  const boton = document.getElementById("btnEnviar");
+
+  const data = {
+    nombre: document.getElementById("nombre").value,
+    telefono: document.getElementById("telefono").value,
+    tipo: document.getElementById("tipo").value,
+    ingrediente: document.getElementById("ingrediente").value || "",
+    cantidadKg: parseFloat(document.getElementById("cantidadKg").value) || 0,
+    monto: document.getElementById("monto").value || "",
+    porciones: document.getElementById("porcionesInput").value || ""
+  };
+
+  // CONTROL INGREDIENTES
+  if(data.tipo==="ingredientes"){
+
+    let res = await fetch(URL);
+    let totales = await res.json();
+
+    let actual = totales[data.ingrediente] || 0;
+    let objetivo = objetivos[data.ingrediente] || 0;
+
+    if(actual >= objetivo){
+      mostrarMensaje(`❌ ${data.ingrediente} ya está completo. Elegí otro.`, "#ff4d4d");
+      return;
+    }
+
+    if(actual + data.cantidadKg > objetivo){
+      let falta = (objetivo - actual).toFixed(1);
+      mostrarMensaje(`⚠️ Solo faltan ${falta} kg de ${data.ingrediente}`, "#ffc107");
+      return;
+    }
+  }
+
+  // UI ENVÍO
+  boton.disabled = true;
+  boton.innerText = "Enviando...";
+  mostrarMensaje("⏳ Aguarde un instante...", "#ffc107");
+
+  await fetch(URL,{
+    method:"POST",
+    mode:"no-cors",
+    body:JSON.stringify(data)
+  });
+
+  mostrarMensaje("✅ Enviado... muchas gracias", "lightgreen");
+
+  document.querySelector("form").reset();
+  mostrarCampos();
+
+  setTimeout(cargarEstado,1000);
+
+  boton.disabled = false;
+  boton.innerText = "Enviar";
+}
+
+// ESTADO
+function cargarEstado(){
+  fetch(URL)
+  .then(res=>res.json())
+  .then(data=>{
+
+    let cont=document.getElementById("estadoIngredientes");
+    cont.innerHTML="";
+
+    for(let ing in objetivos){
+
+      let actual=data[ing]||0;
+      let objetivo=objetivos[ing];
+      let porcentaje=(actual/objetivo)*100;
+
+      let clase="falta";
+      let texto=`🔴 Falta ${ing}`;
+
+      if(porcentaje>=100){
+        clase="ok";
+        let sobra=actual-objetivo;
+        texto=sobra>0
+          ? `🟣 Sobra ${sobra.toFixed(1)} kg de ${ing}`
+          : `✅ ${ing} completo`;
+      }
+      else if(porcentaje>=60){
+        clase="medio";
+        texto=`⚠️ ${ing} ${porcentaje.toFixed(0)}%`;
+      }
+
+      cont.innerHTML+=`
+      <div class="estado-item ${clase}">
+        ${texto} (${actual}/${objetivo} kg)
+      </div>`;
+    }
+
+  });
+}
+
+// INIT
+cargarEstado();
+setInterval(cargarEstado,10000);
+
+</script>
+
+</body>
+</html>

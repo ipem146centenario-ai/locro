@@ -1,232 +1,452 @@
 <!doctype html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Locro Solidario - IPEM 146</title>
-
-<link rel="stylesheet" href="styles.css">
-</head>
-
-<body>
-
-<header>
-  <h1>Gran Locro 10/05/2026</h1>
-  <h2>IPEM 146 "Centenario"</h2>
-  <p>
-    <strong>Cada aporte, por pequeño que sea, suma para alcanzar un gran objetivo.</strong><br>
-    Con tu colaboración hacés posible la elaboración de este locro y fortalecés el espíritu de nuestra escuela.<br>
-    <strong>Juntos podemos hacer la diferencia.</strong>
-  </p>
-</header>
-
-<div class="main">
-
-  <!-- FORMULARIO -->
-  <div class="container">
-    <form onsubmit="enviarDatos(event)">
-
-      <label>Nombre y apellido</label>
-      <input type="text" id="nombre" required>
-
-      <label>Teléfono</label>
-      <input type="number" id="telefono" required>
-
-      <label>Tipo</label>
-      <select id="tipo" onchange="mostrarCampos()" required>
-        <option value="">Seleccionar</option>
-        <option value="ingredientes">Ingredientes</option>
-        <option value="dinero">Dinero</option>
-        <option value="porciones">Porciones</option>
-      </select>
-
-      <div id="ingredientes" style="display:none;">
-        <label>Ingrediente</label>
-        <select id="ingrediente">
-          <option>Maíz</option>
-          <option>Porotos</option>
-          <option>Carne</option>
-          <option>Chorizo</option>
-          <option>Panceta</option>
-          <option>Zapallo</option>
-          <option>Cebolla</option>
-          <option>Condimentos</option>
-        </select>
-
-        <label>Cantidad (kg)</label>
-        <input type="number" id="cantidadKg" step="0.1">
-      </div>
-
-      <div id="dinero" style="display:none;">
-        <label>Monto</label>
-        <input type="number" id="monto">
-      </div>
-
-      <div id="porciones" style="display:none;">
-        <label>Porciones</label>
-        <input type="number" id="porcionesInput">
-      </div>
-
-      <button id="btnEnviar">Enviar</button>
-      <div class="mensaje" id="mensaje"></div>
-
-    </form>
-  </div>
-
-  <!-- ESTADO -->
-  <div class="container">
-    <h2>Estado de Ingredientes</h2>
-    <div id="estadoIngredientes"></div>
-  </div>
-
-</div>
-
-<script>
-
-// MAYÚSCULAS
-document.getElementById("nombre").addEventListener("input", function(){
-  this.value = this.value.toUpperCase();
-});
-
-// URLS
-const URL = "https://script.google.com/macros/s/AKfycbyHhEYb-cLtwJZ-TCHh_R_JJWnwHw_f_saudBEGTbUXcbXey2MgeFwP39iQdBOagosaYA/exec";
-
-// OBJETIVOS
-const objetivos = {
-  Maíz:10, Porotos:8, Carne:15, Chorizo:6,
-  Panceta:5, Zapallo:10, Cebolla:4, Condimentos:2
-};
-
-// UI HELPERS
-function mostrarMensaje(texto, color="white"){
-  const m = document.getElementById("mensaje");
-  m.innerText = texto;
-  m.style.color = color;
-  m.style.opacity = "1";
-
-  setTimeout(()=> m.style.opacity="0", 9000);
-  setTimeout(()=>{
-    m.innerText="";
-    m.style.opacity="1";
-  },10000);
-}
-
-// MOSTRAR CAMPOS
-function mostrarCampos(){
-  let tipo = document.getElementById("tipo").value;
-
-  document.getElementById("ingredientes").style.display="none";
-  document.getElementById("dinero").style.display="none";
-  document.getElementById("porciones").style.display="none";
-
-  if(tipo==="ingredientes") document.getElementById("ingredientes").style.display="block";
-  if(tipo==="dinero") document.getElementById("dinero").style.display="block";
-  if(tipo==="porciones") document.getElementById("porciones").style.display="block";
-}
-
-// ENVIAR
-async function enviarDatos(e){
-  e.preventDefault();
-
-  const boton = document.getElementById("btnEnviar");
-
-  const data = {
-    nombre: document.getElementById("nombre").value,
-    telefono: document.getElementById("telefono").value,
-    tipo: document.getElementById("tipo").value,
-    ingrediente: document.getElementById("ingrediente").value || "",
-    cantidadKg: parseFloat(document.getElementById("cantidadKg").value) || 0,
-    monto: document.getElementById("monto").value || "",
-    porciones: document.getElementById("porcionesInput").value || ""
-  };
-
-  // CONTROL INGREDIENTES
-  if(data.tipo==="ingredientes"){
-
-    let res = await fetch(URL);
-    let totales = await res.json();
-
-    let actual = totales[data.ingrediente] || 0;
-    let objetivo = objetivos[data.ingrediente] || 0;
-
-    if(actual >= objetivo){
-      mostrarMensaje(`❌ ${data.ingrediente} ya está completo. Elegí otro.`, "#ff4d4d");
-      return;
-    }
-
-    if(actual + data.cantidadKg > objetivo){
-      let falta = (objetivo - actual).toFixed(1);
-      mostrarMensaje(`⚠️ Solo faltan ${falta} kg de ${data.ingrediente}`, "#ffc107");
-      return;
-    }
-  }
-
-  // UI ENVÍO
-  boton.disabled = true;
-  boton.innerText = "Enviando...";
-  mostrarMensaje("⏳ Aguarde un instante...", "#ffc107");
-
-  await fetch(URL,{
-    method:"POST",
-    mode:"no-cors",
-    body:JSON.stringify(data)
-  });
-
-  mostrarMensaje("✅ Enviado... muchas gracias", "lightgreen");
-
-  document.querySelector("form").reset();
-  mostrarCampos();
-
-  setTimeout(cargarEstado,1000);
-
-  boton.disabled = false;
-  boton.innerText = "Enviar";
-}
-
-// ESTADO
-function cargarEstado(){
-  fetch(URL)
-  .then(res=>res.json())
-  .then(data=>{
-
-    let cont=document.getElementById("estadoIngredientes");
-    cont.innerHTML="";
-
-    for(let ing in objetivos){
-
-      let actual=data[ing]||0;
-      let objetivo=objetivos[ing];
-      let porcentaje=(actual/objetivo)*100;
-
-      let clase="falta";
-      let texto=`🔴 Falta ${ing}`;
-
-      if(porcentaje>=100){
-        clase="ok";
-        let sobra=actual-objetivo;
-        texto=sobra>0
-          ? `🟣 Sobra ${sobra.toFixed(1)} kg de ${ing}`
-          : `✅ ${ing} completo`;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Locro Solidario - IPEM 146</title>
+    <style>
+      /* GLOBAL */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-      else if(porcentaje>=60){
-        clase="medio";
-        texto=`⚠️ ${ing} ${porcentaje.toFixed(0)}%`;
+      body {
+        font-family: "Segoe UI", sans-serif;
+        color: #fff;
+        background:
+          linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+          url("locro.jpg") center/cover fixed no-repeat;
+        line-height: 1.5;
       }
 
-      cont.innerHTML+=`
-      <div class="estado-item ${clase}">
-        ${texto} (${actual}/${objetivo} kg)
-      </div>`;
-    }
+      /* HEADER */
+      header {
+        background: linear-gradient(135deg, #73d0ea, #085687);
+        color: white;
+        padding: 12px 8px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+      header h1 {
+        font-size: 32px;
+        color: #3a2af0;
+        margin-bottom: 8px;
+      }
+      header p {
+        font-size: 14px;
+        opacity: 0.9;
+      }
 
-  });
-}
+      /* COLUMNAS REFERENTES / INSTRUCCIONES */
+      .c {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 15px;
+        justify-content: center;
+      }
+      .column {
+        flex: 1 1 300px;
+        min-width: 280px;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
 
-// INIT
-cargarEstado();
-setInterval(cargarEstado,10000);
+      .alias {
+        color: #d63384;
+        font-weight: bold;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
 
-</script>
+      .instrucciones {
+        animation: zoomPulse 2s infinite alternate;
+      }
+      @keyframes zoomPulse {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(1.03);
+        }
+      }
 
-</body>
+      /* GRID FORMULARIO */
+      .main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        padding: 15px;
+      }
+      .container {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 18px;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .container:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      label {
+        display: block;
+        margin-top: 8px;
+        font-weight: 600;
+        font-size: 15px;
+      }
+      input,
+      select,
+      button {
+        width: 100%;
+        margin-top: 4px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+      }
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #3cdc10;
+        box-shadow: 0 0 10px rgba(103, 102, 102, 0.3);
+      }
+
+      button {
+        font-size: 18px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #1e8522, #34c759);
+        color: white;
+        cursor: pointer;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+      button:hover:not(:disabled) {
+        transform: scale(1.05);
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+      }
+      button:disabled {
+        background: #999;
+        cursor: not-allowed;
+      }
+
+      .mensaje {
+        text-align: center;
+        font-size: 18px;
+        margin-top: 8px;
+        transition: opacity 0.5s ease;
+      }
+      .estado-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px;
+        margin: 4px 0;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .ok {
+        background: #e6f4ea;
+        color: #1e7e34;
+      }
+      .medio {
+        background: #fff7e0;
+        color: #a07900;
+      }
+      .falta {
+        background: #fdecea;
+        color: #b02a37;
+      }
+
+      footer {
+        text-align: center;
+        padding: 12px;
+        font-size: 14px;
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        margin-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 700px) {
+        .main {
+          grid-template-columns: 1fr;
+        }
+        .c {
+          flex-direction: column;
+          gap: 15px;
+          padding: 10px;
+        }
+        header h1 {
+          font-size: 26px;
+        }
+        header p {
+          font-size: 13px;
+        }
+        label {
+          font-size: 14px;
+        }
+        button {
+          font-size: 16px;
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Gran Locro 10/05/2026 IPEM 146 "Centenario"</h1>
+      <p>
+        <strong
+          >Cada aporte, por pequeño que sea, suma para alcanzar un gran
+          objetivo.</strong
+        ><br />
+        Con tu colaboración hacés posible la elaboración de este locro y
+        fortalecés el espíritu de nuestra escuela.<br />
+        <strong>Juntos podemos hacer la diferencia.</strong>
+      </p>
+    </header>
+
+    <div class="c">
+      <div class="column card">
+        <h2>Referentes</h2>
+        <ul>
+          <li>Estela Molina (<span class="alias">alias: –</span>)</li>
+          <li>Yohana Vallejos (<span class="alias">alias: –</span>)</li>
+          <li>
+            Adriana Córdoba (<span class="alias">alias: adrianacordoba1203</span
+            >)
+          </li>
+        </ul>
+      </div>
+
+      <div class="column card instrucciones">
+        <h2>Instrucciones</h2>
+        <ul>
+          <li>
+            <strong>Dejar ingredientes donados</strong> y
+            <strong
+              >retirar las tarjetas de porciones en la dirección de la
+              escuela.</strong
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="container">
+        <form onsubmit="enviarDatos(event)">
+          <label>Nombre y apellido</label>
+          <input type="text" id="nombre" required />
+
+          <label>Teléfono</label>
+          <input type="number" id="telefono" required />
+
+          <label>Tipo</label>
+          <select id="tipo" onchange="mostrarCampos()" required>
+            <option value="">Seleccionar</option>
+            <option value="ingredientes">Ingredientes</option>
+            <option value="dinero">Dinero en efectivo o transferencia</option>
+            <option value="porciones">Porciones (Cantidad)</option>
+          </select>
+
+          <div id="ingredientes" style="display: none">
+            <label>Ingrediente</label>
+            <select id="ingrediente">
+              <option>Maíz</option>
+              <option>Porotos</option>
+              <option>Carne</option>
+              <option>Chorizo</option>
+              <option>Panceta</option>
+              <option>Zapallo</option>
+              <option>Cebolla</option>
+              <option>Condimentos</option>
+            </select>
+            <label>Cantidad (kg)</label>
+            <input type="number" id="cantidadKg" step="0.1" />
+          </div>
+
+          <div id="dinero" style="display: none">
+            <label>Monto</label>
+            <input type="number" id="monto" />
+          </div>
+
+          <div id="porciones" style="display: none">
+            <label>Porciones</label>
+            <input type="number" id="porcionesInput" />
+          </div>
+
+          <button id="btnEnviar">Enviar</button>
+          <div class="mensaje" id="mensaje"></div>
+        </form>
+      </div>
+
+      <div class="container">
+        <h2>Estado de Ingredientes</h2>
+        <div id="estadoIngredientes"></div>
+      </div>
+    </div>
+
+    <footer>© 2026 IPEM 146 "Centenario" – Gran Locro Solidario</footer>
+
+    <script>
+      // MAYÚSCULAS AUTOMÁTICAS
+      document.getElementById("nombre").addEventListener("input", function () {
+        this.value = this.value.toUpperCase();
+      });
+
+      const URL =
+        "https://script.google.com/macros/s/AKfycbyHhEYb-cLtwJZ-TCHh_R_JJWnwHw_f_saudBEGTbUXcbXey2MgeFwP39iQdBOagosaYA/exec";
+      const objetivos = {
+        Maíz: 10,
+        Porotos: 8,
+        Carne: 15,
+        Chorizo: 6,
+        Panceta: 5,
+        Zapallo: 10,
+        Cebolla: 4,
+        Condimentos: 2,
+      };
+
+      function mostrarMensaje(texto, color = "white") {
+        const m = document.getElementById("mensaje");
+        m.innerText = texto;
+        m.style.color = color;
+        m.style.opacity = "1";
+        setTimeout(() => (m.style.opacity = "0"), 9000);
+        setTimeout(() => {
+          m.innerText = "";
+          m.style.opacity = "1";
+        }, 10000);
+      }
+      function mostrarCampos() {
+        let tipo = document.getElementById("tipo").value;
+        document.getElementById("ingredientes").style.display = "none";
+        document.getElementById("dinero").style.display = "none";
+        document.getElementById("porciones").style.display = "none";
+        if (tipo === "ingredientes")
+          document.getElementById("ingredientes").style.display = "block";
+        if (tipo === "dinero")
+          document.getElementById("dinero").style.display = "block";
+        if (tipo === "porciones")
+          document.getElementById("porciones").style.display = "block";
+      }
+      async function enviarDatos(e) {
+        e.preventDefault();
+        const boton = document.getElementById("btnEnviar");
+        const data = {
+          nombre: document.getElementById("nombre").value,
+          telefono: document.getElementById("telefono").value,
+          tipo: document.getElementById("tipo").value,
+          ingrediente:
+            document.getElementById("tipo").value === "ingredientes"
+              ? document.getElementById("ingrediente").value
+              : "",
+          cantidadKg:
+            document.getElementById("tipo").value === "ingredientes"
+              ? parseFloat(document.getElementById("cantidadKg").value) || 0
+              : 0,
+          monto:
+            document.getElementById("tipo").value === "dinero"
+              ? document.getElementById("monto").value || ""
+              : "",
+          porciones:
+            document.getElementById("tipo").value === "porciones"
+              ? document.getElementById("porcionesInput").value || ""
+              : "",
+        };
+
+        if (data.tipo === "ingredientes") {
+          let res = await fetch(URL);
+          let totales = await res.json();
+          let actual = totales[data.ingrediente] || 0;
+          let objetivo = objetivos[data.ingrediente] || 0;
+          if (actual >= objetivo) {
+            mostrarMensaje(
+              `❌ ${data.ingrediente} ya está completo. Elegí otro.`,
+              "#ff4d4d",
+            );
+            return;
+          }
+          if (actual + data.cantidadKg > objetivo) {
+            let falta = (objetivo - actual).toFixed(1);
+            mostrarMensaje(
+              `⚠️ Solo faltan ${falta} kg de ${data.ingrediente}`,
+              "#ffc107",
+            );
+            return;
+          }
+        }
+
+        boton.disabled = true;
+        boton.innerText = "Enviando...";
+        mostrarMensaje("⏳ Aguarde un instante...", "#ffc107");
+        await fetch(URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify(data),
+        });
+        mostrarMensaje("✅ Enviado... muchas gracias", "lightgreen");
+        document.querySelector("form").reset();
+        mostrarCampos();
+        setTimeout(cargarEstado, 1000);
+        boton.disabled = false;
+        boton.innerText = "Enviar";
+      }
+
+      function cargarEstado() {
+        fetch(URL)
+          .then((res) => res.json())
+          .then((data) => {
+            let cont = document.getElementById("estadoIngredientes");
+            cont.innerHTML = "";
+            for (let ing in objetivos) {
+              let actual = data[ing] || 0;
+              let objetivo = objetivos[ing];
+              let porcentaje = (actual / objetivo) * 100;
+              let clase = "falta";
+              let texto = `🔴 Falta ${ing}`;
+              if (porcentaje >= 100) {
+                clase = "ok";
+                let sobra = actual - objetivo;
+                texto =
+                  sobra > 0
+                    ? `🟣 Sobra ${sobra.toFixed(1)} kg de ${ing}`
+                    : `✅ ${ing} completo`;
+              } else if (porcentaje >= 60) {
+                clase = "medio";
+                texto = `⚠️ ${ing} ${porcentaje.toFixed(0)}%`;
+              }
+              cont.innerHTML += `<div class="estado-item ${clase}">${texto} (${actual}/${objetivo} kg)</div>`;
+            }
+          });
+      }
+
+      cargarEstado();
+      setInterval(cargarEstado, 10000);
+    </script>
+  </body>
 </html>

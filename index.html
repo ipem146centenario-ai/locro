@@ -251,7 +251,7 @@ button:disabled {
               <option>Gas (garrafas de 10kg)</option>
             </select>
 
-            <input type="number" id="cantidadKg" placeholder="Cantidad" />
+            <input type="number" id="cantidadKg" placeholder="Cantidad (Kg - litros - atados - bolsa)" />
           </div>
 
           <div id="dinero" style="display: none">
@@ -426,7 +426,7 @@ mostrarMensaje("✅ Enviado correctamente Muchas Gracias 👌​","lightgreen");
 document.querySelector("form").reset();
 mostrarCampos();
 
-setTimeout(cargarEstado,1000);
+setTimeout(cargarEstado,100);
 
 }catch{
 mostrarMensaje("❌ Error al enviar","#ff4d4d");

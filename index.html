@@ -411,6 +411,11 @@ footer {
           "Ají molido": 1,
           "Gas (garrafas de 10kg)": 5
         };
+        const unidades = {
+  "Cebolla de verdeo": "atados",
+  "Aceite": "litros",
+  "Gas": "unidades"
+};
 
       function mostrarMensaje(texto, color = "white") {
         const m = document.getElementById("mensaje");
@@ -499,33 +504,53 @@ footer {
       }
 
       function cargarEstado() {
-        fetch(URL)
-          .then((res) => res.json())
-          .then((data) => {
-            let cont = document.getElementById("estadoIngredientes");
-            cont.innerHTML = "";
-            for (let ing in objetivos) {
-              let actual = data[ing] || 0;
-              let objetivo = objetivos[ing];
-              let porcentaje = (actual / objetivo) * 100;
-              let clase = "falta";
-              let texto = `🔴 Falta ${ing}`;
-              if (porcentaje >= 100) {
-                clase = "ok";
-                let sobra = actual - objetivo;
-                texto =
-                  sobra > 0
-                    ? `🟣 Sobra ${sobra.toFixed(1)} kg de ${ing}`
-                    : `✅ ${ing} completo`;
-              } else if (porcentaje >= 60) {
-                clase = "medio";
-                texto = `⚠️ ${ing} ${porcentaje.toFixed(0)}%`;
-              }
-              cont.innerHTML += `<div class="estado-item ${clase}">${texto} (${actual}/${objetivo} kg)</div>`;
-            }
-          });
-      }
+  fetch(URL)
+    .then((res) => {
+      if (!res.ok) throw new Error("Error al obtener datos");
+      return res.json();
+    })
+    .then((data) => {
+      const cont = document.getElementById("estadoIngredientes");
+      cont.innerHTML = "";
 
+      Object.keys(objetivos).forEach((ing) => {
+        const actual = data[ing] || 0;
+        const objetivo = objetivos[ing];
+        const porcentaje = (actual / objetivo) * 100;
+
+        // 👉 unidad según ingrediente
+        const unidad = unidades[ing] || "";
+
+        let clase = "";
+        let texto = "";
+
+        if (porcentaje >= 100) {
+          clase = "ok";
+          const sobra = actual - objetivo;
+          texto = sobra > 0
+            ? `🟣 Sobra ${sobra.toFixed(1)} ${unidad} de ${ing}`
+            : `✅ ${ing} completo`;
+        } else if (porcentaje >= 60) {
+          clase = "medio";
+          texto = `⚠️ ${ing} ${porcentaje.toFixed(0)}%`;
+        } else {
+          clase = "falta";
+          texto = `🔴 Falta ${ing}`;
+        }
+
+        const div = document.createElement("div");
+        div.className = `estado-item ${clase}`;
+        div.textContent = `${texto} (${actual}/${objetivo} ${unidad})`;
+
+        cont.appendChild(div);
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+      document.getElementById("estadoIngredientes").innerHTML =
+        "❌ Error al cargar datos";
+    });
+}
       cargarEstado();
       setInterval(cargarEstado, 10000);
     </script>

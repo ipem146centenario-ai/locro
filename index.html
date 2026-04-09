@@ -246,6 +246,16 @@ footer {
   button {
     font-size: 15px;
   }
+  .mensaje.grande {
+  font-size: 26px;
+  font-weight: bold;
+  animation: zoom 0.3s ease;
+}
+
+@keyframes zoom {
+  from { transform: scale(0.8); }
+  to { transform: scale(1); }
+}
 }
 </style>
   </head>
@@ -285,9 +295,6 @@ footer {
     </li>
     <li>
       Elegí cómo querés colaborar (ingredientes, dinero o porciones).
-    </li>
-    <li>
-        Si es ingredientes verifica su ESTADO (aguarda un instante se actualizara)
     </li>
   </ul>
 
@@ -372,21 +379,17 @@ footer {
       <div class="container">
         <h2>Estado de Ingredientes</h2>
         <div id="estadoIngredientes"></div>
-        <div class="mensaje">
-         
-          ⏳ Cargando estado de ingredientes...
-        </div>
       </div>
     </div>
 
-    <footer>© 2026 IPEM 146 "Centenario" – Gran Locro – Diseño y Programación Dpto. Informática</footer>
+    <footer>© 2026 IPEM 146 "Centenario" – Gran Locro Solidario</footer>
 
     <script>
       // MAYÚSCULAS AUTOMÁTICAS
       document.getElementById("nombre").addEventListener("input", function () {
         this.value = this.value.toUpperCase();
       });
-
+      let enviando = false;
       const URL =
         "https://script.google.com/macros/s/AKfycbyHhEYb-cLtwJZ-TCHh_R_JJWnwHw_f_saudBEGTbUXcbXey2MgeFwP39iQdBOagosaYA/exec";
     const objetivos = {
@@ -411,11 +414,6 @@ footer {
           "Ají molido": 1,
           "Gas (garrafas de 10kg)": 5
         };
-        const unidades = {
-  "Cebolla de verdeo": "atados",
-  "Aceite": "litros",
-  "Gas": "unidades"
-};
 
       function mostrarMensaje(texto, color = "white") {
         const m = document.getElementById("mensaje");
@@ -440,117 +438,122 @@ footer {
         if (tipo === "porciones")
           document.getElementById("porciones").style.display = "block";
       }
-      async function enviarDatos(e) {
-        e.preventDefault();
-        const boton = document.getElementById("btnEnviar");
-        const data = {
-          nombre: document.getElementById("nombre").value,
-          telefono: document.getElementById("telefono").value,
-          tipo: document.getElementById("tipo").value,
-          ingrediente:
-            document.getElementById("tipo").value === "ingredientes"
-              ? document.getElementById("ingrediente").value
-              : "",
-          cantidadKg:
-            document.getElementById("tipo").value === "ingredientes"
-              ? parseFloat(document.getElementById("cantidadKg").value) || 0
-              : 0,
-          monto:
-            document.getElementById("tipo").value === "dinero"
-              ? document.getElementById("monto").value || ""
-              : "",
-          porciones:
-            document.getElementById("tipo").value === "porciones"
-              ? document.getElementById("porcionesInput").value || ""
-              : "",
-        };
+     async function enviarDatos(e) {
+  e.preventDefault();
 
-        if (data.tipo === "ingredientes") {
-          let res = await fetch(URL);
-          let totales = await res.json();
-          let actual = totales[data.ingrediente] || 0;
-          let objetivo = objetivos[data.ingrediente] || 0;
-          if (actual >= objetivo) {
-            mostrarMensaje(
-              `❌ ${data.ingrediente} ya está completo. Elegí otro.`,
-              "#ff4d4d",
-            );
-            return;
-          }
-          if (actual + data.cantidadKg > objetivo) {
-            let falta = (objetivo - actual).toFixed(1);
-            mostrarMensaje(
-              `⚠️ Solo faltan ${falta} kg de ${data.ingrediente}`,
-              "#ffc107",
-            );
-            return;
-          }
-        }
+  // 🚫 EVITA DOBLE ENVÍO
+  if (enviando) {
+   mostrarMensaje("⚠️ Ya se está enviando, esperá...", "#ffc107", true);
+    return;
+  }
 
-        boton.disabled = true;
-        boton.innerText = "Enviando...";
-        mostrarMensaje("⏳ Aguarde un instante...", "#ffc107");
-        await fetch(URL, {
-          method: "POST",
-          mode: "no-cors",
-          body: JSON.stringify(data),
-        });
-        mostrarMensaje("✅ Enviado... muchas gracias", "lightgreen");
-        document.querySelector("form").reset();
-        mostrarCampos();
-        setTimeout(cargarEstado, 1000);
-        boton.disabled = false;
-        boton.innerText = "Enviar";
+  enviando = true;
+
+  const boton = document.getElementById("btnEnviar");
+
+  try {
+    const data = {
+      nombre: document.getElementById("nombre").value,
+      telefono: document.getElementById("telefono").value,
+      tipo: document.getElementById("tipo").value,
+      ingrediente:
+        document.getElementById("tipo").value === "ingredientes"
+          ? document.getElementById("ingrediente").value
+          : "",
+      cantidadKg:
+        document.getElementById("tipo").value === "ingredientes"
+          ? parseFloat(document.getElementById("cantidadKg").value) || 0
+          : 0,
+      monto:
+        document.getElementById("tipo").value === "dinero"
+          ? document.getElementById("monto").value || ""
+          : "",
+      porciones:
+        document.getElementById("tipo").value === "porciones"
+          ? document.getElementById("porcionesInput").value || ""
+          : "",
+    };
+
+    // VALIDACIÓN DE INGREDIENTES
+    if (data.tipo === "ingredientes") {
+      let res = await fetch(URL);
+      let totales = await res.json();
+      let actual = totales[data.ingrediente] || 0;
+      let objetivo = objetivos[data.ingrediente] || 0;
+
+      if (actual >= objetivo) {
+        mostrarMensaje(
+          `❌ ${data.ingrediente} ya está completo. Elegí otro.`,
+          "#ff4d4d"
+        );
+        return;
       }
 
-      function cargarEstado() {
-  fetch(URL)
-    .then((res) => {
-      if (!res.ok) throw new Error("Error al obtener datos");
-      return res.json();
-    })
-    .then((data) => {
-      const cont = document.getElementById("estadoIngredientes");
-      cont.innerHTML = "";
+      if (actual + data.cantidadKg > objetivo) {
+        let falta = (objetivo - actual).toFixed(1);
+        mostrarMensaje(
+          `⚠️ Solo faltan ${falta} kg de ${data.ingrediente}`,
+          "#ffc107"
+        );
+        return;
+      }
+    }
 
-      Object.keys(objetivos).forEach((ing) => {
-        const actual = data[ing] || 0;
-        const objetivo = objetivos[ing];
-        const porcentaje = (actual / objetivo) * 100;
+    boton.disabled = true;
+    boton.innerText = "Enviando...";
+    mostrarMensaje("⏳ Aguarde un instante...", "#ffc107");
 
-        // 👉 unidad según ingrediente
-        const unidad = unidades[ing] || "";
-
-        let clase = "";
-        let texto = "";
-
-        if (porcentaje >= 100) {
-          clase = "ok";
-          const sobra = actual - objetivo;
-          texto = sobra > 0
-            ? `🟣 Sobra ${sobra.toFixed(1)} ${unidad} de ${ing}`
-            : `✅ ${ing} completo`;
-        } else if (porcentaje >= 60) {
-          clase = "medio";
-          texto = `⚠️ ${ing} ${porcentaje.toFixed(0)}%`;
-        } else {
-          clase = "falta";
-          texto = `🔴 Falta ${ing}`;
-        }
-
-        const div = document.createElement("div");
-        div.className = `estado-item ${clase}`;
-        div.textContent = `${texto} (${actual}/${objetivo} ${unidad})`;
-
-        cont.appendChild(div);
-      });
-    })
-    .catch((error) => {
-      console.error(error);
-      document.getElementById("estadoIngredientes").innerHTML =
-        "❌ Error al cargar datos";
+    await fetch(URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(data),
     });
+
+    mostrarMensaje("✅ Enviado... muchas gracias", "lightgreen");
+    document.querySelector("form").reset();
+    mostrarCampos();
+    setTimeout(cargarEstado, 1000);
+
+  } catch (error) {
+    console.error(error);
+    mostrarMensaje("❌ Error al enviar", "#ff4d4d");
+
+  } finally {
+    // 🔓 SIEMPRE DESBLOQUEA
+    enviando = false;
+    boton.disabled = false;
+    boton.innerText = "Enviar";
+  }
 }
+
+      function cargarEstado() {
+        fetch(URL)
+          .then((res) => res.json())
+          .then((data) => {
+            let cont = document.getElementById("estadoIngredientes");
+            cont.innerHTML = "";
+            for (let ing in objetivos) {
+              let actual = data[ing] || 0;
+              let objetivo = objetivos[ing];
+              let porcentaje = (actual / objetivo) * 100;
+              let clase = "falta";
+              let texto = `🔴 Falta ${ing}`;
+              if (porcentaje >= 100) {
+                clase = "ok";
+                let sobra = actual - objetivo;
+                texto =
+                  sobra > 0
+                    ? `🟣 Sobra ${sobra.toFixed(1)} kg de ${ing}`
+                    : `✅ ${ing} completo`;
+              } else if (porcentaje >= 60) {
+                clase = "medio";
+                texto = `⚠️ ${ing} ${porcentaje.toFixed(0)}%`;
+              }
+              cont.innerHTML += `<div class="estado-item ${clase}">${texto} (${actual}/${objetivo} kg)</div>`;
+            }
+          });
+      }
+
       cargarEstado();
       setInterval(cargarEstado, 10000);
     </script>

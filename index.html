@@ -4,263 +4,162 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Locro Solidario - IPEM 146</title>
+
     <style>
-/* GLOBAL */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+      /* GLOBAL */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-body {
-  font-family: "Segoe UI", sans-serif;
-  color: #fff;
-  line-height: 1.5;
-  background:
-    linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-    url("locro.jpg") center/cover fixed no-repeat;
-}
+      body {
+        font-family: "Segoe UI", sans-serif;
+        color: #fff;
+        background:
+          linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+          url("locro.jpg") center/cover fixed no-repeat;
+      }
 
-/* HEADER */
-header {
-  background: linear-gradient(135deg, #73d0ea, #085687);
-  text-align: center;
-  padding: 15px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-}
+      /* HEADER */
+      header {
+        background: linear-gradient(135deg, #73d0ea, #085687);
+        text-align: center;
+        padding: 15px;
+      }
 
-header h1 {
-  font-size: 32px;
-  color: #ffffff; /* mejor contraste */
-  margin-bottom: 8px;
-}
+      header h1 {
+        font-size: 32px;
+      }
 
-header p {
-  font-size: 14px;
-  opacity: 0.9;
-}
+      /* COLUMNAS */
+      .c {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 15px;
+      }
 
-/* COLUMNAS */
-.c {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding: 15px;
-  justify-content: center;
-}
+      .column {
+        flex: 1 1 300px;
+      }
 
-.column {
-  flex: 1 1 300px;
-  min-width: 280px;
-}
+      /* TARJETAS */
+      .card {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 16px;
+        border-radius: 12px;
+        backdrop-filter: blur(6px);
+        transition: 0.3s;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+      }
 
-/* TARJETAS */
-.card {
-  background: rgba(255,255,255,0.15);
-  padding: 16px;
-  border-radius: 12px;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  transition: all 0.3s ease;
-}
+      .alias {
+        color: #ffe600;
+        font-weight: bold;
+      }
 
-.card:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-}
+      /* BLOQUE */
+      .a {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 15px;
+        margin-top: 10px;
+        border-radius: 10px;
+      }
 
-/* TEXTO */
-h2 {
-  color: #ffffff;
-  margin-bottom: 10px;
-}
+      /* GRID */
+      .main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        padding: 15px;
+      }
 
-ul {
-  margin-top: 10px;
-  padding-left: 18px;
-  font-size: 30px;
-}
+      /* FORM */
+      .container {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        border-radius: 12px;
+      }
 
-/* ALIAS */
-.alias {
-  color: #ffe600;
-  font-weight: bold;
-}
+      input,
+      select,
+      button {
+        width: 100%;
+        margin-top: 5px;
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+      }
 
-/* BLOQUE OPCIONES */
-.a {
-  border: 2px solid rgba(255,255,255,0.3);
-  padding: 20px;
-  border-radius: 10px;
-  margin-top: 15px;
-  background: rgba(255,255,255,0.1);
-}
+      button {
+        background: linear-gradient(135deg, #1e8522, #34c759);
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+      }
 
-.gracias {
-  margin-top: 15px;
-  font-weight: bold;
-  color: #00ffae;
-  font-size: 16px;
-  text-align: center;
-}
+      button:disabled {
+        background: #999;
+      }
 
-/* ANIMACIÓN SUAVE */
-.instrucciones {
-  animation: zoomPulse 2s infinite alternate;
-}
+      /* MENSAJE */
+      .mensaje {
+        text-align: center;
+        margin-top: 10px;
+      }
 
-@keyframes zoomPulse {
-  from { transform: scale(1); }
-  to { transform: scale(1.03); }
-}
+      /* ESTADO */
+      .estado-item {
+        padding: 10px;
+        margin: 6px 0;
+        border-radius: 10px;
+      }
 
-/* GRID */
-.main {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 15px;
-}
+      .ok {
+        background: #2ecc71;
+      }
+      .medio {
+        background: #f1c40f;
+        color: #000;
+      }
+      .falta {
+        background: #e74c3c;
+      }
 
-/* FORM */
-.container {
-  background: rgba(255,255,255,0.2);
-  padding: 18px;
-  border-radius: 12px;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-  transition: 0.3s;
-}
+      /* BARRA */
+      .barra {
+        height: 10px;
+        background: #333;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 5px;
+      }
 
-.container:hover {
-  transform: translateY(-4px);
-}
-
-/* INPUTS */
-label {
-  display: block;
-  margin-top: 10px;
-  font-weight: 600;
-}
-
-input,
-select,
-button {
-  width: 100%;
-  margin-top: 5px;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  font-size: 14px;
-}
-
-/* FOCUS */
-input:focus,
-select:focus {
-  outline: none;
-  box-shadow: 0 0 8px rgba(0,255,150,0.5);
-}
-
-/* BOTÓN */
-button {
-  margin-top: 15px;
-  font-size: 16px;
-  font-weight: bold;
-  background: linear-gradient(135deg, #1e8522, #34c759);
-  color: white;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-button:hover:not(:disabled) {
-  transform: scale(1.05);
-}
-
+      .progreso {
+        height: 100%;
+        background: linear-gradient(90deg, #00ffae, #2ecc71);
+        transition: 0.5s;
+      }
 button:disabled {
-  background: #999;
-  cursor: not-allowed;
+  opacity: 0.7;
+  cursor: wait;
 }
-
-/* MENSAJE */
-.mensaje {
-  text-align: center;
-  font-size: 16px;
-  margin-top: 10px;
-}
-
-/* ESTADO */
-.estado-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px;
-  margin: 4px 0;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.ok {
-  background: #2ecc71;
-  color: #fff;
-}
-
-.medio {
-  background: #f1c40f;
-  color: #000;
-}
-
-.falta {
-  background: #e74c3c;
-  color: #fff;
-}
-
-/* FOOTER */
-footer {
-  text-align: center;
-  padding: 12px;
-  font-size: 14px;
-  background: rgba(0,0,0,0.5);
-  margin-top: 20px;
-}
-
-/* RESPONSIVE */
-@media (max-width: 700px) {
-  .main {
-    grid-template-columns: 1fr;
-  }
-
-  .c {
-    flex-direction: column;
-    padding: 10px;
-  }
-
-  header h1 {
-    font-size: 26px;
-  }
-
-  header p {
-    font-size: 13px;
-  }
-
-  button {
-    font-size: 15px;
-  }
-  .mensaje.grande {
-  font-size: 26px;
-  font-weight: bold;
-  animation: zoom 0.3s ease;
-}
-
-@keyframes zoom {
-  from { transform: scale(0.8); }
-  to { transform: scale(1); }
-}
-}
-</style>
+      @media (max-width: 700px) {
+        .main {
+          grid-template-columns: 1fr;
+        }
+        .c {
+          flex-direction: column;
+        }
+      }
+    </style>
   </head>
+
   <body>
-    <header>
+   <header>
       <h1>Gran Locro 10/05/2026 IPEM 146 "Centenario"</h1>
       <h3>
         <strong
@@ -273,7 +172,7 @@ footer {
       </h3>
     </header>
 
-    <div class="c">
+  <div class="c">
       <div class="column card">
         <h2>Referentes</h2>
         <ul>
@@ -318,22 +217,17 @@ footer {
     <div class="main">
       <div class="container">
         <form onsubmit="enviarDatos(event)">
-          <label>Nombre y apellido</label>
-          <input type="text" id="nombre" required />
+          <input id="nombre" placeholder="Nombre" required />
+          <input type="number" id="telefono" placeholder="Teléfono" required />
 
-          <label>Teléfono</label>
-          <input type="number" id="telefono" required />
-
-          <label>Tipo</label>
           <select id="tipo" onchange="mostrarCampos()" required>
-            <option value="">Seleccionar</option>
+            <option value="">Tipo</option>
             <option value="ingredientes">Ingredientes</option>
-            <option value="dinero">Dinero en efectivo o transferencia</option>
-            <option value="porciones">Porciones (Cantidad)</option>
+            <option value="dinero">Dinero</option>
+            <option value="porciones">Porciones</option>
           </select>
 
           <div id="ingredientes" style="display: none">
-            <label>Ingrediente</label>
             <select id="ingrediente">
               <option>Maíz</option>
               <option>Porotos</option>
@@ -357,18 +251,15 @@ footer {
               <option>Gas (garrafas de 10kg)</option>
             </select>
 
-            <label id="labelCantidad">Cantidad (kg,litros, bolsas o atados excepto garrafas que es cantidad)</label>
-            <input type="number" id="cantidadKg" step="0.1" />
+            <input type="number" id="cantidadKg" placeholder="Cantidad" />
           </div>
 
           <div id="dinero" style="display: none">
-            <label>Monto</label>
-            <input type="number" id="monto" />
+            <input type="number" id="monto" placeholder="Monto" />
           </div>
 
           <div id="porciones" style="display: none">
-            <label>Porciones</label>
-            <input type="number" id="porcionesInput" />
+            <input type="number" id="porcionesInput" placeholder="Cantidad" />
           </div>
 
           <button id="btnEnviar">Enviar</button>
@@ -382,180 +273,201 @@ footer {
       </div>
     </div>
 
-    <footer>© 2026 IPEM 146 "Centenario" – Gran Locro Solidario</footer>
+    <footer style="text-align: center; padding: 10px">© 2026 IPEM 146</footer>
 
-    <script>
-      // MAYÚSCULAS AUTOMÁTICAS
-      document.getElementById("nombre").addEventListener("input", function () {
-        this.value = this.value.toUpperCase();
-      });
-      let enviando = false;
-      const URL =
-        "https://script.google.com/macros/s/AKfycbyHhEYb-cLtwJZ-TCHh_R_JJWnwHw_f_saudBEGTbUXcbXey2MgeFwP39iQdBOagosaYA/exec";
-    const objetivos = {
-          "Maíz": 60,
-          "Porotos": 50,
-          "Chorizos": 20,
-          "Zapallo criollo": 80,
-          "Falda": 60,
-          "Carnaza": 50,
-          "Carne de cerdo (paleta)": 60,
-          "Cueritos de cerdo": 25,
-          "Mondongo": 50,
-          "Cebolla": 1, // (aclarar unidad: bolsa/bulto)
-          "Cebolla de verdeo (atados)": 10,
-          "Aceite (litros)": 20,
-          "Queso cremoso (hormas)": 3,
-          "Grasa de cerdo": 5,
-          "Sal gruesa": 5,
-          "Pimienta": 0.5,
-          "Pimentón": 0.5,
-          "Orégano": 0.5,
-          "Ají molido": 1,
-          "Gas (garrafas de 10kg)": 5
-        };
+<script>
+nombre.addEventListener("input",()=>nombre.value=nombre.value.toUpperCase());
 
-      function mostrarMensaje(texto, color = "white") {
-        const m = document.getElementById("mensaje");
-        m.innerText = texto;
-        m.style.color = color;
-        m.style.opacity = "1";
-        setTimeout(() => (m.style.opacity = "0"), 9000);
-        setTimeout(() => {
-          m.innerText = "";
-          m.style.opacity = "1";
-        }, 10000);
-      }
-      function mostrarCampos() {
-        let tipo = document.getElementById("tipo").value;
-        document.getElementById("ingredientes").style.display = "none";
-        document.getElementById("dinero").style.display = "none";
-        document.getElementById("porciones").style.display = "none";
-        if (tipo === "ingredientes")
-          document.getElementById("ingredientes").style.display = "block";
-        if (tipo === "dinero")
-          document.getElementById("dinero").style.display = "block";
-        if (tipo === "porciones")
-          document.getElementById("porciones").style.display = "block";
-      }
-     async function enviarDatos(e) {
-  e.preventDefault();
+const URL="https://script.google.com/macros/s/AKfycbyHhEYb-cLtwJZ-TCHh_R_JJWnwHw_f_saudBEGTbUXcbXey2MgeFwP39iQdBOagosaYA/exec";
 
-  // 🚫 EVITA DOBLE ENVÍO
-  if (enviando) {
-   mostrarMensaje("⚠️ Ya se está enviando, esperá...", "#ffc107", true);
-    return;
-  }
+const objetivos={
+Maíz:60,
+Porotos:50,
+Chorizos:20,
+"Zapallo criollo":80,
+Falda:60,
+Carnaza:50,
+"Carne de cerdo (paleta)":60,
+"Cueritos de cerdo":25,
+Mondongo:50,
+"Cebolla (1 bolsa)":1,
+"Cebolla de verdeo (atados)":10,
+"Aceite (litros)":20,
+"Queso cremoso (hormas)":3,
+"Grasa de cerdo":5,
+"Sal gruesa":5,
+Pimienta:0.5,
+Pimentón:0.5,
+Orégano:0.5,
+"Ají molido":1,
+"Gas (garrafas de 10kg)":5
+};
 
-  enviando = true;
-
-  const boton = document.getElementById("btnEnviar");
-
-  try {
-    const data = {
-      nombre: document.getElementById("nombre").value,
-      telefono: document.getElementById("telefono").value,
-      tipo: document.getElementById("tipo").value,
-      ingrediente:
-        document.getElementById("tipo").value === "ingredientes"
-          ? document.getElementById("ingrediente").value
-          : "",
-      cantidadKg:
-        document.getElementById("tipo").value === "ingredientes"
-          ? parseFloat(document.getElementById("cantidadKg").value) || 0
-          : 0,
-      monto:
-        document.getElementById("tipo").value === "dinero"
-          ? document.getElementById("monto").value || ""
-          : "",
-      porciones:
-        document.getElementById("tipo").value === "porciones"
-          ? document.getElementById("porcionesInput").value || ""
-          : "",
-    };
-
-    // VALIDACIÓN DE INGREDIENTES
-    if (data.tipo === "ingredientes") {
-      let res = await fetch(URL);
-      let totales = await res.json();
-      let actual = totales[data.ingrediente] || 0;
-      let objetivo = objetivos[data.ingrediente] || 0;
-
-      if (actual >= objetivo) {
-        mostrarMensaje(
-          `❌ ${data.ingrediente} ya está completo. Elegí otro.`,
-          "#ff4d4d"
-        );
-        return;
-      }
-
-      if (actual + data.cantidadKg > objetivo) {
-        let falta = (objetivo - actual).toFixed(1);
-        mostrarMensaje(
-          `⚠️ Solo faltan ${falta} kg de ${data.ingrediente}`,
-          "#ffc107"
-        );
-        return;
-      }
-    }
-
-    boton.disabled = true;
-    boton.innerText = "Enviando...";
-    mostrarMensaje("⏳ Aguarde un instante...", "#ffc107");
-
-    await fetch(URL, {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify(data),
-    });
-
-    mostrarMensaje("✅ Enviado... muchas gracias", "lightgreen");
-    document.querySelector("form").reset();
-    mostrarCampos();
-    setTimeout(cargarEstado, 1000);
-
-  } catch (error) {
-    console.error(error);
-    mostrarMensaje("❌ Error al enviar", "#ff4d4d");
-
-  } finally {
-    // 🔓 SIEMPRE DESBLOQUEA
-    enviando = false;
-    boton.disabled = false;
-    boton.innerText = "Enviar";
-  }
+function mostrarMensaje(t,c="white"){
+mensaje.innerText=t;
+mensaje.style.color=c;
 }
 
-      function cargarEstado() {
-        fetch(URL)
-          .then((res) => res.json())
-          .then((data) => {
-            let cont = document.getElementById("estadoIngredientes");
-            cont.innerHTML = "";
-            for (let ing in objetivos) {
-              let actual = data[ing] || 0;
-              let objetivo = objetivos[ing];
-              let porcentaje = (actual / objetivo) * 100;
-              let clase = "falta";
-              let texto = `🔴 Falta ${ing}`;
-              if (porcentaje >= 100) {
-                clase = "ok";
-                let sobra = actual - objetivo;
-                texto =
-                  sobra > 0
-                    ? `🟣 Sobra ${sobra.toFixed(1)} kg de ${ing}`
-                    : `✅ ${ing} completo`;
-              } else if (porcentaje >= 60) {
-                clase = "medio";
-                texto = `⚠️ ${ing} ${porcentaje.toFixed(0)}%`;
-              }
-              cont.innerHTML += `<div class="estado-item ${clase}">${texto} (${actual}/${objetivo} )</div>`;
-            }
-          });
-      }
+function mostrarCampos(){
+ingredientes.style.display="none";
+dinero.style.display="none";
+porciones.style.display="none";
 
-      cargarEstado();
-      setInterval(cargarEstado, 10000);
-    </script>
+if(tipo.value==="ingredientes")ingredientes.style.display="block";
+if(tipo.value==="dinero")dinero.style.display="block";
+if(tipo.value==="porciones")porciones.style.display="block";
+}
+
+/* 🔥 EVENTOS (FUERA DE enviarDatos) */
+ingrediente.addEventListener("change",actualizarMaximo);
+cantidadKg.addEventListener("input",controlarMaximo);
+
+async function actualizarMaximo(){
+try{
+let res=await fetch(URL);
+let data=await res.json();
+
+let ing=ingrediente.value;
+let actual=data[ing]||0;
+let obj=objetivos[ing]||0;
+let falta=obj-actual;
+
+if(falta<=0){
+cantidadKg.max=0;
+mostrarMensaje(`❌ ${ing} completo`,"#ff4d4d");
+}else{
+cantidadKg.max=falta;
+cantidadKg.placeholder=`Máx: ${falta.toFixed(1)}`;
+}
+}catch{}
+}
+
+function controlarMaximo(){
+let max=parseFloat(cantidadKg.max)||0;
+
+if(max>0 && parseFloat(cantidadKg.value)>max){
+cantidadKg.value=max;
+mostrarMensaje(`⚠️ Máximo: ${max.toFixed(1)}`,"#ffc107");
+}
+}
+
+/* 🔥 ENVIAR */
+async function enviarDatos(e){
+e.preventDefault();
+
+let data={
+nombre:nombre.value.trim(),
+telefono:telefono.value.trim(),
+tipo:tipo.value,
+ingrediente:tipo.value==="ingredientes"?ingrediente.value:"",
+cantidadKg:parseFloat(cantidadKg.value)||0,
+monto:parseFloat(monto.value)||0,
+porciones:parseInt(porcionesInput.value)||0
+};
+
+/* VALIDACIÓN */
+if(!data.nombre || !data.telefono || !data.tipo){
+mostrarMensaje("⚠️ Completá todos los campos","#ffc107");
+return;
+}
+
+/* CONTROL INGREDIENTES */
+if(data.tipo==="ingredientes"){
+
+if(data.cantidadKg<=0){
+mostrarMensaje("⚠️ Ingresá cantidad válida","#ffc107");
+return;
+}
+
+try{
+let res=await fetch(URL);
+let totales=await res.json();
+
+let actual=totales[data.ingrediente]||0;
+let objetivo=objetivos[data.ingrediente]||0;
+let falta=objetivo-actual;
+
+if(falta<=0){
+mostrarMensaje(`❌ ${data.ingrediente} completo`,"#ff4d4d");
+return;
+}
+
+if(data.cantidadKg>falta){
+mostrarMensaje(`⚠️ Máximo permitido: ${falta.toFixed(1)}`,"#ffc107");
+cantidadKg.value=falta.toFixed(1);
+return;
+}
+
+}catch{
+mostrarMensaje("❌ Error al verificar","#ff4d4d");
+return;
+}
+}
+
+/* 🔥 INDICAR ENVÍO */
+btnEnviar.disabled = true;
+btnEnviar.innerText = "⏳ Enviando...";
+btnEnviar.style.opacity = "0.7";
+
+/* MENSAJE EN PANTALLA */
+mostrarMensaje("⏳ Enviando datos... por favor espere", "#ffc107");
+
+mostrarMensaje("⏳ Enviando datos...","#ffc107");
+
+try{
+await fetch(URL,{
+method:"POST",
+mode:"no-cors",
+body:JSON.stringify(data)
+});
+
+mostrarMensaje("✅ Enviado correctamente Muchas Gracias 👌​","lightgreen");
+
+document.querySelector("form").reset();
+mostrarCampos();
+
+setTimeout(cargarEstado,1000);
+
+}catch{
+mostrarMensaje("❌ Error al enviar","#ff4d4d");
+}
+
+/* RESTAURAR */
+btnEnviar.disabled=false;
+btnEnviar.innerText="Enviar";
+btnEnviar.style.opacity="1";
+}
+
+/* 🔥 ESTADO */
+function cargarEstado(){
+fetch(URL)
+.then(res=>res.json())
+.then(data=>{
+estadoIngredientes.innerHTML="";
+
+for(let ing in objetivos){
+let actual=data[ing]||0;
+let objetivo=objetivos[ing];
+let porcentaje=(actual/objetivo)*100;
+
+let clase="falta";
+if(porcentaje>=100)clase="ok";
+else if(porcentaje>=60)clase="medio";
+
+estadoIngredientes.innerHTML+=`
+<div class="estado-item ${clase}">
+${ing} (${actual}/${objetivo})
+<div class="barra">
+<div class="progreso" style="width:${Math.min(porcentaje,100)}%"></div>
+</div>
+</div>`;
+}
+});
+}
+
+cargarEstado();
+setInterval(cargarEstado,10000);
+
+</script>
   </body>
 </html>

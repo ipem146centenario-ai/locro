@@ -5,259 +5,303 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Locro Solidario - IPEM 146</title>
     <style>
-      /* GLOBAL */
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-      body {
-        font-family: "Segoe UI", sans-serif;
-        color: #fff;
-        background:
-          linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-          url("locro.jpg") center/cover fixed no-repeat;
-        line-height: 1.5;
-      }
+/* GLOBAL */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-      /* HEADER */
-      header {
-        background: linear-gradient(135deg, #73d0ea, #085687);
-        color: white;
-        padding: 12px 8px;
-        text-align: center;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      }
-      header h1 {
-        font-size: 32px;
-        color: #3a2af0;
-        margin-bottom: 8px;
-      }
-      header p {
-        font-size: 14px;
-        opacity: 0.9;
-      }
+body {
+  font-family: "Segoe UI", sans-serif;
+  color: #fff;
+  line-height: 1.5;
+  background:
+    linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+    url("locro.jpg") center/cover fixed no-repeat;
+}
 
-      /* COLUMNAS REFERENTES / INSTRUCCIONES */
-      .c {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        padding: 15px;
-        justify-content: center;
-      }
-      .column {
-        flex: 1 1 300px;
-        min-width: 280px;
-      }
-      .card {
-        background: rgba(255, 255, 255, 0.15);
-        padding: 16px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transition:
-          transform 0.3s ease,
-          box-shadow 0.3s ease;
-      }
-      .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      }
+/* HEADER */
+header {
+  background: linear-gradient(135deg, #73d0ea, #085687);
+  text-align: center;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
 
-      .alias {
-        color: #eeee05;
-      
-        font-size: 18px;
-        padding: 2px 6px;
-        border-radius: 6px;
-      }
+header h1 {
+  font-size: 32px;
+  color: #ffffff; /* mejor contraste */
+  margin-bottom: 8px;
+}
 
-      .instrucciones {
-        animation: zoomPulse 2s infinite alternate;
-      }
-      @keyframes zoomPulse {
-        0% {
-          transform: scale(1);
-        }
-        100% {
-          transform: scale(1.03);
-        }
-      }
+header p {
+  font-size: 14px;
+  opacity: 0.9;
+}
 
-      /* GRID FORMULARIO */
-      .main {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        padding: 15px;
-      }
-      .container {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 18px;
-        border-radius: 12px;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        transition:
-          transform 0.3s ease,
-          box-shadow 0.3s ease;
-      }
-      .container:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      }
+/* COLUMNAS */
+.c {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 15px;
+  justify-content: center;
+}
 
-      label {
-        display: block;
-        margin-top: 8px;
-        font-weight: 600;
-        font-size: 15px;
-      }
-      input,
-      select,
-      button {
-        width: 100%;
-        margin-top: 4px;
-        padding: 10px 12px;
-        border-radius: 10px;
-        border: 1px solid #ccc;
-        font-size: 14px;
-      }
-      input:focus,
-      select:focus {
-        outline: none;
-        border-color: #3cdc10;
-        box-shadow: 0 0 10px rgba(103, 102, 102, 0.3);
-      }
+.column {
+  flex: 1 1 300px;
+  min-width: 280px;
+}
 
-      button {
-        font-size: 18px;
-        font-weight: 600;
-        background: linear-gradient(135deg, #1e8522, #34c759);
-        color: white;
-        cursor: pointer;
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-        transition:
-          transform 0.2s ease,
-          box-shadow 0.2s ease;
-      }
-      button:hover:not(:disabled) {
-        transform: scale(1.05);
-        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
-      }
-      button:disabled {
-        background: #999;
-        cursor: not-allowed;
-      }
+/* TARJETAS */
+.card {
+  background: rgba(255,255,255,0.15);
+  padding: 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
 
-      .mensaje {
-        text-align: center;
-        font-size: 18px;
-        margin-top: 8px;
-        transition: opacity 0.5s ease;
-      }
-      .estado-item {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px;
-        margin: 4px 0;
-        border-radius: 10px;
-        font-size: 13px;
-        font-weight: 600;
-      }
-      .ok {
-        background: #e6f4ea;
-        color: #1e7e34;
-      }
-      .medio {
-        background: #fff7e0;
-        color: #a07900;
-      }
-      .falta {
-        background: #fdecea;
-        color: #b02a37;
-      }
+.card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
 
-      footer {
-        text-align: center;
-        padding: 12px;
-        font-size: 14px;
-        background: rgba(0, 0, 0, 0.5);
-        color: #fff;
-        margin-top: 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-      }
+/* TEXTO */
+h2 {
+  color: #ffffff;
+  margin-bottom: 10px;
+}
 
-      /* RESPONSIVE */
-      @media (max-width: 700px) {
-        .main {
-          grid-template-columns: 1fr;
-        }
-        .c {
-          flex-direction: column;
-          gap: 15px;
-          padding: 10px;
-        }
-        header h1 {
-          font-size: 26px;
-        }
-        header p {
-          font-size: 13px;
-        }
-        label {
-          font-size: 14px;
-        }
-        button {
-          font-size: 16px;
-          padding: 10px;
-        }
-      }
-    </style>
+ul {
+  margin-top: 10px;
+  padding-left: 18px;
+  font-size: 30px;
+}
+
+/* ALIAS */
+.alias {
+  color: #ffe600;
+  font-weight: bold;
+}
+
+/* BLOQUE OPCIONES */
+.a {
+  border: 2px solid rgba(255,255,255,0.3);
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 15px;
+  background: rgba(255,255,255,0.1);
+}
+
+.gracias {
+  margin-top: 15px;
+  font-weight: bold;
+  color: #00ffae;
+  font-size: 16px;
+  text-align: center;
+}
+
+/* ANIMACIÓN SUAVE */
+.instrucciones {
+  animation: zoomPulse 2s infinite alternate;
+}
+
+@keyframes zoomPulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.03); }
+}
+
+/* GRID */
+.main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 15px;
+}
+
+/* FORM */
+.container {
+  background: rgba(255,255,255,0.2);
+  padding: 18px;
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  transition: 0.3s;
+}
+
+.container:hover {
+  transform: translateY(-4px);
+}
+
+/* INPUTS */
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+input,
+select,
+button {
+  width: 100%;
+  margin-top: 5px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+}
+
+/* FOCUS */
+input:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(0,255,150,0.5);
+}
+
+/* BOTÓN */
+button {
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #1e8522, #34c759);
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+button:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+/* MENSAJE */
+.mensaje {
+  text-align: center;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+/* ESTADO */
+.estado-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  margin: 4px 0;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ok {
+  background: #2ecc71;
+  color: #fff;
+}
+
+.medio {
+  background: #f1c40f;
+  color: #000;
+}
+
+.falta {
+  background: #e74c3c;
+  color: #fff;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 12px;
+  font-size: 14px;
+  background: rgba(0,0,0,0.5);
+  margin-top: 20px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+
+  .c {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  header h1 {
+    font-size: 26px;
+  }
+
+  header p {
+    font-size: 13px;
+  }
+
+  button {
+    font-size: 15px;
+  }
+}
+</style>
   </head>
   <body>
     <header>
       <h1>Gran Locro 10/05/2026 IPEM 146 "Centenario"</h1>
-      <p>
+      <h3>
         <strong
           >Cada aporte, por pequeño que sea, suma para alcanzar un gran
           objetivo.</strong
         ><br />
         Con tu colaboración hacés posible la elaboración de este locro y
         fortalecés el espíritu de nuestra escuela.<br />
-        <strong>Juntos podemos hacer la diferencia.</strong>
-      </p>
+        <strong>Juntos podemos hacer la diferencia. 💙</strong>
+      </h3>
     </header>
 
     <div class="c">
       <div class="column card">
         <h2>Referentes</h2>
         <ul>
-          <li>Estela Molina (<span class="alias">alias: –</span>)</li>
-          <li>Yohana Vallejos (<span class="alias">alias: –</span>)</li>
+          <li>Estela Molina (<span class="alias">alias: SMOLINA2137.NX.ARS</span>)</li>
+          <li>Yohana Vallejos (<span class="alias">alias: GVALLEJOS8964.NX.ARS</span>)</li>
           <li>
             Adriana Córdoba (<span class="alias">alias: adrianacordoba1203</span
             >)
           </li>
         </ul>
       </div>
+<div class="column card instrucciones">
 
-      <div class="column card instrucciones">
-        <h2>Instrucciones</h2>
-        <ul>
-          <li>
-            <strong>Dejar ingredientes donados</strong> y
-            <strong
-              >retirar las tarjetas de porciones en la dirección de la
-              escuela.</strong
-            >
-          </li>
-            <li>
-            <strong>Completá el formulario ingresando tu nombre y apellido, número de teléfono y el tipo de donación que deseás realizar.</strong>
-            
-            
-          </li>
-        </ul>
+  <h2>¿Cómo colaborar?</h2>
+
+  <ul>
+    <li>
+      <strong>Completá el formulario</strong> con tu nombre, teléfono y el tipo de donación.
+    </li>
+    <li>
+      Elegí cómo querés colaborar (ingredientes, dinero o porciones).
+    </li>
+  </ul>
+
+  <div class="a">
+    <h3>Opciones de colaboración:</h3>
+
+    <ul>
+      <li>💳 Transferí tu aporte a los alias indicados.</li>
+      <li>📦 Entregá los productos en Dirección.</li>
+      <li>🎟️ Retirá tu tarjeta en Dirección.</li>
+    </ul>
+
+    <p class="gracias">🙏 ¡Muchas gracias por sumarte!</p>
+  </div>
+
+</div>
+
       </div>
     </div>
 
@@ -283,14 +327,27 @@
             <select id="ingrediente">
               <option>Maíz</option>
               <option>Porotos</option>
-              <option>Carne</option>
-              <option>Chorizo</option>
-              <option>Panceta</option>
-              <option>Zapallo</option>
-              <option>Cebolla</option>
-              <option>Condimentos</option>
+              <option>Chorizos</option>
+              <option>Zapallo criollo</option>
+              <option>Falda</option>
+              <option>Carnaza</option>
+              <option>Carne de cerdo (paleta)</option>
+              <option>Cueritos de cerdo</option>
+              <option>Mondongo</option>
+              <option>Cebolla (1 bolsa)</option>
+              <option>Cebolla de verdeo (atados)</option>
+              <option>Aceite (litros)</option>
+              <option>Queso cremoso (hormas)</option>
+              <option>Grasa de cerdo</option>
+              <option>Sal gruesa</option>
+              <option>Pimienta</option>
+              <option>Pimentón</option>
+              <option>Orégano</option>
+              <option>Ají molido</option>
+              <option>Gas (garrafas de 10kg)</option>
             </select>
-            <label>Cantidad (kg)</label>
+
+            <label id="labelCantidad">Cantidad (kg,litros, bolsas o atados excepto garrafas que es cantidad)</label>
             <input type="number" id="cantidadKg" step="0.1" />
           </div>
 
@@ -325,16 +382,28 @@
 
       const URL =
         "https://script.google.com/macros/s/AKfycbyHhEYb-cLtwJZ-TCHh_R_JJWnwHw_f_saudBEGTbUXcbXey2MgeFwP39iQdBOagosaYA/exec";
-      const objetivos = {
-        Maíz: 10,
-        Porotos: 8,
-        Carne: 15,
-        Chorizo: 6,
-        Panceta: 5,
-        Zapallo: 10,
-        Cebolla: 4,
-        Condimentos: 2,
-      };
+    const objetivos = {
+          "Maíz": 60,
+          "Porotos": 50,
+          "Chorizos": 20,
+          "Zapallo criollo": 80,
+          "Falda": 60,
+          "Carnaza": 50,
+          "Carne de cerdo (paleta)": 60,
+          "Cueritos de cerdo": 25,
+          "Mondongo": 50,
+          "Cebolla": 1, // (aclarar unidad: bolsa/bulto)
+          "Cebolla de verdeo (atados)": 10,
+          "Aceite (litros)": 20,
+          "Queso cremoso (hormas)": 3,
+          "Grasa de cerdo": 5,
+          "Sal gruesa": 5,
+          "Pimienta": 0.5,
+          "Pimentón": 0.5,
+          "Orégano": 0.5,
+          "Ají molido": 1,
+          "Gas (garrafas de 10kg)": 5
+        };
 
       function mostrarMensaje(texto, color = "white") {
         const m = document.getElementById("mensaje");

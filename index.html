@@ -1,473 +1,650 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Locro Solidario - IPEM 146</title>
 
-    <style>
-      /* GLOBAL */
+<head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>Locro - IPEM 146 "Centenario"</title>
+   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+   <style>
+      :root {
+         --primary: #00d2ff;
+         --secondary: #003366;
+         --bg-dark: #000c1a;
+         --accent: #ffd700;
+         --success: #00e676;
+         --danger: #ff5252;
+         --glass: rgba(255, 255, 255, 0.05);
+         --glass-border: rgba(255, 255, 255, 0.15);
+      }
+
       * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
+         box-sizing: border-box;
+         margin: 0;
+         padding: 0;
       }
 
       body {
-        font-family: "Segoe UI", sans-serif;
-        color: #fff;
-        background:
-          linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-          url("locro.jpg") center/cover fixed no-repeat;
+         font-family: 'Inter', 'Segoe UI', sans-serif;
+         color: #e0f2f1;
+         background: linear-gradient(135deg, var(--bg-dark) 0%, #003366 100%) fixed;
+         height: 100vh;
+         display: flex;
+         flex-direction: column;
+         overflow: hidden;
       }
 
-      /* HEADER */
       header {
-        background: linear-gradient(135deg, #73d0ea, #085687);
-        text-align: center;
-        padding: 15px;
+         padding: 1rem;
+         text-align: center;
+         background: rgba(0, 0, 0, 0.4);
+         border-bottom: 1px solid var(--glass-border);
       }
 
       header h1 {
-        font-size: 32px;
+         font-size: 1rem;
+         color: var(--primary);
+         font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
       }
 
-      /* COLUMNAS */
-      .c {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        padding: 15px;
+      /* Panel de Porciones Totales */
+      .stats-panel {
+         background: linear-gradient(45deg, #004e92, #000428);
+         padding: 10px;
+         border-radius: 12px;
+         margin: 10px auto;
+         width: 90%;
+         text-align: center;
+         border: 1px solid var(--primary);
+      }
+      .stats-num { font-size: 1.8rem; font-weight: 800; color: var(--accent); }
+
+      .app-container {
+         display: grid;
+         grid-template-columns: 320px 1fr 340px;
+         gap: 15px;
+         padding: 15px;
+         flex: 1;
+         overflow: hidden;
       }
 
-      .column {
-        flex: 1 1 300px;
+      .panel {
+         background: var(--glass);
+         backdrop-filter: blur(20px);
+         border: 1px solid var(--glass-border);
+         border-radius: 16px;
+         padding: 1.2rem;
+         display: flex;
+         flex-direction: column;
+         overflow: hidden;
+         position: relative;
       }
 
-      /* TARJETAS */
-      .card {
-        background: rgba(255, 255, 255, 0.15);
-        padding: 16px;
-        border-radius: 12px;
-        backdrop-filter: blur(6px);
-        transition: 0.3s;
+      h2 {
+         font-size: 0.95rem;
+         margin-bottom: 0.8rem;
+         color: var(--primary);
+         border-bottom: 1px solid var(--glass-border);
+         padding-bottom: 6px;
+         z-index: 10;
+         background: rgba(0, 51, 102, 0.2);
       }
-      .card:hover {
-        transform: translateY(-4px);
+
+      /* Filtros */
+      .filtros-container { display: flex; gap: 5px; margin-bottom: 10px; }
+      .btn-filtro { flex: 1; background: var(--glass); border: 1px solid var(--glass-border); color: white; padding: 5px; border-radius: 6px; cursor: pointer; font-size: 0.65rem; transition: 0.3s; }
+      .btn-filtro.active { background: var(--primary); color: var(--secondary); font-weight: bold; }
+
+      /* Marquesina */
+      footer { background: rgba(0,0,0,0.5); padding: 8px; overflow: hidden; white-space: nowrap; border-top: 1px solid var(--glass-border); }
+      .marquee-text { display: inline-block; animation: marquee 25s linear infinite; font-size: 0.85rem; color: var(--success); }
+      @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+      @keyframes pulso-critico {
+         0% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.4); }
+         70% { box-shadow: 0 0 0 10px rgba(255, 82, 82, 0); }
+         100% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); }
+      }
+
+      .resaltar-critico {
+         animation: pulso-critico 2s infinite;
+         border: 2px solid var(--danger) !important;
+         background: rgba(255, 82, 82, 0.1) !important;
+      }
+
+      @keyframes autoScroll {
+          0% { transform: translateY(0); }
+          10% { transform: translateY(0); } 
+          45% { transform: translateY(-60%); }
+          55% { transform: translateY(-60%); }
+          90% { transform: translateY(0); }
+          100% { transform: translateY(0); }
+      }
+
+      .scroll-automatico {
+          display: flex;
+          flex-direction: column;
+          animation: autoScroll 40s ease-in-out infinite;
+      }
+
+      .scroll-automatico:hover {
+          animation-play-state: paused;
+      }
+
+      .viewport-colaborar {
+          flex: 1;
+          overflow: hidden;
+          position: relative;
+      }
+
+      .instrucciones-box {
+          font-size: 0.85rem;
+          line-height: 1.4;
+          margin-bottom: 20px;
+      }
+
+      .instrucciones-box li {
+          margin-bottom: 8px;
+          padding-left: 5px;
+          border-left: 2px solid var(--primary);
+          list-style: none;
+      }
+
+      .alias-box {
+          background: rgba(0, 0, 0, 0.4);
+          padding: 10px;
+          border-radius: 8px;
+          margin-bottom: 8px;
+          border: 1px dashed var(--primary);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
       }
 
       .alias {
-        color: #ffe600;
-        font-weight: bold;
+          color: var(--accent);
+          font-family: monospace;
+          font-size: 0.8rem;
+          font-weight: bold;
+          display: block;
       }
 
-      /* BLOQUE */
-      .a {
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        padding: 15px;
-        margin-top: 10px;
-        border-radius: 10px;
-      }
-
-      /* GRID */
-      .main {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        padding: 15px;
-      }
-
-      /* FORM */
-      .container {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 15px;
-        border-radius: 12px;
+      .btn-copy {
+          background: var(--primary);
+          color: var(--secondary);
+          border: none;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.6rem;
+          font-weight: bold;
+          cursor: pointer;
       }
 
       input,
-      select,
-      button {
-        width: 100%;
-        margin-top: 5px;
-        padding: 10px;
-        border-radius: 10px;
-        border: none;
+      select {
+          width: 100%;
+          background: #fff;
+          border: 2px solid transparent;
+          padding: 10px;
+          border-radius: 8px;
+          margin-bottom: 10px;
+          color: #002244;
+          font-weight: 500;
+          transition: border-color 0.3s;
       }
 
-      button {
-        background: linear-gradient(135deg, #1e8522, #34c759);
-        color: #fff;
-        font-weight: bold;
-        cursor: pointer;
+      input.error-input {
+          border: 2px solid var(--danger) !important;
       }
 
-      button:disabled {
-        background: #999;
+      button#btnEnviar {
+          background: var(--primary);
+          color: var(--secondary);
+          border: none;
+          padding: 14px;
+          border-radius: 8px;
+          font-weight: bold;
+          cursor: pointer;
+          text-transform: uppercase;
+          width: 100%;
+          transition: 0.3s;
       }
 
-      /* MENSAJE */
-      .mensaje {
-        text-align: center;
-        margin-top: 10px;
+      button#btnEnviar:hover:not(:disabled) {
+          background: #fff;
       }
 
-      /* ESTADO */
-      .estado-item {
-        padding: 10px;
-        margin: 6px 0;
-        border-radius: 10px;
+      button#btnEnviar:disabled {
+          opacity: 0.5;
+          filter: grayscale(1);
+          cursor: not-allowed;
       }
 
-      .ok {
-        background: #2ecc71;
-      }
-      .medio {
-        background: #f1c40f;
-        color: #000;
-      }
-      .falta {
-        background: #e74c3c;
+      .scroll-v {
+          overflow-y: auto;
+          flex: 1;
+          padding-right: 5px;
       }
 
-      /* BARRA */
-      .barra {
-        height: 10px;
-        background: #333;
-        border-radius: 10px;
-        overflow: hidden;
-        margin-top: 5px;
+      .estado-card {
+          background: rgba(0, 0, 0, 0.3);
+          padding: 12px;
+          border-radius: 10px;
+          margin-bottom: 10px;
+          border-left: 4px solid transparent;
+          transition: all 0.3s ease;
       }
 
-      .progreso {
-        height: 100%;
-        background: linear-gradient(90deg, #00ffae, #2ecc71);
-        transition: 0.5s;
+      .estado-info {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          margin-bottom: 5px;
       }
-button:disabled {
-  opacity: 0.7;
-  cursor: wait;
-}
-      @media (max-width: 700px) {
-        .main {
-          grid-template-columns: 1fr;
-        }
-        .c {
-          flex-direction: column;
-        }
-      }
-    </style>
-  </head>
 
-  <body>
+      .ingrediente-nombre {
+          font-size: 0.8rem;
+          font-weight: bold;
+          color: var(--primary);
+      }
+
+      .falta-texto {
+          font-size: 0.7rem;
+          color: var(--accent);
+          font-weight: 600;
+      }
+
+      .porcentaje-badge {
+          font-size: 0.7rem;
+          background: var(--glass-border);
+          padding: 2px 6px;
+          border-radius: 4px;
+          margin-left: 5px;
+      }
+
+      .barra-bg {
+          height: 8px;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 10px;
+          overflow: hidden;
+          margin-top: 5px;
+      }
+
+      .barra-fill {
+          height: 100%;
+          transition: width 1s ease-in-out;
+      }
+
+      .ok { border-left-color: var(--success); }
+      .ok .barra-fill { background: var(--success); }
+      .medio { border-left-color: var(--primary); }
+      .medio .barra-fill { background: var(--primary); }
+      .falta { border-left-color: var(--danger); }
+      .falta .barra-fill { background: var(--danger); }
+
+      @media (max-width: 1000px) {
+          body { overflow-y: auto; height: auto; }
+          .app-container { grid-template-columns: 1fr; }
+          .panel { height: 500px; }
+          .scroll-automatico { animation: none; }
+      }
+   </style>
+</head>
+
+<body>
+
    <header>
-      <h1>Gran Locro 10/05/2026 IPEM 146 "Centenario"</h1>
-      <h3>
-        <strong
-          >Cada aporte, por pequeño que sea, suma para alcanzar un gran
-          objetivo.</strong
-        ><br />
-        Con tu colaboración hacés posible la elaboración de este locro y
-        fortalecés el espíritu de nuestra escuela.<br />
-        <strong>Juntos podemos hacer la diferencia. 💙</strong>
-      </h3>
-    </header>
-
-  <div class="c">
-      <div class="column card">
-        <h2>Referentes</h2>
-        <ul>
-          <li>Estela Molina (<span class="alias">alias: SMOLINA2137.NX.ARS</span>)</li>
-          <li>Yohana Vallejos (<span class="alias">alias: GVALLEJOS8964.NX.ARS</span>)</li>
-          <li>
-            Adriana Córdoba (<span class="alias">alias: adrianacordoba1203</span
-            >)
-          </li>
-        </ul>
+      <h1>Locro IPEM 146 "Centenario"</h1>
+      <h2>10 de mayo 2026</h2>
+      <div class="stats-panel">
+         <p style="font-size: 0.65rem; text-transform: uppercase; color: var(--primary);">Porciones Reservadas en Total</p>
+         <div id="totalPorciones" class="stats-num">0</div>
       </div>
-<div class="column card instrucciones">
+   </header>
 
-  <h2>¿Cómo colaborar?</h2>
+   <div class="app-container">
 
-  <ul>
-    <li>
-      <strong>Completá el formulario</strong> con tu nombre, teléfono y el tipo de donación.
-    </li>
-    <li>
-      Elegí cómo querés colaborar (ingredientes, dinero o porciones).
-    </li>
-  </ul>
+      <aside class="panel">
+          <h2>🤝 Cómo Colaborar</h2>
+          <div class="viewport-colaborar">
+             <div class="scroll-automatico">
+                <div class="instrucciones-box">
+                   <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                      <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Paso 1</p>
+                      <p style="font-size: 0.85rem;">📝 <strong>Registrate:</strong> Completá el formulario central con tu nombre y WhatsApp-Teléfono.</p>
+                   </div>
 
-  <div class="a">
-    <h3>Opciones de colaboración:</h3>
+                   <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                      <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Paso 2</p>
+                      <p style="font-size: 0.85rem;">🍲 <strong>Elegí tu aporte:</strong> Podés donar ingredientes, dinero o reservar tus porciones.</p>
+                   </div>
 
-    <ul>
-      <li>💳 Transferí tu aporte a los alias indicados.</li>
-      <li>📦 Entregá los productos en Dirección.</li>
-      <li>🎟️ Retirá tu tarjeta en Dirección.</li>
-    </ul>
+                   <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                      <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Paso 3: Entrega</p>
+                      <ul style="font-size: 0.8rem; margin-top: 5px;">
+                         <li style="border-left: 2px solid var(--success); margin-bottom: 5px;">💳 <strong>Efectivo:</strong> Copiá un alias y transferí.</li>
+                         <li style="border-left: 2px solid var(--primary); margin-bottom: 5px;">📦 <strong>Insumos:</strong> Entregá los productos en Dirección.</li>
+                         <li style="border-left: 2px solid var(--accent);">🎟️ <strong>Tarjetas:</strong> Retiralas por Dirección.</li>
+                      </ul>
+                   </div>
+                </div>
 
-    <p class="gracias">🙏 ¡Muchas gracias por sumarte!</p>
-  </div>
-
-</div>
-
-      </div>
-    </div>
-
-    <div class="main">
-      <div class="container">
-        <form onsubmit="enviarDatos(event)">
-          <input id="nombre" placeholder="Nombre" required />
-          <input type="number" id="telefono" placeholder="Teléfono" required />
-
-          <select id="tipo" onchange="mostrarCampos()" required>
-            <option value="">Tipo</option>
-            <option value="ingredientes">Ingredientes</option>
-            <option value="dinero">Dinero</option>
-            <option value="porciones">Porciones</option>
-          </select>
-
-          <div id="ingredientes" style="display: none">
-            <select id="ingrediente">
-              <option>Maíz</option>
-              <option>Porotos</option>
-              <option>Chorizos</option>
-              <option>Zapallo criollo</option>
-              <option>Falda</option>
-              <option>Carnaza</option>
-              <option>Carne de cerdo (paleta)</option>
-              <option>Cueritos de cerdo</option>
-              <option>Mondongo</option>
-              <option>Cebolla (1 bolsa)</option>
-              <option>Cebolla de verdeo (atados)</option>
-              <option>Aceite (litros)</option>
-              <option>Queso cremoso (hormas)</option>
-              <option>Grasa de cerdo</option>
-              <option>Sal gruesa</option>
-              <option>Pimienta</option>
-              <option>Pimentón</option>
-              <option>Orégano</option>
-              <option>Ají molido</option>
-              <option>Gas (garrafas de 10kg)</option>
-            </select>
-
-            <input type="number" id="cantidadKg" placeholder="Cantidad (Kg - litros - atados - bolsa)" />
+                <h2 style="margin-top: 10px;">💳 Cuentas para Transferir</h2>
+                <div class="alias-box">
+                   <div style="flex: 1;">
+                      <span style="font-size: 0.75rem; opacity: 0.8;">Estela Molina</span>
+                      <span class="alias">SMOLINA2137.NX.ARS</span>
+                   </div>
+                   <button class="btn-copy" onclick="copiarAlias('SMOLINA2137.NX.ARS', this)">COPIAR</button>
+                </div>
+                <div class="alias-box">
+                   <div style="flex: 1;">
+                      <span style="font-size: 0.75rem; opacity: 0.8;">Yohana Vallejos</span>
+                      <span class="alias">GVALLEJOS8964.NX.ARS</span>
+                   </div>
+                   <button class="btn-copy" onclick="copiarAlias('GVALLEJOS8964.NX.ARS', this)">COPIAR</button>
+                </div>
+                <div class="alias-box" style="margin-bottom: 20px;">
+                   <div style="flex: 1;">
+                      <span style="font-size: 0.75rem; opacity: 0.8;">Adriana Córdoba</span>
+                      <span class="alias">adrianacordoba1203</span>
+                   </div>
+                   <button class="btn-copy" onclick="copiarAlias('adrianacordoba1203', this)">COPIAR</button>
+                </div>
+             </div>
           </div>
+      </aside>
 
-          <div id="dinero" style="display: none">
-            <input type="number" id="monto" placeholder="Monto" />
+      <main class="panel">
+          <h2>📝 Registro de Aporte</h2>
+          <form id="formRegistro" onsubmit="enviarDatos(event)">
+             <input id="nombre" placeholder="Nombre y Apellido" required />
+             <input type="number" id="telefono" placeholder="WhatsApp-Teléfono" required />
+
+             <select id="tipo" onchange="mostrarCampos()" required>
+                <option value="">Seleccione tipo...</option>
+                <option value="ingredientes">Ingredientes 🍲</option>
+                <option value="dinero">Dinero 💸</option>
+                <option value="porciones">Comprar Porciones 🎟️</option>
+             </select>
+
+             <div id="divIngredientes" style="display: none">
+                <select id="ingrediente"></select>
+                <input type="number" step="0.01" min="0.01" id="cantidadKg" placeholder="Cantidad (mayor a 0)" />
+             </div>
+
+             <div id="divDinero" style="display: none">
+                <input type="number" min="1" id="monto" placeholder="Monto $ (mayor a 0)" />
+             </div>
+
+             <div id="divPorciones" style="display: none">
+                <input type="number" min="1" id="porcionesInput" placeholder="Cantidad de porciones (mayor a 0)" />
+             </div>
+
+             <div id="captchaBox" style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--glass-border);">
+                <label id="captchaTexto" style="font-size: 0.8rem; color: var(--primary); font-weight: bold;"></label>
+                <input type="number" id="captchaInput" placeholder="Respuesta" required style="margin-top: 5px;" />
+             </div>
+
+             <button type="submit" id="btnEnviar">Enviar Registro</button>
+             <div id="mensaje" style="text-align:center; margin-top:10px; font-size: 0.85rem; height: 1.5rem; font-weight: bold;"></div>
+          </form>
+      </main>
+
+      <section class="panel">
+          <h2>📊 Estado de Insumos</h2>
+          <div class="filtros-container">
+             <button class="btn-filtro active" onclick="setFiltro('todos', this)">Todos</button>
+             <button class="btn-filtro" onclick="setFiltro('faltantes', this)">Faltan</button>
+             <button class="btn-filtro" onclick="setFiltro('listos', this)">Listos</button>
           </div>
-
-          <div id="porciones" style="display: none">
-            <input type="number" id="porcionesInput" placeholder="Cantidad" />
+          <div id="estadoIngredientes" class="scroll-v">
+             <p style="text-align:center; opacity:0.5;">Cargando...</p>
           </div>
+      </section>
+      
+   </div>
 
-          <button id="btnEnviar">Enviar</button>
-          <div class="mensaje" id="mensaje"></div>
-        </form>
-      </div>
+   <footer>
+      <div id="marquee" class="marquee-text">¡Gracias por colaborar con la cooperadora del IPEM 146! ❤️ Todo lo recaudado es para el colegio.</div>
+   </footer>
 
-      <div class="container">
-        <h2>Estado de Ingredientes</h2>
-        <div id="estadoIngredientes"></div>
-      </div>
-    </div>
+   <script>
+      const URL = "https://script.google.com/macros/s/AKfycbyHhEYb-cLtwJZ-TCHh_R_JJWnwHw_f_saudBEGTbUXcbXey2MgeFwP39iQdBOagosaYA/exec";
+      
+      const objetivos = {
+          "Maíz 60": {meta: 60, icon: "🌽"}, "Porotos": {meta: 50, icon: "🫘"}, "Chorizos": {meta: 20, icon: "🌭"}, 
+          "Zapallo criollo": {meta: 80, icon: "🎃"}, "Falda": {meta: 60, icon: "🥩"}, "Carnaza": {meta: 50, icon: "🍖"}, 
+          "Carne de cerdo (paleta)": {meta: 60, icon: "🐖"}, "Cueritos de cerdo": {meta: 25, icon: "🥓"}, 
+          "Mondongo": {meta: 50, icon: "🍲"}, "Cebolla (1 bolsa)": {meta: 1, icon: "🧅"}, 
+          "Cebolla de verdeo (atados)": {meta: 10, icon: "🌿"}, "Aceite (litros)": {meta: 20, icon: "🧴"},
+          "Queso cremoso (hormas)": {meta: 3, icon: "🧀"}, "Grasa de cerdo": {meta: 5, icon: "🍯"}, 
+          "Sal gruesa": {meta: 5, icon: "🧂"}, "Pimienta": {meta: 0.5, icon: "🧂"}, 
+          "Pimentón": {meta: 0.5, icon: "🌶️"}, "Orégano": {meta: 0.5, icon: "🌿"}, 
+          "Ají molido": {meta: 1, icon: "🌶️"}, "Gas (garrafas de 10kg)": {meta: 5, icon: "🔥"}
+      };
 
-    <footer style="text-align: center; padding: 10px">© 2026 IPEM 146</footer>
+      let captchaCorrecto = 0;
+      let datosActuales = {};
+      let filtroActual = 'todos';
 
-<script>
-nombre.addEventListener("input",()=>nombre.value=nombre.value.toUpperCase());
+      const selIng = document.getElementById("ingrediente");
+      Object.entries(objetivos).forEach(([nombre, info]) => {
+          let opt = document.createElement("option");
+          opt.value = nombre; opt.text = `${info.icon} ${nombre}`; selIng.add(opt);
+      });
 
-const URL="https://script.google.com/macros/s/AKfycbyHhEYb-cLtwJZ-TCHh_R_JJWnwHw_f_saudBEGTbUXcbXey2MgeFwP39iQdBOagosaYA/exec";
+      function setFiltro(f, btn) {
+          filtroActual = f;
+          document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          cargarEstado();
+      }
 
-const objetivos={
-Maíz:60,
-Porotos:50,
-Chorizos:20,
-"Zapallo criollo":80,
-Falda:60,
-Carnaza:50,
-"Carne de cerdo (paleta)":60,
-"Cueritos de cerdo":25,
-Mondongo:50,
-"Cebolla (1 bolsa)":1,
-"Cebolla de verdeo (atados)":10,
-"Aceite (litros)":20,
-"Queso cremoso (hormas)":3,
-"Grasa de cerdo":5,
-"Sal gruesa":5,
-Pimienta:0.5,
-Pimentón:0.5,
-Orégano:0.5,
-"Ají molido":1,
-"Gas (garrafas de 10kg)":5
-};
+      function generarCaptcha() {
+          const a = Math.floor(Math.random() * 9) + 1;
+          const b = Math.floor(Math.random() * 9) + 1;
+          captchaCorrecto = a + b;
+          document.getElementById("captchaTexto").innerText = `Seguridad: ¿Cuánto es ${a} + ${b}?`;
+          document.getElementById("captchaInput").value = "";
+      }
 
-function mostrarMensaje(t,c="white"){
-mensaje.innerText=t;
-mensaje.style.color=c;
-}
+      function mostrarCampos() {
+          const t = document.getElementById("tipo").value;
+          document.getElementById("divIngredientes").style.display = t === "ingredientes" ? "block" : "none";
+          document.getElementById("divDinero").style.display = t === "dinero" ? "block" : "none";
+          document.getElementById("divPorciones").style.display = t === "porciones" ? "block" : "none";
+          validarInput();
+      }
 
-function mostrarCampos(){
-ingredientes.style.display="none";
-dinero.style.display="none";
-porciones.style.display="none";
+      function obtenerUnidad(i) {
+          if (i.includes("bolsa")) return "Bolsa";
+          if (i.includes("atados")) return "Atados";
+          if (i.includes("litros")) return "L";
+          if (i.includes("hormas")) return "Hormas";
+          if (i.includes("garrafas")) return "Garrafas";
+          return "Kg";
+      }
 
-if(tipo.value==="ingredientes")ingredientes.style.display="block";
-if(tipo.value==="dinero")dinero.style.display="block";
-if(tipo.value==="porciones")porciones.style.display="block";
-}
+      function validarInput() {
+          const tipo = document.getElementById("tipo").value;
+          const msg = document.getElementById("mensaje");
+          const btn = document.getElementById("btnEnviar");
+          const inputCant = document.getElementById("cantidadKg");
+          const inputMonto = document.getElementById("monto");
+          const inputPorc = document.getElementById("porcionesInput");
+          const ingSelect = document.getElementById("ingrediente").value;
 
-/* 🔥 EVENTOS (FUERA DE enviarDatos) */
-ingrediente.addEventListener("change",actualizarMaximo);
-cantidadKg.addEventListener("input",controlarMaximo);
+          if (!msg.innerText.includes("✅")) msg.innerText = "";
+          btn.disabled = false;
+          [inputCant, inputMonto, inputPorc].forEach(el => el.classList.remove("error-input"));
 
-async function actualizarMaximo(){
-try{
-let res=await fetch(URL);
-let data=await res.json();
+          let valorActual = 0;
+          let inputActivo = null;
 
-let ing=ingrediente.value;
-let actual=data[ing]||0;
-let obj=objetivos[ing]||0;
-let falta=obj-actual;
+          if (tipo === "ingredientes") {
+              valorActual = parseFloat(inputCant.value) || 0;
+              inputActivo = inputCant;
+          } else if (tipo === "dinero") {
+              valorActual = parseFloat(inputMonto.value) || 0;
+              inputActivo = inputMonto;
+          } else if (tipo === "porciones") {
+              valorActual = parseInt(inputPorc.value) || 0;
+              inputActivo = inputPorc;
+          }
 
-if(falta<=0){
-cantidadKg.max=0;
-mostrarMensaje(`❌ ${ing} completo`,"#ff4d4d");
-}else{
-cantidadKg.max=falta;
-cantidadKg.placeholder=`Máx: ${falta.toFixed(1)}`;
-}
-}catch{}
-}
+          if (tipo !== "" && valorActual <= 0) {
+              msg.innerText = "⚠️ Cantidad debe ser mayor a 0";
+              msg.style.color = "var(--accent)";
+              if(inputActivo) inputActivo.classList.add("error-input");
+              btn.disabled = true;
+              return;
+          }
 
-function controlarMaximo(){
-let max=parseFloat(cantidadKg.max)||0;
+          if (tipo === "ingredientes" && ingSelect) {
+              const recibido = datosActuales[ingSelect] || 0;
+              const meta = objetivos[ingSelect].meta;
+              const falta = meta - recibido;
 
-if(max>0 && parseFloat(cantidadKg.value)>max){
-cantidadKg.value=max;
-mostrarMensaje(`⚠️ Máximo: ${max.toFixed(1)}`,"#ffc107");
-}
-}
+              if (recibido >= meta) {
+                 msg.innerText = `❌ ${ingSelect} ya está completo.`;
+                 msg.style.color = "var(--danger)";
+                 btn.disabled = true;
+              } else if (valorActual > (falta + 0.001)) {
+                 msg.innerText = `⚠️ Máximo aceptado: ${falta.toFixed(2)} ${obtenerUnidad(ingSelect)}`;
+                 msg.style.color = "var(--accent)";
+                 inputCant.classList.add("error-input");
+                 btn.disabled = true;
+              }
+          }
+      }
 
-/* 🔥 ENVIAR */
-async function enviarDatos(e){
-e.preventDefault();
+      document.getElementById("cantidadKg").addEventListener("input", validarInput);
+      document.getElementById("monto").addEventListener("input", validarInput);
+      document.getElementById("porcionesInput").addEventListener("input", validarInput);
+      document.getElementById("ingrediente").addEventListener("change", validarInput);
+      
+      document.getElementById("captchaInput").addEventListener("input", function() {
+          if (this.value != "" && parseInt(this.value) !== captchaCorrecto) {
+              document.getElementById("mensaje").innerText = "❌ Resultado incorrecto";
+              document.getElementById("mensaje").style.color = "var(--danger)";
+          } else {
+              validarInput();
+          }
+      });
 
-let data={
-nombre:nombre.value.trim(),
-telefono:telefono.value.trim(),
-tipo:tipo.value,
-ingrediente:tipo.value==="ingredientes"?ingrediente.value:"",
-cantidadKg:parseFloat(cantidadKg.value)||0,
-monto:parseFloat(monto.value)||0,
-porciones:parseInt(porcionesInput.value)||0
-};
+      async function enviarDatos(e) {
+          e.preventDefault();
+          const msg = document.getElementById("mensaje");
+          const btn = document.getElementById("btnEnviar");
 
-/* VALIDACIÓN */
-if(!data.nombre || !data.telefono || !data.tipo){
-mostrarMensaje("⚠️ Completá todos los campos","#ffc107");
-return;
-}
+          if (parseInt(document.getElementById("captchaInput").value) !== captchaCorrecto) {
+              msg.innerText = "❌ Error en la suma"; return;
+          }
 
-/* CONTROL INGREDIENTES */
-if(data.tipo==="ingredientes"){
+          btn.disabled = true;
+          btn.innerText = "ENVIANDO...";
 
-if(data.cantidadKg<=0){
-mostrarMensaje("⚠️ Ingresá cantidad válida","#ffc107");
-return;
-}
+          const nombre = document.getElementById("nombre").value.toUpperCase();
+          const tipo = document.getElementById("tipo").value;
+          const ing = document.getElementById("ingrediente").value;
+          const cant = parseFloat(document.getElementById("cantidadKg").value) || 0;
 
-try{
-let res=await fetch(URL);
-let totales=await res.json();
+          const data = {
+              nombre: nombre,
+              telefono: document.getElementById("telefono").value,
+              tipo: tipo,
+              ingrediente: ing,
+              cantidadKg: cant,
+              monto: parseFloat(document.getElementById("monto").value) || 0,
+              porciones: parseInt(document.getElementById("porcionesInput").value) || 0
+          };
 
-let actual=totales[data.ingrediente]||0;
-let objetivo=objetivos[data.ingrediente]||0;
-let falta=objetivo-actual;
+          try {
+              await fetch(URL, { method: "POST", mode: "no-cors", body: JSON.stringify(data) });
+              
+              // Historial Marquesina
+              const det = tipo === 'ingredientes' ? `${cant}kg de ${ing}` : (tipo === 'dinero' ? `$${data.monto}` : `${data.porciones} porc.`);
+              document.getElementById("marquee").innerText = `¡GRACIAS ${nombre} por sumar ${det}! ❤️ --- `;
 
-if(falta<=0){
-mostrarMensaje(`❌ ${data.ingrediente} completo`,"#ff4d4d");
-return;
-}
+              // Confeti si se completa
+              if (tipo === 'ingredientes' && (datosActuales[ing] + cant) >= objetivos[ing].meta) {
+                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+              }
 
-if(data.cantidadKg>falta){
-mostrarMensaje(`⚠️ Máximo permitido: ${falta.toFixed(1)}`,"#ffc107");
-cantidadKg.value=falta.toFixed(1);
-return;
-}
+              msg.innerText = "✅ ¡Recibido! Gracias.";
+              msg.style.color = "var(--success)";
+              document.getElementById("formRegistro").reset();
+              mostrarCampos();
+              generarCaptcha();
+              setTimeout(cargarEstado, 2500);
+          } catch (e) {
+              msg.innerText = "❌ Error de red";
+          } finally {
+              btn.innerText = "ENVIAR REGISTRO";
+              btn.disabled = false;
+          }
+      }
 
-}catch{
-mostrarMensaje("❌ Error al verificar","#ff4d4d");
-return;
-}
-}
+      function cargarEstado() {
+          fetch(URL).then(r => r.json()).then(data => {
+              datosActuales = data;
+              document.getElementById("totalPorciones").innerText = data.TOTAL_PORCIONES || 0;
+              const contenedor = document.getElementById("estadoIngredientes");
+              contenedor.innerHTML = "";
 
-/* 🔥 INDICAR ENVÍO */
-btnEnviar.disabled = true;
-btnEnviar.innerText = "⏳ Enviando...";
-btnEnviar.style.opacity = "0.7";
+              const listaOrdenada = Object.keys(objetivos).map(nombre => {
+                  const val = data[nombre] || 0;
+                  const meta = objetivos[nombre].meta;
+                  const porc = Math.min((val / meta) * 100, 100);
+                  return { nombre, val, meta, porc, icon: objetivos[nombre].icon };
+              });
 
-/* MENSAJE EN PANTALLA */
-mostrarMensaje("⏳ Enviando datos... por favor espere", "#ffc107");
+              listaOrdenada.sort((a, b) => a.porc - b.porc);
 
-mostrarMensaje("⏳ Enviando datos...","#ffc107");
+              listaOrdenada.forEach((item, index) => {
+                 if (filtroActual === 'faltantes' && item.porc >= 100) return;
+                 if (filtroActual === 'listos' && item.porc < 100) return;
 
-try{
-await fetch(URL,{
-method:"POST",
-mode:"no-cors",
-body:JSON.stringify(data)
-});
+                 let falta = Math.max(item.meta - item.val, 0);
+                 let claseColor = item.porc >= 100 ? "ok" : (item.porc >= 60 ? "medio" : "falta");
+                 let unidad = obtenerUnidad(item.nombre);
+                 let claseResaltado = (index < 3 && item.porc < 100) ? "resaltar-critico" : "";
 
-mostrarMensaje("✅ Enviado correctamente Muchas Gracias 👌​","lightgreen");
+                 // Bloqueo y marca en select
+                 const opt = Array.from(selIng.options).find(o => o.value === item.nombre);
+                 if(opt) {
+                    opt.disabled = item.porc >= 100;
+                    opt.text = (item.porc >= 100 ? "✅ " : "") + item.icon + " " + item.nombre + (item.porc >= 100 ? " (LLENO)" : "");
+                 }
 
-document.querySelector("form").reset();
-mostrarCampos();
+                 contenedor.innerHTML += `
+                 <div class="estado-card ${claseColor} ${claseResaltado}">
+                    <div class="estado-info">
+                       <span class="ingrediente-nombre">${item.icon} ${item.nombre} <span class="porcentaje-badge">${item.porc.toFixed(0)}%</span></span>
+                       <span class="falta-texto">${falta > 0 ? 'Faltan ' + falta.toFixed(2) + ' ' + unidad : '¡LISTO!'}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.65rem; opacity:0.8; margin-bottom:2px;">
+                       <span>Recibido: ${item.val.toFixed(2)} ${unidad}</span>
+                       <span>Meta: ${item.meta} ${unidad}</span>
+                    </div>
+                    <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
+                 </div>`;
+              });
+              validarInput();
+          });
+      }
 
-setTimeout(cargarEstado,100);
+      function copiarAlias(texto, btn) {
+          navigator.clipboard.writeText(texto).then(() => {
+              const old = btn.innerText; btn.innerText = "¡OK!";
+              setTimeout(() => btn.innerText = old, 2000);
+          });
+      }
 
-}catch{
-mostrarMensaje("❌ Error al enviar","#ff4d4d");
-}
-
-/* RESTAURAR */
-btnEnviar.disabled=false;
-btnEnviar.innerText="Enviar";
-btnEnviar.style.opacity="1";
-}
-
-/* 🔥 ESTADO */
-function cargarEstado(){
-fetch(URL)
-.then(res=>res.json())
-.then(data=>{
-estadoIngredientes.innerHTML="";
-
-for(let ing in objetivos){
-let actual=data[ing]||0;
-let objetivo=objetivos[ing];
-let porcentaje=(actual/objetivo)*100;
-
-let clase="falta";
-if(porcentaje>=100)clase="ok";
-else if(porcentaje>=60)clase="medio";
-
-estadoIngredientes.innerHTML+=`
-<div class="estado-item ${clase}">
-${ing} (${actual}/${objetivo})
-<div class="barra">
-<div class="progreso" style="width:${Math.min(porcentaje,100)}%"></div>
-</div>
-</div>`;
-}
-});
-}
-
-cargarEstado();
-setInterval(cargarEstado,10000);
-
-</script>
-  </body>
+      generarCaptcha();
+      cargarEstado();
+      setInterval(cargarEstado, 60000);
+   </script>
+</body>
 </html>

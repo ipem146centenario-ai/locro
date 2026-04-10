@@ -42,22 +42,33 @@
       }
 
       header h1 {
-         font-size: 1rem;
+         font-size: 1.2rem;
          color: var(--primary);
-         font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+         margin-bottom: 5px;
+      }
+
+      header h2 {
+         font-size: 0.85rem;
+         font-weight: normal;
+         line-height: 1.4;
+         border-bottom: none;
+         background: transparent;
       }
 
       /* Panel de Porciones Totales */
       .stats-panel {
          background: linear-gradient(45deg, #004e92, #000428);
-         padding: 10px;
+         padding: 12px;
          border-radius: 12px;
          margin: 10px auto;
          width: 90%;
+         max-width: 400px;
          text-align: center;
          border: 1px solid var(--primary);
+         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
       }
-      .stats-num { font-size: 1.8rem; font-weight: 800; color: var(--accent); }
+      .stats-num { font-size: 2rem; font-weight: 800; color: var(--accent); display: block; }
+      .stats-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
 
       .app-container {
          display: grid;
@@ -87,15 +98,12 @@
          border-bottom: 1px solid var(--glass-border);
          padding-bottom: 6px;
          z-index: 10;
-         background: rgba(0, 51, 102, 0.2);
       }
 
-      /* Filtros */
       .filtros-container { display: flex; gap: 5px; margin-bottom: 10px; }
       .btn-filtro { flex: 1; background: var(--glass); border: 1px solid var(--glass-border); color: white; padding: 5px; border-radius: 6px; cursor: pointer; font-size: 0.65rem; transition: 0.3s; }
       .btn-filtro.active { background: var(--primary); color: var(--secondary); font-weight: bold; }
 
-      /* Marquesina */
       footer { background: rgba(0,0,0,0.5); padding: 8px; overflow: hidden; white-space: nowrap; border-top: 1px solid var(--glass-border); }
       .marquee-text { display: inline-block; animation: marquee 25s linear infinite; font-size: 0.85rem; color: var(--success); }
       @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
@@ -127,28 +135,12 @@
           animation: autoScroll 40s ease-in-out infinite;
       }
 
-      .scroll-automatico:hover {
-          animation-play-state: paused;
-      }
+      .scroll-automatico:hover { animation-play-state: paused; }
 
-      .viewport-colaborar {
-          flex: 1;
-          overflow: hidden;
-          position: relative;
-      }
+      .viewport-colaborar { flex: 1; overflow: hidden; position: relative; }
 
-      .instrucciones-box {
-          font-size: 0.85rem;
-          line-height: 1.4;
-          margin-bottom: 20px;
-      }
-
-      .instrucciones-box li {
-          margin-bottom: 8px;
-          padding-left: 5px;
-          border-left: 2px solid var(--primary);
-          list-style: none;
-      }
+      .instrucciones-box { font-size: 0.85rem; line-height: 1.4; margin-bottom: 20px; }
+      .instrucciones-box li { margin-bottom: 8px; padding-left: 5px; border-left: 2px solid var(--primary); list-style: none; }
 
       .alias-box {
           background: rgba(0, 0, 0, 0.4);
@@ -161,13 +153,7 @@
           align-items: center;
       }
 
-      .alias {
-          color: var(--accent);
-          font-family: monospace;
-          font-size: 0.8rem;
-          font-weight: bold;
-          display: block;
-      }
+      .alias { color: var(--accent); font-family: monospace; font-size: 0.8rem; font-weight: bold; display: block; }
 
       .btn-copy {
           background: var(--primary);
@@ -180,8 +166,7 @@
           cursor: pointer;
       }
 
-      input,
-      select {
+      input, select {
           width: 100%;
           background: #fff;
           border: 2px solid transparent;
@@ -190,12 +175,9 @@
           margin-bottom: 10px;
           color: #002244;
           font-weight: 500;
-          transition: border-color 0.3s;
       }
 
-      input.error-input {
-          border: 2px solid var(--danger) !important;
-      }
+      input.error-input { border: 2px solid var(--danger) !important; }
 
       button#btnEnviar {
           background: var(--primary);
@@ -210,21 +192,9 @@
           transition: 0.3s;
       }
 
-      button#btnEnviar:hover:not(:disabled) {
-          background: #fff;
-      }
+      button#btnEnviar:disabled { opacity: 0.5; cursor: not-allowed; }
 
-      button#btnEnviar:disabled {
-          opacity: 0.5;
-          filter: grayscale(1);
-          cursor: not-allowed;
-      }
-
-      .scroll-v {
-          overflow-y: auto;
-          flex: 1;
-          padding-right: 5px;
-      }
+      .scroll-v { overflow-y: auto; flex: 1; padding-right: 5px; }
 
       .estado-card {
           background: rgba(0, 0, 0, 0.3);
@@ -232,48 +202,15 @@
           border-radius: 10px;
           margin-bottom: 10px;
           border-left: 4px solid transparent;
-          transition: all 0.3s ease;
       }
 
-      .estado-info {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-end;
-          margin-bottom: 5px;
-      }
+      .estado-info { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px; }
+      .ingrediente-nombre { font-size: 0.8rem; font-weight: bold; color: var(--primary); }
+      .falta-texto { font-size: 0.7rem; color: var(--accent); font-weight: 600; }
+      .porcentaje-badge { font-size: 0.7rem; background: var(--glass-border); padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
 
-      .ingrediente-nombre {
-          font-size: 0.8rem;
-          font-weight: bold;
-          color: var(--primary);
-      }
-
-      .falta-texto {
-          font-size: 0.7rem;
-          color: var(--accent);
-          font-weight: 600;
-      }
-
-      .porcentaje-badge {
-          font-size: 0.7rem;
-          background: var(--glass-border);
-          padding: 2px 6px;
-          border-radius: 4px;
-          margin-left: 5px;
-      }
-
-      .barra-bg {
-          height: 8px;
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 10px;
-          overflow: hidden;
-          margin-top: 5px;
-      }
-
-      .barra-fill {
-          height: 100%;
-          transition: width 1s ease-in-out;
-      }
+      .barra-bg { height: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden; margin-top: 5px; }
+      .barra-fill { height: 100%; transition: width 1s ease-in-out; }
 
       .ok { border-left-color: var(--success); }
       .ok .barra-fill { background: var(--success); }
@@ -293,122 +230,111 @@
 
 <body>
 
-    <header>
+   <header>
       <h1>Gran Locro 10/05/2026 IPEM 146 "Centenario"</h1>
-      <h3>
-        <strong
-          >Cada aporte, por pequeño que sea, suma para alcanzar un gran
-          objetivo.</strong
-        ><br />
-        Con tu colaboración hacés posible la elaboración de este locro y
-        fortalecés el espíritu de nuestra escuela.<br />
-        <strong>Juntos podemos hacer la diferencia. 💙</strong>
-      </h3>
-      
+      <h2>
+         <strong>Cada aporte, por pequeño que sea, suma para alcanzar un gran objetivo.</strong><br />
+         Juntos podemos hacer la diferencia. 💙
+      </h2>
+   </header>
+
    
-    </header>
-
    <div class="app-container">
-
       <aside class="panel">
-          <h2>🤝 Cómo Colaborar</h2>
-          <div class="viewport-colaborar">
-             <div class="scroll-automatico">
-                <div class="instrucciones-box">
-                   <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
-                      <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Paso 1</p>
-                      <p style="font-size: 0.85rem;">📝 <strong>Registrate:</strong> Completá el formulario central con tu nombre y WhatsApp-Teléfono.</p>
-                   </div>
+         <h2>🤝 Cómo Colaborar</h2>
+         <div class="viewport-colaborar">
+            <div class="scroll-automatico">
+               <div class="instrucciones-box">
+                  <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                     <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Paso 1</p>
+                     <p>📝 <strong>Registrate:</strong> Completá el formulario central.</p>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                     <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Paso 2</p>
+                     <p>🍲 <strong>Elegí tu aporte:</strong> Doná insumos o comprá porciones.</p>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                     <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Cuentas</p>
+                     <ul style="font-size: 0.8rem; margin-top: 5px;">
+                        <li style="border-left: 2px solid var(--success);">💳 Transferencia / Efectivo</li>
+                        <li style="border-left: 2px solid var(--primary);">📦 Insumos en Dirección</li>
+                     </ul>
+                  </div>
+               </div>
 
-                   <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
-                      <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Paso 2</p>
-                      <p style="font-size: 0.85rem;">🍲 <strong>Elegí tu aporte:</strong> Podés donar ingredientes, dinero o reservar tus porciones.</p>
-                   </div>
-
-                   <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-                      <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Paso 3: Entrega</p>
-                      <ul style="font-size: 0.8rem; margin-top: 5px;">
-                         <li style="border-left: 2px solid var(--success); margin-bottom: 5px;">💳 <strong>Efectivo:</strong> Copiá un alias y transferí.</li>
-                         <li style="border-left: 2px solid var(--primary); margin-bottom: 5px;">📦 <strong>Insumos:</strong> Entregá los productos en Dirección.</li>
-                         <li style="border-left: 2px solid var(--accent);">🎟️ <strong>Tarjetas:</strong> Retiralas por Dirección.</li>
-                      </ul>
-                   </div>
-                </div>
-
-                <h2 style="margin-top: 10px;">💳 Cuentas para Transferir</h2>
-                <div class="alias-box">
-                   <div style="flex: 1;">
-                      <span style="font-size: 0.75rem; opacity: 0.8;">Estela Molina</span>
-                      <span class="alias">SMOLINA2137.NX.ARS</span>
-                   </div>
-                   <button class="btn-copy" onclick="copiarAlias('SMOLINA2137.NX.ARS', this)">COPIAR</button>
-                </div>
-                <div class="alias-box">
-                   <div style="flex: 1;">
-                      <span style="font-size: 0.75rem; opacity: 0.8;">Yohana Vallejos</span>
-                      <span class="alias">GVALLEJOS8964.NX.ARS</span>
-                   </div>
-                   <button class="btn-copy" onclick="copiarAlias('GVALLEJOS8964.NX.ARS', this)">COPIAR</button>
-                </div>
-                <div class="alias-box" style="margin-bottom: 20px;">
-                   <div style="flex: 1;">
-                      <span style="font-size: 0.75rem; opacity: 0.8;">Adriana Córdoba</span>
-                      <span class="alias">adrianacordoba1203</span>
-                   </div>
-                   <button class="btn-copy" onclick="copiarAlias('adrianacordoba1203', this)">COPIAR</button>
-                </div>
-             </div>
-          </div>
+               <h2>💳 Cuentas para Transferir</h2>
+               <div class="alias-box">
+                  <div style="flex: 1;">
+                     <span style="font-size: 0.75rem; opacity: 0.8;">Estela Molina</span>
+                     <span class="alias">SMOLINA2137.NX.ARS</span>
+                  </div>
+                  <button class="btn-copy" onclick="copiarAlias('SMOLINA2137.NX.ARS', this)">COPIAR</button>
+               </div>
+               <div class="alias-box">
+                  <div style="flex: 1;">
+                     <span style="font-size: 0.75rem; opacity: 0.8;">Yohana Vallejos</span>
+                     <span class="alias">GVALLEJOS8964.NX.ARS</span>
+                  </div>
+                  <button class="btn-copy" onclick="copiarAlias('GVALLEJOS8964.NX.ARS', this)">COPIAR</button>
+               </div>
+               <div class="alias-box">
+                  <div style="flex: 1;">
+                     <span style="font-size: 0.75rem; opacity: 0.8;">Adriana Cordoba</span>
+                     <span class="alias">adrianacordoba1203</span>
+                  </div>
+                  <button class="btn-copy" onclick="copiarAlias('adrianacordoba1203', this)">COPIAR</button>
+               </div>
+            </div>
+         </div>
       </aside>
 
       <main class="panel">
-          <h2>📝 Registro de Aporte</h2>
-          <form id="formRegistro" onsubmit="enviarDatos(event)">
-             <input id="nombre" placeholder="Nombre y Apellido" required />
-             <input type="number" id="telefono" placeholder="WhatsApp-Teléfono" required />
+         <h2>📝 Registro de Aporte</h2>
+         <form id="formRegistro" onsubmit="enviarDatos(event)">
+            <input id="nombre" placeholder="Nombre y Apellido" required />
+            <input type="number" id="telefono" placeholder="WhatsApp-Teléfono" required />
 
-             <select id="tipo" onchange="mostrarCampos()" required>
-                <option value="">Seleccione tipo...</option>
-                <option value="ingredientes">Ingredientes 🍲</option>
-                <option value="dinero">Dinero 💸</option>
-                <option value="porciones">Comprar Porciones 🎟️</option>
-             </select>
+            <select id="tipo" onchange="mostrarCampos()" required>
+               <option value="">Seleccione tipo...</option>
+               <option value="ingredientes">Ingredientes 🍲</option>
+               <option value="dinero">Dinero 💸</option>
+               <option value="porciones">Comprar Porciones 🎟️</option>
+            </select>
 
-             <div id="divIngredientes" style="display: none">
-                <select id="ingrediente"></select>
-                <input type="number" step="0.01" min="0.01" id="cantidadKg" placeholder="Cantidad (mayor a 0)" />
-             </div>
+            <div id="divIngredientes" style="display: none">
+               <select id="ingrediente"></select>
+               <input type="number" step="0.01" min="0.01" id="cantidadKg" placeholder="Cantidad" />
+            </div>
 
-             <div id="divDinero" style="display: none">
-                <input type="number" min="1" id="monto" placeholder="Monto $ (mayor a 0)" />
-             </div>
+            <div id="divDinero" style="display: none">
+               <input type="number" min="1" id="monto" placeholder="Monto $" />
+            </div>
 
-             <div id="divPorciones" style="display: none">
-                <input type="number" min="1" id="porcionesInput" placeholder="Cantidad de porciones (mayor a 0)" />
-             </div>
+            <div id="divPorciones" style="display: none">
+               <input type="number" min="1" id="porcionesInput" placeholder="Cantidad de porciones" />
+            </div>
 
-             <div id="captchaBox" style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--glass-border);">
-                <label id="captchaTexto" style="font-size: 0.8rem; color: var(--primary); font-weight: bold;"></label>
-                <input type="number" id="captchaInput" placeholder="Respuesta" required style="margin-top: 5px;" />
-             </div>
+            <div id="captchaBox" style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--glass-border);">
+               <label id="captchaTexto" style="font-size: 0.8rem; color: var(--primary); font-weight: bold;"></label>
+               <input type="number" id="captchaInput" placeholder="Respuesta" required style="margin-top: 5px;" />
+            </div>
 
-             <button type="submit" id="btnEnviar">Enviar Registro</button>
-             <div id="mensaje" style="text-align:center; margin-top:10px; font-size: 0.85rem; height: 1.5rem; font-weight: bold;"></div>
-          </form>
+            <button type="submit" id="btnEnviar">Enviar Registro</button>
+            <div id="mensaje" style="text-align:center; margin-top:10px; font-size: 0.85rem; font-weight: bold;"></div>
+         </form>
       </main>
 
       <section class="panel">
-          <h2>📊 Estado de Insumos</h2>
-          <div class="filtros-container">
-             <button class="btn-filtro active" onclick="setFiltro('todos', this)">Todos</button>
-             <button class="btn-filtro" onclick="setFiltro('faltantes', this)">Faltan</button>
-             <button class="btn-filtro" onclick="setFiltro('listos', this)">Listos</button>
-          </div>
-          <div id="estadoIngredientes" class="scroll-v">
-             <p style="text-align:center; opacity:0.5;">Cargando...</p>
-          </div>
+         <h2>📊 Estado de Insumos</h2>
+         <div class="filtros-container">
+            <button class="btn-filtro active" onclick="setFiltro('todos', this)">Todos</button>
+            <button class="btn-filtro" onclick="setFiltro('faltantes', this)">Faltan</button>
+            <button class="btn-filtro" onclick="setFiltro('listos', this)">Listos</button>
+         </div>
+         <div id="estadoIngredientes" class="scroll-v">
+            <p style="text-align:center; opacity:0.5;">Cargando...</p>
+         </div>
       </section>
-      
    </div>
 
    <footer>
@@ -476,114 +402,52 @@
           const tipo = document.getElementById("tipo").value;
           const msg = document.getElementById("mensaje");
           const btn = document.getElementById("btnEnviar");
-          const inputCant = document.getElementById("cantidadKg");
-          const inputMonto = document.getElementById("monto");
-          const inputPorc = document.getElementById("porcionesInput");
-          const ingSelect = document.getElementById("ingrediente").value;
-
+          
           if (!msg.innerText.includes("✅")) msg.innerText = "";
           btn.disabled = false;
-          [inputCant, inputMonto, inputPorc].forEach(el => el.classList.remove("error-input"));
 
           let valorActual = 0;
-          let inputActivo = null;
-
-          if (tipo === "ingredientes") {
-              valorActual = parseFloat(inputCant.value) || 0;
-              inputActivo = inputCant;
-          } else if (tipo === "dinero") {
-              valorActual = parseFloat(inputMonto.value) || 0;
-              inputActivo = inputMonto;
-          } else if (tipo === "porciones") {
-              valorActual = parseInt(inputPorc.value) || 0;
-              inputActivo = inputPorc;
-          }
+          if (tipo === "ingredientes") valorActual = parseFloat(document.getElementById("cantidadKg").value) || 0;
+          else if (tipo === "dinero") valorActual = parseFloat(document.getElementById("monto").value) || 0;
+          else if (tipo === "porciones") valorActual = parseInt(document.getElementById("porcionesInput").value) || 0;
 
           if (tipo !== "" && valorActual <= 0) {
               msg.innerText = "⚠️ Cantidad debe ser mayor a 0";
               msg.style.color = "var(--accent)";
-              if(inputActivo) inputActivo.classList.add("error-input");
               btn.disabled = true;
-              return;
-          }
-
-          if (tipo === "ingredientes" && ingSelect) {
-              const recibido = datosActuales[ingSelect] || 0;
-              const meta = objetivos[ingSelect].meta;
-              const falta = meta - recibido;
-
-              if (recibido >= meta) {
-                  msg.innerText = `❌ ${ingSelect} ya está completo.`;
-                  msg.style.color = "var(--danger)";
-                  btn.disabled = true;
-              } else if (valorActual > (falta + 0.001)) {
-                  msg.innerText = `⚠️ Máximo aceptado: ${falta.toFixed(2)} ${obtenerUnidad(ingSelect)}`;
-                  msg.style.color = "var(--accent)";
-                  inputCant.classList.add("error-input");
-                  btn.disabled = true;
-              }
           }
       }
 
-      document.getElementById("cantidadKg").addEventListener("input", validarInput);
-      document.getElementById("monto").addEventListener("input", validarInput);
-      document.getElementById("porcionesInput").addEventListener("input", validarInput);
-      document.getElementById("ingrediente").addEventListener("change", validarInput);
-      
-      document.getElementById("captchaInput").addEventListener("input", function() {
-          if (this.value != "" && parseInt(this.value) !== captchaCorrecto) {
-              document.getElementById("mensaje").innerText = "❌ Resultado incorrecto";
-              document.getElementById("mensaje").style.color = "var(--danger)";
-          } else {
-              validarInput();
-          }
-      });
-
       async function enviarDatos(e) {
           e.preventDefault();
-          const msg = document.getElementById("mensaje");
-          const btn = document.getElementById("btnEnviar");
-
           if (parseInt(document.getElementById("captchaInput").value) !== captchaCorrecto) {
-              msg.innerText = "❌ Error en la suma"; return;
+              alert("Error en la suma de seguridad"); return;
           }
 
+          const btn = document.getElementById("btnEnviar");
           btn.disabled = true;
           btn.innerText = "ENVIANDO...";
 
-          const nombre = document.getElementById("nombre").value.toUpperCase();
-          const tipo = document.getElementById("tipo").value;
-          const ing = document.getElementById("ingrediente").value;
-          const cant = parseFloat(document.getElementById("cantidadKg").value) || 0;
-
           const data = {
-              nombre: nombre,
+              nombre: document.getElementById("nombre").value.toUpperCase(),
               telefono: document.getElementById("telefono").value,
-              tipo: tipo,
-              ingrediente: ing,
-              cantidadKg: cant,
+              tipo: document.getElementById("tipo").value,
+              ingrediente: document.getElementById("ingrediente").value,
+              cantidadKg: parseFloat(document.getElementById("cantidadKg").value) || 0,
               monto: parseFloat(document.getElementById("monto").value) || 0,
               porciones: parseInt(document.getElementById("porcionesInput").value) || 0
           };
 
           try {
               await fetch(URL, { method: "POST", mode: "no-cors", body: JSON.stringify(data) });
-              
-              const det = tipo === 'ingredientes' ? `${cant}kg de ${ing}` : (tipo === 'dinero' ? `$${data.monto}` : `${data.porciones} porc.`);
-              document.getElementById("marquee").innerText = `¡GRACIAS ${nombre} por sumar ${det}! ❤️ --- `;
-
-              if (tipo === 'ingredientes' && (datosActuales[ing] + cant) >= objetivos[ing].meta) {
-                  confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-              }
-
-              msg.innerText = "✅ ¡Recibido! Gracias.";
-              msg.style.color = "var(--success)";
+              document.getElementById("mensaje").innerText = "✅ ¡Recibido! Gracias.";
+              document.getElementById("mensaje").style.color = "var(--success)";
               document.getElementById("formRegistro").reset();
               mostrarCampos();
               generarCaptcha();
-              setTimeout(cargarEstado, 2500);
+              setTimeout(cargarEstado, 2000);
           } catch (e) {
-              msg.innerText = "❌ Error de red";
+              document.getElementById("mensaje").innerText = "❌ Error de envío";
           } finally {
               btn.innerText = "ENVIAR REGISTRO";
               btn.disabled = false;
@@ -593,10 +457,7 @@
       function cargarEstado() {
           fetch(URL).then(r => r.json()).then(data => {
               datosActuales = data;
-              // Aquí estaba el error: ahora el elemento totalPorciones sí existe en el HTML
-              if (document.getElementById("totalPorciones")) {
-                  document.getElementById("totalPorciones").innerText = data.TOTAL_PORCIONES || 0;
-              }
+              document.getElementById("totalPorciones").innerText = data.TOTAL_PORCIONES || 0;
               
               const contenedor = document.getElementById("estadoIngredientes");
               contenedor.innerHTML = "";
@@ -606,9 +467,7 @@
                   const meta = objetivos[nombre].meta;
                   const porc = Math.min((val / meta) * 100, 100);
                   return { nombre, val, meta, porc, icon: objetivos[nombre].icon };
-              });
-
-              listaOrdenada.sort((a, b) => a.porc - b.porc);
+              }).sort((a, b) => a.porc - b.porc);
 
               listaOrdenada.forEach((item, index) => {
                   if (filtroActual === 'faltantes' && item.porc >= 100) return;
@@ -616,29 +475,17 @@
 
                   let falta = Math.max(item.meta - item.val, 0);
                   let claseColor = item.porc >= 100 ? "ok" : (item.porc >= 60 ? "medio" : "falta");
-                  let unidad = obtenerUnidad(item.nombre);
                   let claseResaltado = (index < 3 && item.porc < 100) ? "resaltar-critico" : "";
-
-                  const opt = Array.from(selIng.options).find(o => o.value === item.nombre);
-                  if(opt) {
-                     opt.disabled = item.porc >= 100;
-                     opt.text = (item.porc >= 100 ? "✅ " : "") + item.icon + " " + item.nombre + (item.porc >= 100 ? " (LLENO)" : "");
-                  }
 
                   contenedor.innerHTML += `
                   <div class="estado-card ${claseColor} ${claseResaltado}">
                      <div class="estado-info">
                         <span class="ingrediente-nombre">${item.icon} ${item.nombre} <span class="porcentaje-badge">${item.porc.toFixed(0)}%</span></span>
-                        <span class="falta-texto">${falta > 0 ? 'Faltan ' + falta.toFixed(2) + ' ' + unidad : '¡LISTO!'}</span>
-                     </div>
-                     <div style="display:flex; justify-content:space-between; font-size:0.65rem; opacity:0.8; margin-bottom:2px;">
-                        <span>Recibido: ${item.val.toFixed(2)} ${unidad}</span>
-                        <span>Meta: ${item.meta} ${unidad}</span>
+                        <span class="falta-texto">${falta > 0 ? 'Faltan ' + falta.toFixed(1) : '¡LISTO!'}</span>
                      </div>
                      <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
                   </div>`;
               });
-              validarInput();
           });
       }
 

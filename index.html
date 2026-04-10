@@ -55,21 +55,6 @@
          background: transparent;
       }
 
-      /* Panel de Porciones Totales */
-      .stats-panel {
-         background: linear-gradient(45deg, #004e92, #000428);
-         padding: 12px;
-         border-radius: 12px;
-         margin: 10px auto;
-         width: 90%;
-         max-width: 400px;
-         text-align: center;
-         border: 1px solid var(--primary);
-         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      }
-      .stats-num { font-size: 2rem; font-weight: 800; color: var(--accent); display: block; }
-      .stats-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
-
       .app-container {
          display: grid;
          grid-template-columns: 320px 1fr 340px;
@@ -137,7 +122,6 @@
 
       .scroll-automatico:hover { animation-play-state: paused; }
 
-      /* MEJORA: Contenedor con scroll manual para celulares */
       .viewport-colaborar { 
           flex: 1; 
           overflow-y: auto; 
@@ -145,7 +129,6 @@
           padding-right: 5px;
       }
 
-      /* Personalización de la barra de desplazamiento */
       .viewport-colaborar::-webkit-scrollbar { width: 5px; }
       .viewport-colaborar::-webkit-scrollbar-track { background: transparent; }
       .viewport-colaborar::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
@@ -234,7 +217,6 @@
           body { overflow-y: auto; height: auto; }
           .app-container { grid-template-columns: 1fr; }
           .panel { height: auto; max-height: 600px; }
-          /* En celulares quitamos la animación para que no "luche" contra el dedo del usuario */
           .scroll-automatico { animation: none; }
           .viewport-colaborar { overflow-y: auto; }
       }
@@ -251,7 +233,6 @@
       </h2>
    </header>
 
-   
    <div class="app-container">
       <aside class="panel">
          <h2>🤝 Cómo Colaborar</h2>
@@ -315,16 +296,16 @@
             </select>
 
             <div id="divIngredientes" style="display: none">
-               <select id="ingrediente"></select>
-               <input type="number" step="0.01" min="0.01" id="cantidadKg" placeholder="Cantidad" />
+               <select id="ingrediente" onchange="actualizarMaximo()"></select>
+               <input type="number" step="0.01" min="0.01" id="cantidadKg" placeholder="Cantidad" oninput="validarInput()" />
             </div>
 
             <div id="divDinero" style="display: none">
-               <input type="number" min="1" id="monto" placeholder="Monto $" />
+               <input type="number" min="1" id="monto" placeholder="Monto $" oninput="validarInput()" />
             </div>
 
             <div id="divPorciones" style="display: none">
-               <input type="number" min="1" id="porcionesInput" placeholder="Cantidad de porciones" />
+               <input type="number" min="1" id="porcionesInput" placeholder="Cantidad de porciones" oninput="validarInput()" />
             </div>
 
             <div id="captchaBox" style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--glass-border);">
@@ -383,7 +364,7 @@
           filtroActual = f;
           document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
-          cargarEstado();
+          renderizarLista();
       }
 
       function generarCaptcha() {
@@ -399,7 +380,28 @@
           document.getElementById("divIngredientes").style.display = t === "ingredientes" ? "block" : "none";
           document.getElementById("divDinero").style.display = t === "dinero" ? "block" : "none";
           document.getElementById("divPorciones").style.display = t === "porciones" ? "block" : "none";
+          if(t === "ingredientes") actualizarMaximo();
           validarInput();
+      }
+
+      // NUEVA FUNCIÓN: Actualiza el máximo permitido según lo que falta
+      function actualizarMaximo() {
+          const ing = document.getElementById("ingrediente").value;
+          const inputCant = document.getElementById("cantidadKg");
+          const meta = objetivos[ing].meta;
+          const actual = datosActuales[ing] || 0;
+          const falta = Math.max(meta - actual, 0);
+          const unidad = obtenerUnidad(ing);
+
+          inputCant.max = falta.toFixed(2);
+          inputCant.placeholder = falta > 0 ? `Máximo: ${falta.toFixed(1)} ${unidad}` : "¡Cupo lleno!";
+          
+          if(falta <= 0) {
+              inputCant.disabled = true;
+              inputCant.value = "";
+          } else {
+              inputCant.disabled = false;
+          }
       }
 
       function obtenerUnidad(i) {
@@ -420,13 +422,25 @@
           btn.disabled = false;
 
           let valorActual = 0;
-          if (tipo === "ingredientes") valorActual = parseFloat(document.getElementById("cantidadKg").value) || 0;
-          else if (tipo === "dinero") valorActual = parseFloat(document.getElementById("monto").value) || 0;
-          else if (tipo === "porciones") valorActual = parseInt(document.getElementById("porcionesInput").value) || 0;
+          let maxPermitido = 999999;
+
+          if (tipo === "ingredientes") {
+              const inputCant = document.getElementById("cantidadKg");
+              valorActual = parseFloat(inputCant.value) || 0;
+              maxPermitido = parseFloat(inputCant.max) || 0;
+          } else if (tipo === "dinero") {
+              valorActual = parseFloat(document.getElementById("monto").value) || 0;
+          } else if (tipo === "porciones") {
+              valorActual = parseInt(document.getElementById("porcionesInput").value) || 0;
+          }
 
           if (tipo !== "" && valorActual <= 0) {
               msg.innerText = "⚠️ Cantidad debe ser mayor a 0";
               msg.style.color = "var(--accent)";
+              btn.disabled = true;
+          } else if (tipo === "ingredientes" && valorActual > maxPermitido) {
+              msg.innerText = `⚠️ Supera el máximo faltante (${maxPermitido})`;
+              msg.style.color = "var(--danger)";
               btn.disabled = true;
           }
       }
@@ -470,34 +484,39 @@
       function cargarEstado() {
           fetch(URL).then(r => r.json()).then(data => {
               datosActuales = data;
-              
-              const contenedor = document.getElementById("estadoIngredientes");
-              contenedor.innerHTML = "";
+              renderizarLista();
+              // Si el usuario ya tenía el formulario de ingredientes abierto, actualizamos el max
+              if(document.getElementById("tipo").value === "ingredientes") actualizarMaximo();
+          });
+      }
 
-              const listaOrdenada = Object.keys(objetivos).map(nombre => {
-                  const val = data[nombre] || 0;
-                  const meta = objetivos[nombre].meta;
-                  const porc = Math.min((val / meta) * 100, 100);
-                  return { nombre, val, meta, porc, icon: objetivos[nombre].icon };
-              }).sort((a, b) => a.porc - b.porc);
+      function renderizarLista() {
+          const contenedor = document.getElementById("estadoIngredientes");
+          contenedor.innerHTML = "";
 
-              listaOrdenada.forEach((item, index) => {
-                  if (filtroActual === 'faltantes' && item.porc >= 100) return;
-                  if (filtroActual === 'listos' && item.porc < 100) return;
+          const listaOrdenada = Object.keys(objetivos).map(nombre => {
+              const val = datosActuales[nombre] || 0;
+              const meta = objetivos[nombre].meta;
+              const porc = Math.min((val / meta) * 100, 100);
+              return { nombre, val, meta, porc, icon: objetivos[nombre].icon };
+          }).sort((a, b) => a.porc - b.porc);
 
-                  let falta = Math.max(item.meta - item.val, 0);
-                  let claseColor = item.porc >= 100 ? "ok" : (item.porc >= 60 ? "medio" : "falta");
-                  let claseResaltado = (index < 3 && item.porc < 100) ? "resaltar-critico" : "";
+          listaOrdenada.forEach((item, index) => {
+              if (filtroActual === 'faltantes' && item.porc >= 100) return;
+              if (filtroActual === 'listos' && item.porc < 100) return;
 
-                  contenedor.innerHTML += `
-                  <div class="estado-card ${claseColor} ${claseResaltado}">
-                      <div class="estado-info">
-                         <span class="ingrediente-nombre">${item.icon} ${item.nombre} <span class="porcentaje-badge">${item.porc.toFixed(0)}%</span></span>
-                         <span class="falta-texto">${falta > 0 ? 'Faltan ' + falta.toFixed(1) : '¡LISTO!'}</span>
-                      </div>
-                      <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
-                  </div>`;
-              });
+              let falta = Math.max(item.meta - item.val, 0);
+              let claseColor = item.porc >= 100 ? "ok" : (item.porc >= 60 ? "medio" : "falta");
+              let claseResaltado = (index < 3 && item.porc < 100) ? "resaltar-critico" : "";
+
+              contenedor.innerHTML += `
+              <div class="estado-card ${claseColor} ${claseResaltado}">
+                  <div class="estado-info">
+                     <span class="ingrediente-nombre">${item.icon} ${item.nombre} <span class="porcentaje-badge">${item.porc.toFixed(0)}%</span></span>
+                     <span class="falta-texto">${falta > 0 ? 'Faltan ' + falta.toFixed(1) : '¡LISTO!'}</span>
+                  </div>
+                  <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
+              </div>`;
           });
       }
 

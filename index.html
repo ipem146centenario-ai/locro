@@ -293,14 +293,20 @@
 
 <body>
 
-   <header>
-      <h1>Locro IPEM 146 "Centenario"</h1>
-      <h2>10 de mayo 2026</h2>
-      <div class="stats-panel">
-         <p style="font-size: 0.65rem; text-transform: uppercase; color: var(--primary);">Porciones Reservadas en Total</p>
-         <div id="totalPorciones" class="stats-num">0</div>
-      </div>
-   </header>
+    <header>
+      <h1>Gran Locro 10/05/2026 IPEM 146 "Centenario"</h1>
+      <h3>
+        <strong
+          >Cada aporte, por pequeño que sea, suma para alcanzar un gran
+          objetivo.</strong
+        ><br />
+        Con tu colaboración hacés posible la elaboración de este locro y
+        fortalecés el espíritu de nuestra escuela.<br />
+        <strong>Juntos podemos hacer la diferencia. 💙</strong>
+      </h3>
+      
+   
+    </header>
 
    <div class="app-container">
 
@@ -406,7 +412,7 @@
    </div>
 
    <footer>
-      <div id="marquee" class="marquee-text">¡Gracias por colaborar con la cooperadora del IPEM 146! ❤️ Todo lo recaudado es para el colegio.</div>
+      <div id="marquee" class="marquee-text">¡Gracias por colaborar con el IPEM 146! ❤️</div>
    </footer>
 
    <script>
@@ -507,14 +513,14 @@
               const falta = meta - recibido;
 
               if (recibido >= meta) {
-                 msg.innerText = `❌ ${ingSelect} ya está completo.`;
-                 msg.style.color = "var(--danger)";
-                 btn.disabled = true;
+                  msg.innerText = `❌ ${ingSelect} ya está completo.`;
+                  msg.style.color = "var(--danger)";
+                  btn.disabled = true;
               } else if (valorActual > (falta + 0.001)) {
-                 msg.innerText = `⚠️ Máximo aceptado: ${falta.toFixed(2)} ${obtenerUnidad(ingSelect)}`;
-                 msg.style.color = "var(--accent)";
-                 inputCant.classList.add("error-input");
-                 btn.disabled = true;
+                  msg.innerText = `⚠️ Máximo aceptado: ${falta.toFixed(2)} ${obtenerUnidad(ingSelect)}`;
+                  msg.style.color = "var(--accent)";
+                  inputCant.classList.add("error-input");
+                  btn.disabled = true;
               }
           }
       }
@@ -563,13 +569,11 @@
           try {
               await fetch(URL, { method: "POST", mode: "no-cors", body: JSON.stringify(data) });
               
-              // Historial Marquesina
               const det = tipo === 'ingredientes' ? `${cant}kg de ${ing}` : (tipo === 'dinero' ? `$${data.monto}` : `${data.porciones} porc.`);
               document.getElementById("marquee").innerText = `¡GRACIAS ${nombre} por sumar ${det}! ❤️ --- `;
 
-              // Confeti si se completa
               if (tipo === 'ingredientes' && (datosActuales[ing] + cant) >= objetivos[ing].meta) {
-                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                  confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
               }
 
               msg.innerText = "✅ ¡Recibido! Gracias.";
@@ -589,7 +593,11 @@
       function cargarEstado() {
           fetch(URL).then(r => r.json()).then(data => {
               datosActuales = data;
-              document.getElementById("totalPorciones").innerText = data.TOTAL_PORCIONES || 0;
+              // Aquí estaba el error: ahora el elemento totalPorciones sí existe en el HTML
+              if (document.getElementById("totalPorciones")) {
+                  document.getElementById("totalPorciones").innerText = data.TOTAL_PORCIONES || 0;
+              }
+              
               const contenedor = document.getElementById("estadoIngredientes");
               contenedor.innerHTML = "";
 
@@ -603,33 +611,32 @@
               listaOrdenada.sort((a, b) => a.porc - b.porc);
 
               listaOrdenada.forEach((item, index) => {
-                 if (filtroActual === 'faltantes' && item.porc >= 100) return;
-                 if (filtroActual === 'listos' && item.porc < 100) return;
+                  if (filtroActual === 'faltantes' && item.porc >= 100) return;
+                  if (filtroActual === 'listos' && item.porc < 100) return;
 
-                 let falta = Math.max(item.meta - item.val, 0);
-                 let claseColor = item.porc >= 100 ? "ok" : (item.porc >= 60 ? "medio" : "falta");
-                 let unidad = obtenerUnidad(item.nombre);
-                 let claseResaltado = (index < 3 && item.porc < 100) ? "resaltar-critico" : "";
+                  let falta = Math.max(item.meta - item.val, 0);
+                  let claseColor = item.porc >= 100 ? "ok" : (item.porc >= 60 ? "medio" : "falta");
+                  let unidad = obtenerUnidad(item.nombre);
+                  let claseResaltado = (index < 3 && item.porc < 100) ? "resaltar-critico" : "";
 
-                 // Bloqueo y marca en select
-                 const opt = Array.from(selIng.options).find(o => o.value === item.nombre);
-                 if(opt) {
-                    opt.disabled = item.porc >= 100;
-                    opt.text = (item.porc >= 100 ? "✅ " : "") + item.icon + " " + item.nombre + (item.porc >= 100 ? " (LLENO)" : "");
-                 }
+                  const opt = Array.from(selIng.options).find(o => o.value === item.nombre);
+                  if(opt) {
+                     opt.disabled = item.porc >= 100;
+                     opt.text = (item.porc >= 100 ? "✅ " : "") + item.icon + " " + item.nombre + (item.porc >= 100 ? " (LLENO)" : "");
+                  }
 
-                 contenedor.innerHTML += `
-                 <div class="estado-card ${claseColor} ${claseResaltado}">
-                    <div class="estado-info">
-                       <span class="ingrediente-nombre">${item.icon} ${item.nombre} <span class="porcentaje-badge">${item.porc.toFixed(0)}%</span></span>
-                       <span class="falta-texto">${falta > 0 ? 'Faltan ' + falta.toFixed(2) + ' ' + unidad : '¡LISTO!'}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.65rem; opacity:0.8; margin-bottom:2px;">
-                       <span>Recibido: ${item.val.toFixed(2)} ${unidad}</span>
-                       <span>Meta: ${item.meta} ${unidad}</span>
-                    </div>
-                    <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
-                 </div>`;
+                  contenedor.innerHTML += `
+                  <div class="estado-card ${claseColor} ${claseResaltado}">
+                     <div class="estado-info">
+                        <span class="ingrediente-nombre">${item.icon} ${item.nombre} <span class="porcentaje-badge">${item.porc.toFixed(0)}%</span></span>
+                        <span class="falta-texto">${falta > 0 ? 'Faltan ' + falta.toFixed(2) + ' ' + unidad : '¡LISTO!'}</span>
+                     </div>
+                     <div style="display:flex; justify-content:space-between; font-size:0.65rem; opacity:0.8; margin-bottom:2px;">
+                        <span>Recibido: ${item.val.toFixed(2)} ${unidad}</span>
+                        <span>Meta: ${item.meta} ${unidad}</span>
+                     </div>
+                     <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
+                  </div>`;
               });
               validarInput();
           });

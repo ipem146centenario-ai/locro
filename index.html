@@ -18,7 +18,11 @@
          --glass-border: rgba(255, 255, 255, 0.15);
       }
 
-      * { box-sizing: border-box; margin: 0; padding: 0; }
+      * {
+         box-sizing: border-box;
+         margin: 0;
+         padding: 0;
+      }
 
       body {
          font-family: 'Inter', sans-serif;
@@ -30,8 +34,102 @@
          overflow: hidden;
       }
 
-      header { padding: 1rem; text-align: center; background: rgba(0, 0, 0, 0.4); border-bottom: 1px solid var(--glass-border); }
-      header h1 { font-size: 1.2rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+      /* BOTÓN WHATSAPP FLOTANTE */
+      .btn-wa-float {
+         position: fixed;
+         bottom: 60px;
+         right: 20px;
+         background: #25d366;
+         color: white;
+         width: 55px;
+         height: 55px;
+         border-radius: 50%;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+         z-index: 10000;
+         text-decoration: none;
+         font-size: 24px;
+         transition: 0.3s;
+      }
+
+      .btn-wa-float:hover {
+         transform: scale(1.1);
+      }
+
+      .modal-overlay {
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background: rgba(0, 0, 0, 0.85);
+         backdrop-filter: blur(8px);
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         z-index: 9999;
+         transition: opacity 0.5s ease;
+      }
+
+      .modal-content {
+         background: var(--secondary);
+         border: 2px solid var(--primary);
+         padding: 2rem;
+         border-radius: 20px;
+         text-align: center;
+         box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+         max-width: 90%;
+      }
+
+      .modal-content h2 {
+         font-size: 2rem;
+         color: var(--accent);
+         margin-bottom: 1rem;
+         border: none;
+      }
+
+      .precio-destacado {
+         font-size: 3.5rem;
+         font-weight: 900;
+         color: var(--success);
+         display: block;
+         margin: 10px 0;
+      }
+
+      .incluye-queso {
+         font-size: 1.2rem;
+         color: #fff;
+         display: block;
+         margin-bottom: 20px;
+         font-style: italic;
+      }
+
+      .btn-cerrar-modal {
+         background: var(--primary);
+         color: var(--secondary);
+         border: none;
+         padding: 12px 30px;
+         border-radius: 8px;
+         font-weight: bold;
+         cursor: pointer;
+         font-size: 1rem;
+      }
+
+      header {
+         padding: 1rem;
+         text-align: center;
+         background: rgba(0, 0, 0, 0.4);
+         border-bottom: 1px solid var(--glass-border);
+      }
+
+      header h1 {
+         font-size: 1.2rem;
+         color: var(--primary);
+         text-transform: uppercase;
+         letter-spacing: 1px;
+      }
 
       .app-container {
          display: grid;
@@ -51,158 +149,423 @@
          display: flex;
          flex-direction: column;
          overflow: hidden;
+         position: relative;
       }
 
-      h2 { font-size: 0.9rem; margin-bottom: 0.8rem; color: var(--primary); border-bottom: 1px solid var(--glass-border); padding-bottom: 6px; text-transform: uppercase; }
+      .enviando-overlay {
+         opacity: 0.5;
+         pointer-events: none;
+         filter: grayscale(0.5);
+      }
 
-      /* Animaciones */
-      @keyframes shimmer { 0% { opacity: 0.3; } 50% { opacity: 0.6; } 100% { opacity: 0.3; } }
-      .skeleton { height: 60px; background: var(--glass); border-radius: 10px; margin-bottom: 10px; animation: shimmer 1.5s infinite; }
+      h2 {
+         font-size: 0.9rem;
+         margin-bottom: 0.8rem;
+         color: var(--primary);
+         border-bottom: 1px solid var(--glass-border);
+         padding-bottom: 6px;
+         text-transform: uppercase;
+      }
 
-      @keyframes pulso-critico { 0% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 82, 82, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); } }
-      .resaltar-critico { animation: pulso-critico 2s infinite; border: 2px solid var(--danger) !important; background: rgba(255, 82, 82, 0.1) !important; }
+      @keyframes shimmer {
+         0% {
+            opacity: 0.3;
+         }
 
-      @keyframes autoScroll { 0%, 15% { transform: translateY(0); } 40%, 60% { transform: translateY(-30%); } 85%, 100% { transform: translateY(0); } }
-      .scroll-automatico { display: flex; flex-direction: column; animation: autoScroll 40s ease-in-out infinite; }
-      .scroll-automatico:hover { animation-play-state: paused; }
+         50% {
+            opacity: 0.6;
+         }
 
-      /* Componentes */
-      .filtros-container { display: flex; gap: 5px; margin-bottom: 10px; }
-      .btn-filtro { flex: 1; background: var(--glass); border: 1px solid var(--glass-border); color: white; padding: 6px; border-radius: 6px; cursor: pointer; font-size: 0.65rem; transition: 0.3s; }
-      .btn-filtro.active { background: var(--primary); color: var(--secondary); font-weight: bold; }
+         100% {
+            opacity: 0.3;
+         }
+      }
 
-      .estado-card { background: rgba(0, 0, 0, 0.3); padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid transparent; transition: 0.2s; }
-      .estado-info { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px; }
-      .ingrediente-nombre { font-size: 0.8rem; font-weight: bold; color: var(--primary); }
-      .falta-texto { font-size: 0.7rem; color: var(--accent); font-weight: 900; }
+      .skeleton {
+         height: 60px;
+         background: var(--glass);
+         border-radius: 10px;
+         margin-bottom: 10px;
+         animation: shimmer 1.5s infinite;
+      }
 
-      .barra-bg { height: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden; position: relative; }
-      .barra-fill { height: 100%; transition: width 1.5s cubic-bezier(0.1, 0, 0.1, 1); }
-      .ok { border-left-color: var(--success); } .ok .barra-fill { background: var(--success); }
-      .medio { border-left-color: var(--primary); } .medio .barra-fill { background: var(--primary); }
-      .falta { border-left-color: var(--danger); } .falta .barra-fill { background: var(--danger); }
+      @keyframes pulso-critico {
+         0% {
+            box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.4);
+         }
 
-      input, select { width: 100%; background: #fff; border: 2px solid transparent; padding: 12px; border-radius: 10px; margin-bottom: 12px; color: #002244; font-weight: 700; outline: none; }
-      button#btnEnviar { background: var(--primary); color: var(--secondary); border: none; padding: 16px; border-radius: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; width: 100%; }
-      button#btnEnviar:disabled { background: #444; color: #777; cursor: not-allowed; }
+         70% {
+            box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
+         }
 
-      footer { background: rgba(0,0,0,0.6); padding: 10px; border-top: 1px solid var(--glass-border); overflow: hidden; }
-      .marquee-text { display: inline-block; animation: marquee 35s linear infinite; font-size: 0.8rem; font-weight: bold; color: var(--success); text-transform: uppercase; white-space: nowrap; }
-      @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+         100% {
+            box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+         }
+      }
+
+      .resaltar-critico {
+         animation: pulso-critico 2s infinite;
+         border: 2px solid var(--danger) !important;
+         background: rgba(255, 82, 82, 0.1) !important;
+      }
+
+      @keyframes pulso-casi-listo {
+         0% {
+            opacity: 1;
+         }
+
+         50% {
+            opacity: 0.7;
+         }
+
+         100% {
+            opacity: 1;
+         }
+      }
+
+      .casi-listo {
+         animation: pulso-casi-listo 3s infinite;
+         border-left-color: var(--accent) !important;
+      }
+
+      @keyframes autoScroll {
+
+         0%,
+         15% {
+            transform: translateY(0);
+         }
+
+         40%,
+         60% {
+            transform: translateY(-30%);
+         }
+
+         85%,
+         100% {
+            transform: translateY(0);
+         }
+      }
+
+      .scroll-automatico {
+         display: flex;
+         flex-direction: column;
+         animation: autoScroll 40s ease-in-out infinite;
+      }
+
+      .scroll-automatico:hover {
+         animation-play-state: paused;
+      }
+
+      .filtros-container {
+         display: flex;
+         gap: 5px;
+         margin-bottom: 10px;
+      }
+
+      .btn-filtro {
+         flex: 1;
+         background: var(--glass);
+         border: 1px solid var(--glass-border);
+         color: white;
+         padding: 6px;
+         border-radius: 6px;
+         cursor: pointer;
+         font-size: 0.65rem;
+         transition: 0.3s;
+      }
+
+      .btn-filtro.active {
+         background: var(--primary);
+         color: var(--secondary);
+         font-weight: bold;
+      }
+
+      .estado-card {
+         background: rgba(0, 0, 0, 0.3);
+         padding: 12px;
+         border-radius: 10px;
+         margin-bottom: 10px;
+         border-left: 4px solid transparent;
+         transition: 0.2s;
+      }
+
+      .estado-info {
+         display: flex;
+         justify-content: space-between;
+         align-items: flex-end;
+         margin-bottom: 5px;
+      }
+
+      .ingrediente-nombre {
+         font-size: 0.8rem;
+         font-weight: bold;
+         color: var(--primary);
+      }
+
+      .falta-texto {
+         font-size: 0.7rem;
+         color: var(--accent);
+         font-weight: 900;
+      }
+
+      .barra-bg {
+         height: 8px;
+         background: rgba(255, 255, 255, 0.05);
+         border-radius: 10px;
+         overflow: hidden;
+         position: relative;
+      }
+
+      .barra-fill {
+         height: 100%;
+         transition: width 1.5s cubic-bezier(0.1, 0, 0.1, 1);
+      }
+
+      .ok {
+         border-left-color: var(--success);
+      }
+
+      .ok .barra-fill {
+         background: var(--success);
+      }
+
+      .medio {
+         border-left-color: var(--primary);
+      }
+
+      .medio .barra-fill {
+         background: var(--primary);
+      }
+
+      .falta {
+         border-left-color: var(--danger);
+      }
+
+      .falta .barra-fill {
+         background: var(--danger);
+      }
+
+      .barra-global-container {
+         margin-bottom: 15px;
+         padding: 10px;
+         background: rgba(255, 255, 255, 0.03);
+         border-radius: 10px;
+      }
+
+      input,
+      select {
+         width: 100%;
+         background: #fff;
+         border: 2px solid transparent;
+         padding: 12px;
+         border-radius: 10px;
+         margin-bottom: 12px;
+         color: #002244;
+         font-weight: 700;
+         outline: none;
+      }
+
+      button#btnEnviar {
+         background: var(--primary);
+         color: var(--secondary);
+         border: none;
+         padding: 16px;
+         border-radius: 10px;
+         font-weight: 900;
+         cursor: pointer;
+         text-transform: uppercase;
+         width: 100%;
+      }
+
+      button#btnEnviar:disabled {
+         background: #444;
+         color: #777;
+         cursor: not-allowed;
+      }
+
+      footer {
+         background: rgba(0, 0, 0, 0.6);
+         padding: 10px;
+         border-top: 1px solid var(--glass-border);
+         overflow: hidden;
+      }
+
+      .marquee-text {
+         display: inline-block;
+         animation: marquee 35s linear infinite;
+         font-size: 0.8rem;
+         font-weight: bold;
+         color: var(--success);
+         text-transform: uppercase;
+         white-space: nowrap;
+      }
+
+      @keyframes marquee {
+         0% {
+            transform: translateX(100%);
+         }
+
+         100% {
+            transform: translateX(-100%);
+         }
+      }
 
       @media (max-width: 1100px) {
-         body { overflow-y: auto; height: auto; }
-         .app-container { grid-template-columns: 1fr; }
-         .panel { max-height: 550px; }
-         .scroll-automatico { animation: none; }
+         body {
+            overflow-y: auto;
+            height: auto;
+         }
+
+         .app-container {
+            grid-template-columns: 1fr;
+         }
+
+         .panel {
+            max-height: 550px;
+         }
+
+         .scroll-automatico {
+            animation: none;
+         }
       }
-      h6{
-        text-align: center;
-        font-family: 'Courier New', Courier, monospace;
+
+      h6 {
+         text-align: center;
+         font-family: 'Courier New', Courier, monospace;
       }
    </style>
 </head>
 
 <body>
+   <div id="modalPrecio" class="modal-overlay">
+      <div class="modal-content">
+         <h2>🍲 Porción de Locro</h2>
+         <span class="precio-destacado">$8.000</span>
+         <span class="incluye-queso">(Incluye queso)</span>
+         <p>Gran Locro IPEM 146 - 10 de Mayo</p>
+         <p style="margin-top: 10px; font-size: 0.9rem;">Hacé tu pedido con anticipación al <strong>3544-586602</strong>
+         </p>
+         <br>
+         <button class="btn-cerrar-modal" onclick="cerrarModal()">ENTENDIDO</button>
+      </div>
+   </div>
+
    <header>
       <h1>IPEM 146 "Centenario" - Gran Locro 2026</h1>
    </header>
 
    <div class="app-container">
       <aside class="panel">
-         <h2>🤝 Información y Cuentas para transferir</h2>
+         <h2>🤝 Información y Cuentas</h2>
          <div style="flex:1; overflow-y:auto;">
             <div class="scroll-automatico">
-<h2>🤝 Cómo Colaborar</h2>
-         <div class="viewport-colaborar">
-            <div class="scroll-automatico">
                <div class="instrucciones-box">
-                  <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
-                     <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Paso 1</p>
+                  <div
+                     style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                     <p
+                        style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">
+                        Paso 1</p>
                      <p>📝 <strong>Registrate:</strong> Completá el formulario central.</p>
                   </div>
-                  <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
-                     <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Paso 2</p>
-                     <p>🍲 <strong>Elegí tu aporte:</strong> Doná insumos, dinero (efectivo o transferencia) o bien comprá porciones.</p>
+                  <div
+                     style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                     <p
+                        style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">
+                        Paso 2</p>
+                     <p>🍲 <strong>Elegí tu aporte:</strong> Doná insumos, dinero o comprá porciones.</p>
                   </div>
-                   
-                         <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
-                     <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Paso 3</p>
-                     <p>🍲 <strong>Entrega/retiro:</strong> Deja los donado y/o retira Tarjeta (compra porciones) en dirección.</p>
+                  <div
+                     style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                     <p
+                        style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">
+                        Paso 3</p>
+                     <p>🍲 <strong>Entrega/retiro:</strong> Acercate a dirección para dejar lo donado o retirar tarjeta.
+                        <strong>El 10 de mayo ¡Traer recipiente!</strong></p>
                   </div>
-                  <div style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-                     <p style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">Cuentas</p>
-                     <ul style="font-size: 0.8rem; margin-top: 5px;">
-                        <li style="border-left: 2px solid var(--success);">💳 Transferencia / Efectivo</li>
-                       
-                     </ul>
+                  <div
+                     style="background: rgba(0,229,118,0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--success);">
+                     <p style="color: var(--success); font-weight: bold; font-size: 0.95rem;">VALOR PORCIÓN: $8.000 (c/
+                        queso)</p>
                   </div>
-               </div>
 
-               <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--primary); display: flex; justify-content: space-between; align-items: center;">
-                  <div><small style="opacity:0.7">LOURDES ROMINA TORRES LOPEZ</small><br><span style="color:var(--accent); font-family:monospace; font-weight:bold;">lou.romina.tl</span></div>
-                  <button onclick="copiarAlias('lou.romina.tl', this)" style="background:var(--primary); border:none; padding:5px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.6rem;">COPIAR</button>
-               </div>
-               <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--primary); display: flex; justify-content: space-between; align-items: center;">
-                  <div><small style="opacity:0.7">GLADYS YOHANA VALLEJOS</small><br><span style="color:var(--accent); font-family:monospace; font-weight:bold;">GVALLEJOS8964.NX.ARS</span></div>
-                  <button onclick="copiarAlias('GVALLEJOS8964.NX.ARS', this)" style="background:var(--primary); border:none; padding:5px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.6rem;">COPIAR</button>
-               </div>
-               <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--primary); display: flex; justify-content: space-between; align-items: center;">
-                  <div><small style="opacity:0.7">MARIA ADRIANA CORDOBA</small><br><span style="color:var(--accent); font-family:monospace; font-weight:bold;">adrianacordoba1203</span></div>
-                  <button onclick="copiarAlias('adrianacordoba1203', this)" style="background:var(--primary); border:none; padding:5px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.6rem;">COPIAR</button>
+                  <div
+                     style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--primary); display: flex; justify-content: space-between; align-items: center;">
+                     <div><small style="opacity:0.7">LOURDES ROMINA TORRES LOPEZ</small><br><span
+                           style="color:var(--accent); font-family:monospace; font-weight:bold;">lou.romina.tl</span>
+                     </div>
+                     <button onclick="copiarAlias('lou.romina.tl', this)"
+                        style="background:var(--primary); border:none; padding:5px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.6rem;">COPIAR</button>
+                  </div>
+                  <div
+                     style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--primary); display: flex; justify-content: space-between; align-items: center;">
+                     <div><small style="opacity:0.7">GLADYS YOHANA VALLEJOS</small><br><span
+                           style="color:var(--accent); font-family:monospace; font-weight:bold;">GVALLEJOS8964.NX.ARS</span>
+                     </div>
+                     <button onclick="copiarAlias('GVALLEJOS8964.NX.ARS', this)"
+                        style="background:var(--primary); border:none; padding:5px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.6rem;">COPIAR</button>
+                  </div>
+                  <div
+                     style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--primary); display: flex; justify-content: space-between; align-items: center;">
+                     <div><small style="opacity:0.7">MARIA ADRIANA CORDOBA</small><br><span
+                           style="color:var(--accent); font-family:monospace; font-weight:bold;">adrianacordoba1203</span>
+                     </div>
+                     <button onclick="copiarAlias('adrianacordoba1203', this)"
+                        style="background:var(--primary); border:none; padding:5px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.6rem;">COPIAR</button>
+                  </div>
                </div>
             </div>
          </div>
       </aside>
 
-      <main class="panel">
-         <div id="countdown" style="margin-bottom: 15px; padding: 12px; background: rgba(0, 0, 0, 0.4); border-radius: 12px; border: 1px solid var(--primary); text-align: center;">
+      <main class="panel" id="panelCentral">
+         <div id="countdown"
+            style="margin-bottom: 15px; padding: 12px; background: rgba(0, 0, 0, 0.4); border-radius: 12px; border: 1px solid var(--primary); text-align: center;">
             <div style="display: flex; justify-content: center; gap: 12px;">
-                <div><span id="days">00</span><br><small style="font-size:0.5rem">DÍAS</small></div>
-                <div style="color: var(--primary);">:</div>
-                <div><span id="hours">00</span><br><small style="font-size:0.5rem">HORAS</small></div>
-                <div style="color: var(--primary);">:</div>
-                <div><span id="minutes">00</span><br><small style="font-size:0.5rem">MIN</small></div>
-                <div style="color: var(--primary);">:</div>
-                <div><span id="seconds" style="color: var(--success);">00</span><br><small style="font-size:0.5rem">SEG</small></div>
+               <div><span id="days">00</span><br><small style="font-size:0.5rem">DÍAS</small></div>
+               <div style="color: var(--primary);">:</div>
+               <div><span id="hours">00</span><br><small style="font-size:0.5rem">HORAS</small></div>
+               <div style="color: var(--primary);">:</div>
+               <div><span id="minutes">00</span><br><small style="font-size:0.5rem">MIN</small></div>
+               <div style="color: var(--primary);">:</div>
+               <div><span id="seconds" style="color: var(--success);">00</span><br><small
+                     style="font-size:0.5rem">SEG</small></div>
             </div>
-         </div>
-
-         <div style="margin-bottom: 15px;">
-            <div style="display:flex; justify-content: space-between; font-size: 0.7rem; font-weight: bold; margin-bottom: 5px;">
-                <span style="color:var(--primary)">PROGRESO GENERAL DE INSUMOS</span>
-                <span id="txtGlobal">0%</span>
-            </div>
-            <div class="barra-bg"><div id="barraGlobal" class="barra-fill" style="width: 0%; background: var(--success);"></div></div>
          </div>
 
          <form id="formRegistro" onsubmit="enviarDatos(event)">
             <input id="nombre" placeholder="Nombre y Apellido" required oninput="saveDraft()" />
-            <input type="tel" id="telefono" placeholder="WhatsApp" required oninput="this.value = this.value.replace(/[^0-9]/g, ''); saveDraft()" />
+            <input type="tel" id="telefono" placeholder="WhatsApp (ej: 3544586602)" required inputmode="tel"
+               oninput="this.value = this.value.replace(/[^0-9]/g, ''); saveDraft()" minlength="10" />
 
             <select id="tipo" onchange="mostrarCampos()" required>
                <option value="">¿Cómo colaborarás?</option>
                <option value="ingredientes">Insumos/Ingredientes 🍲</option>
                <option value="dinero">Donar Dinero 💸</option>
-               <option value="porciones">Comprar Porciones 🎟️</option>
+               <option value="porciones">Comprar Porciones ($8000 c/queso) 🎟️</option>
             </select>
 
             <div id="divIngredientes" style="display: none">
                <select id="ingrediente" onchange="actualizarMaximo()"></select>
-               <input type="number" step="0.01" id="cantidadKg" placeholder="Cantidad" oninput="validarInput()" />
+               <input type="number" step="0.01" id="cantidadKg" placeholder="Cantidad" oninput="validarInput()"
+                  inputmode="decimal" />
             </div>
 
             <div id="divDinero" style="display: none">
-               <input type="number" id="monto" placeholder="Monto $" oninput="validarInput()" />
+               <input type="number" id="monto" placeholder="Monto $" oninput="validarInput()" inputmode="numeric" />
             </div>
 
             <div id="divPorciones" style="display: none">
-               <input type="number" id="porcionesInput" placeholder="Cantidad de porciones" oninput="validarInput()" />
+               <input type="number" id="porcionesInput" placeholder="Cantidad de porciones"
+                  oninput="calcularTotalPorciones()" inputmode="numeric" />
+               <p id="txtTotalVenta"
+                  style="color: var(--success); font-weight: bold; margin-bottom: 10px; text-align: center; font-size: 0.9rem;">
+               </p>
             </div>
 
-            <div id="captchaBox" style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--glass-border);">
+            <div id="captchaBox"
+               style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--glass-border);">
                <label id="captchaTexto" style="font-size: 0.8rem; color: var(--primary); font-weight: bold;"></label>
-               <input type="number" id="captchaInput" placeholder="Respuesta" required />
+               <input type="number" id="captchaInput" placeholder="Respuesta" required inputmode="numeric" />
             </div>
 
             <button type="submit" id="btnEnviar">Registrar Compromiso</button>
@@ -212,192 +575,271 @@
 
       <section class="panel">
          <h2>📊 Estado Actual</h2>
+         <div class="barra-global-container">
+            <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:5px;">
+               <span>PROGRESO GENERAL</span>
+               <span id="txtGlobal" style="color:var(--success); font-weight:bold;">0%</span>
+            </div>
+            <div class="barra-bg">
+               <div id="barraGlobal" class="barra-fill" style="background:var(--success); width:0%;"></div>
+            </div>
+         </div>
          <div class="filtros-container">
             <button class="btn-filtro active" onclick="setFiltro('todos', this)">Todos</button>
             <button class="btn-filtro" onclick="setFiltro('faltantes', this)">Faltan</button>
             <button class="btn-filtro" onclick="setFiltro('listos', this)">Listos</button>
          </div>
          <div id="estadoIngredientes" style="overflow-y: auto; flex: 1;">
-            <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
+            <div class="skeleton"></div>
          </div>
       </section>
    </div>
 
+   <a href="https://wa.me/5493544586602?text=Hola!%20Hago%20mi%20pedido%20o%20consulta%20para%20el%20Gran%20Locro%20del%2010%20de%20Mayo"
+      target="_blank" class="btn-wa-float">
+      💬
+   </a>
+
    <footer>
-      <div class="marquee-text">IPEM 146 "Centenario" - Cooperación Solidaria para el Gran Locro del 10 de Mayo - ¡Sumate con tu aporte! - Gracias por apoyar.</div>
+      <div class="marquee-text">IPEM 146 "Centenario" - Cooperación Solidaria para el Gran Locro del 10 de Mayo -
+         ¡Sumate con tu aporte! - Entrega desde las 12:30 hs en el SUM de la escuela</div>
       <div>
-        <h6>Diseño y programación Dpto de Informática - 2026</h6></div>
+         <h6>Diseño y programación Dpto de Informática - 2026</h6>
+      </div>
    </footer>
 
    <script>
+      const PRECIO_PORCION = 8000;
       const URL = "https://script.google.com/macros/s/AKfycbyHhEYb-cLtwJZ-TCHh_R_JJWnwHw_f_saudBEGTbUXcbXey2MgeFwP39iQdBOagosaYA/exec";
-      
+      const WHATSAPP_COORDINADOR = "5493544586602"; // Número actualizado según folleto
+
       const objetivos = {
-          "Maíz": {meta: 60, icon: "🌽"}, "Porotos": {meta: 50, icon: "🫘"}, "Chorizos": {meta: 20, icon: "🌭"}, 
-          "Zapallo criollo": {meta: 80, icon: "🎃"}, "Falda": {meta: 60, icon: "🥩"}, "Carnaza": {meta: 50, icon: "🍖"}, 
-          "Carne de cerdo (paleta)": {meta: 60, icon: "🐖"}, "Cueritos de cerdo": {meta: 25, icon: "🥓"}, 
-          "Mondongo": {meta: 50, icon: "🍲"}, "Cebolla (1 bolsa)": {meta: 1, icon: "🧅"}, 
-          "Cebolla de verdeo (atados)": {meta: 10, icon: "🌿"}, "Aceite (litros)": {meta: 20, icon: "🧴"},
-          "Queso cremoso (hormas)": {meta: 3, icon: "🧀"}, "Grasa de cerdo": {meta: 5, icon: "🍯"}, 
-          "Sal gruesa": {meta: 5, icon: "🧂"}, "Pimienta": {meta: 0.5, icon: "🧂"}, 
-          "Pimentón": {meta: 0.5, icon: "🌶️"}, "Orégano": {meta: 0.5, icon: "🌿"}, 
-          "Ají molido": {meta: 1, icon: "🌶️"}, "Gas (garrafas de 10kg)": {meta: 5, icon: "🔥"}
+         "Maíz": { meta: 60, icon: "🌽" }, "Porotos": { meta: 50, icon: "🫘" }, "Chorizos": { meta: 20, icon: "🌭" },
+         "Zapallo criollo": { meta: 80, icon: "🎃" }, "Falda": { meta: 60, icon: "🥩" }, "Carnaza": { meta: 50, icon: "🍖" },
+         "Carne de cerdo (paleta)": { meta: 60, icon: "🐖" }, "Cueritos de cerdo": { meta: 25, icon: "🥓" },
+         "Mondongo": { meta: 50, icon: "🍲" }, "Cebolla (1 bolsa)": { meta: 1, icon: "🧅" },
+         "Cebolla de verdeo (atados)": { meta: 10, icon: "🌿" }, "Aceite (litros)": { meta: 20, icon: "🧴" },
+         "Queso cremoso (hormas)": { meta: 3, icon: "🧀" }, "Grasa de cerdo": { meta: 5, icon: "🍯" },
+         "Sal gruesa": { meta: 5, icon: "🧂" }, "Pimienta": { meta: 0.5, icon: "🧂" },
+         "Pimentón": { meta: 0.5, icon: "🌶️" }, "Orégano": { meta: 0.5, icon: "🌿" },
+         "Ají molido": { meta: 1, icon: "🌶️" }, "Gas (garrafas de 10kg)": { meta: 5, icon: "🔥" }
       };
 
       let captchaCorrecto = 0, datosActuales = {}, filtroActual = 'todos';
 
+      function cerrarModal() {
+         const modal = document.getElementById('modalPrecio');
+         if (modal) {
+            modal.style.opacity = '0';
+            setTimeout(() => { modal.style.display = 'none'; }, 500);
+         }
+      }
+
+      function calcularTotalPorciones() {
+         const cant = parseInt(document.getElementById("porcionesInput").value) || 0;
+         const total = cant * PRECIO_PORCION;
+         const txt = document.getElementById("txtTotalVenta");
+         txt.innerText = cant > 0 ? `Total a transferir: $${total.toLocaleString()}` : "";
+         validarInput();
+      }
+
       const selIng = document.getElementById("ingrediente");
       Object.entries(objetivos).forEach(([nombre, info]) => {
-          let opt = document.createElement("option"); opt.value = nombre; opt.text = `${info.icon} ${nombre}`; selIng.add(opt);
+         let opt = document.createElement("option"); opt.value = nombre; opt.text = `${info.icon} ${nombre}`; selIng.add(opt);
       });
 
       function saveDraft() {
-          localStorage.setItem('locro_nombre', document.getElementById('nombre').value);
-          localStorage.setItem('locro_tel', document.getElementById('telefono').value);
+         localStorage.setItem('locro_nombre', document.getElementById('nombre').value);
+         localStorage.setItem('locro_tel', document.getElementById('telefono').value);
       }
 
       function loadDraft() {
-          document.getElementById('nombre').value = localStorage.getItem('locro_nombre') || '';
-          document.getElementById('telefono').value = localStorage.getItem('locro_tel') || '';
+         document.getElementById('nombre').value = localStorage.getItem('locro_nombre') || '';
+         document.getElementById('telefono').value = localStorage.getItem('locro_tel') || '';
       }
 
       function generarCaptcha() {
-          const a = Math.floor(Math.random() * 9) + 1, b = Math.floor(Math.random() * 9) + 1;
-          captchaCorrecto = a + b;
-          document.getElementById("captchaTexto").innerText = `Seguridad: ¿Cuánto es ${a} + ${b}?`;
-          document.getElementById("captchaInput").value = "";
+         const a = Math.floor(Math.random() * 9) + 1, b = Math.floor(Math.random() * 9) + 1;
+         captchaCorrecto = a + b;
+         document.getElementById("captchaTexto").innerText = `Seguridad: ¿Cuánto es ${a} + ${b}?`;
+         document.getElementById("captchaInput").value = "";
       }
 
       function mostrarCampos() {
-          const t = document.getElementById("tipo").value;
-          document.getElementById("divIngredientes").style.display = t === "ingredientes" ? "block" : "none";
-          document.getElementById("divDinero").style.display = t === "dinero" ? "block" : "none";
-          document.getElementById("divPorciones").style.display = t === "porciones" ? "block" : "none";
-          if(t === "ingredientes") actualizarMaximo();
-          validarInput();
+         const t = document.getElementById("tipo").value;
+         document.getElementById("divIngredientes").style.display = t === "ingredientes" ? "block" : "none";
+         document.getElementById("divDinero").style.display = t === "dinero" ? "block" : "none";
+         document.getElementById("divPorciones").style.display = t === "porciones" ? "block" : "none";
+         if (t === "ingredientes") actualizarMaximo();
+         validarInput();
       }
 
       function actualizarMaximo() {
-          const ing = document.getElementById("ingrediente").value;
-          const input = document.getElementById("cantidadKg");
-          const falta = Math.max(objetivos[ing].meta - (datosActuales[ing] || 0), 0);
-          input.max = falta.toFixed(2);
-          input.placeholder = falta > 0 ? `Máximo: ${falta.toFixed(1)} Unid/Kg` : "CUPO LLENO";
-          input.disabled = (falta <= 0);
-          validarInput();
+         const ing = document.getElementById("ingrediente").value;
+         const input = document.getElementById("cantidadKg");
+         const falta = Math.max(objetivos[ing].meta - (datosActuales[ing] || 0), 0);
+         input.max = falta.toFixed(2);
+         input.placeholder = falta > 0 ? `Máximo: ${falta.toFixed(1)} Unid/Kg` : "CUPO LLENO";
+         input.disabled = (falta <= 0);
+         validarInput();
       }
 
       function validarInput() {
-          const tipo = document.getElementById("tipo").value, btn = document.getElementById("btnEnviar"), msg = document.getElementById("mensaje");
-          btn.disabled = false; msg.innerText = "";
-          if (tipo === "ingredientes") {
-              const cant = parseFloat(document.getElementById("cantidadKg").value) || 0;
-              const max = parseFloat(document.getElementById("cantidadKg").max) || 0;
-              if (max <= 0) { msg.innerText = "❌ Ingrediente completo."; btn.disabled = true; }
-              else if (cant > max) { msg.innerText = `⚠️ Máximo: ${max}`; btn.disabled = true; }
-          }
+         const tipo = document.getElementById("tipo").value, btn = document.getElementById("btnEnviar"), msg = document.getElementById("mensaje");
+         btn.disabled = false; msg.innerText = "";
+         if (tipo === "ingredientes") {
+            const cant = parseFloat(document.getElementById("cantidadKg").value) || 0;
+            const max = parseFloat(document.getElementById("cantidadKg").max) || 0;
+            if (max <= 0) { msg.innerText = "❌ Ingrediente completo."; btn.disabled = true; }
+            else if (cant > max) { msg.innerText = `⚠️ Máximo: ${max}`; btn.disabled = true; }
+         }
       }
 
       async function enviarDatos(e) {
-          e.preventDefault();
-          if (parseInt(document.getElementById("captchaInput").value) !== captchaCorrecto) { alert("Respuesta incorrecta."); return; }
-          const btn = document.getElementById("btnEnviar");
-          btn.disabled = true; btn.innerHTML = "⌛ ENVIANDO...";
-          const data = {
-              nombre: document.getElementById("nombre").value.toUpperCase(),
-              telefono: document.getElementById("telefono").value,
-              tipo: document.getElementById("tipo").value,
-              ingrediente: document.getElementById("ingrediente").value,
-              cantidadKg: parseFloat(document.getElementById("cantidadKg").value) || 0,
-              monto: parseFloat(document.getElementById("monto").value) || 0,
-              porciones: parseInt(document.getElementById("porcionesInput").value) || 0
-          };
-          try {
-              await fetch(URL, { method: "POST", mode: "no-cors", body: JSON.stringify(data) });
-              confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-              document.getElementById("mensaje").innerHTML = "<span style='color:var(--success)'>✅ GRACIAS POR COLABORAR.</span>";
-              document.getElementById("formRegistro").reset();
-              localStorage.clear();
-              mostrarCampos(); generarCaptcha();
-              setTimeout(cargarEstado, 2000);
-          } catch (e) { document.getElementById("mensaje").innerText = "❌ Error."; }
-          finally { btn.innerHTML = "REGISTRAR COMPROMISO"; btn.disabled = false; }
+         e.preventDefault();
+         if (parseInt(document.getElementById("captchaInput").value) !== captchaCorrecto) {
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+            alert("Respuesta incorrecta.");
+            return;
+         }
+
+         const btn = document.getElementById("btnEnviar");
+         const panel = document.getElementById("panelCentral");
+         const tipoColab = document.getElementById("tipo").value;
+         const nombreUsr = document.getElementById("nombre").value.toUpperCase();
+
+         btn.disabled = true; btn.innerHTML = "⌛ ENVIANDO...";
+         panel.classList.add("enviando-overlay");
+
+         const data = {
+            nombre: nombreUsr,
+            telefono: document.getElementById("telefono").value,
+            tipo: tipoColab,
+            ingrediente: document.getElementById("ingrediente").value,
+            cantidadKg: parseFloat(document.getElementById("cantidadKg").value) || 0,
+            monto: parseFloat(document.getElementById("monto").value) || 0,
+            porciones: parseInt(document.getElementById("porcionesInput").value) || 0
+         };
+
+         try {
+            await fetch(URL, { method: "POST", mode: "no-cors", body: JSON.stringify(data) });
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+            const textoWA = encodeURIComponent(`¡Hola! Soy ${nombreUsr}. Hice mi pedido/compromiso para el Locro (${tipoColab}). ¡Muchas gracias!`);
+            const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${textoWA}`;
+
+            let avisoExtra = (tipoColab === 'dinero' || tipoColab === 'porciones')
+               ? `<br><a href="${urlWA}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">📱 CLIC AQUÍ para avisar por WhatsApp</a>`
+               : `<br><small style='color:var(--primary)'>Gracias por tu aporte solidario.</small>`;
+
+            document.getElementById("mensaje").innerHTML = `<span style='color:var(--success)'>✅ COMPROMISO REGISTRADO.</span>${avisoExtra}`;
+            document.getElementById("formRegistro").reset();
+            document.getElementById("txtTotalVenta").innerText = "";
+
+            localStorage.removeItem('locro_nombre');
+            localStorage.removeItem('locro_tel');
+
+            mostrarCampos(); generarCaptcha();
+            setTimeout(cargarEstado, 2000);
+         } catch (e) {
+            document.getElementById("mensaje").innerText = "❌ Error al enviar.";
+         }
+         finally {
+            btn.innerHTML = "REGISTRAR COMPROMISO";
+            btn.disabled = false;
+            panel.classList.remove("enviando-overlay");
+         }
       }
 
       function cargarEstado() {
-          fetch(URL).then(r => r.json()).then(data => {
-              datosActuales = data;
-              renderizarLista();
-          });
+         fetch(URL).then(r => r.json()).then(data => {
+            datosActuales = data;
+            renderizarLista();
+         }).catch(e => console.error("Error de carga", e));
       }
 
       function obtenerUnidad(i) {
-          if (i.includes("bolsa")) return "Bolsa";
-          if (i.includes("atados")) return "Atados";
-          if (i.includes("litros")) return "L";
-          if (i.includes("hormas")) return "Hormas";
-          if (i.includes("garrafas")) return "Garrafas";
-          return "Kg";
+         if (i.includes("bolsa")) return "Bolsa";
+         if (i.includes("atados")) return "Atados";
+         if (i.includes("litros")) return "L";
+         if (i.includes("hormas")) return "Hormas";
+         if (i.includes("garrafas")) return "Garrafas";
+         return "Kg";
       }
 
       function renderizarLista() {
-          const contenedor = document.getElementById("estadoIngredientes");
-          contenedor.innerHTML = "";
-          let totM = 0, totA = 0;
-          const lista = Object.keys(objetivos).map(nombre => {
-              const val = datosActuales[nombre] || 0, meta = objetivos[nombre].meta;
-              totM += meta; totA += Math.min(val, meta);
-              return { nombre, val, meta, porc: Math.min((val/meta)*100, 100), icon: objetivos[nombre].icon };
-          }).sort((a, b) => a.porc - b.porc);
-          const totalG = (totA / totM * 100);
-          document.getElementById("barraGlobal").style.width = totalG + "%";
-          document.getElementById("txtGlobal").innerText = totalG.toFixed(1) + "%";
-          lista.forEach((item, index) => {
-              if (filtroActual === 'faltantes' && item.porc >= 100) return;
-              if (filtroActual === 'listos' && item.porc < 100) return;
-              let falta = Math.max(item.meta - item.val, 0);
-              let clase = item.porc >= 100 ? "ok" : (item.porc >= 60 ? "medio" : "falta");
-              let critico = (index < 3 && item.porc < 100) ? "resaltar-critico" : "";
-              contenedor.innerHTML += `<div class="estado-card ${clase} ${critico}">
+         const contenedor = document.getElementById("estadoIngredientes");
+         if (!contenedor) return;
+         contenedor.innerHTML = "";
+         let totM = 0, totA = 0;
+         const lista = Object.keys(objetivos).map(nombre => {
+            const val = parseFloat(datosActuales[nombre]) || 0, meta = objetivos[nombre].meta;
+            totM += meta; totA += Math.min(val, meta);
+            return { nombre, val, meta, porc: Math.min((val / meta) * 100, 100), icon: objetivos[nombre].icon };
+         }).sort((a, b) => a.porc - b.porc);
+
+         const totalG = (totA / totM * 100);
+         const barraG = document.getElementById("barraGlobal");
+         const txtG = document.getElementById("txtGlobal");
+         if (barraG) barraG.style.width = totalG + "%";
+         if (txtG) txtG.innerText = totalG.toFixed(1) + "%";
+
+         lista.forEach((item, index) => {
+            if (filtroActual === 'faltantes' && item.porc >= 100) return;
+            if (filtroActual === 'listos' && item.porc < 100) return;
+            let falta = Math.max(item.meta - item.val, 0);
+            let clase = item.porc >= 100 ? "ok" : (item.porc >= 60 ? "medio" : "falta");
+
+            let critico = (index < 3 && item.porc < 100) ? "resaltar-critico" : "";
+            let casiListo = (item.porc >= 90 && item.porc < 100) ? "casi-listo" : "";
+
+            contenedor.innerHTML += `<div class="estado-card ${clase} ${critico} ${casiListo}">
                   <div class="estado-info">
-                     <span class="ingrediente-nombre">${item.icon} ${item.nombre}</span>
-                     <span class="falta-texto">${falta > 0 ? 'Faltan ' + falta.toFixed(1) + ' ' + obtenerUnidad(item.nombre) : 'LISTO ✅'}</span>
+                      <span class="ingrediente-nombre">${item.icon} ${item.nombre}</span>
+                      <span class="falta-texto">${falta > 0 ? 'Faltan ' + falta.toFixed(1) + ' ' + obtenerUnidad(item.nombre) : 'LISTO ✅'}</span>
                   </div>
                   <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
               </div>`;
-          });
+         });
       }
 
       function iniciarCountdown() {
-          const fecha = new Date('May 10, 2026 12:00:00').getTime();
-          setInterval(() => {
-              const dist = fecha - new Date().getTime();
-              if(dist < 0) return;
-              document.getElementById("days").innerText = Math.floor(dist / (1000*60*60*24)).toString().padStart(2,'0');
-              document.getElementById("hours").innerText = Math.floor((dist % (1000*60*60*24)) / (1000*60*60)).toString().padStart(2,'0');
-              document.getElementById("minutes").innerText = Math.floor((dist % (1000*60*60)) / (1000*60)).toString().padStart(2,'0');
-              document.getElementById("seconds").innerText = Math.floor((dist % (1000*60)) / 1000).toString().padStart(2,'0');
-          }, 1000);
+         const fecha = new Date('May 10, 2026 12:30:00').getTime();
+         setInterval(() => {
+            const dist = fecha - new Date().getTime();
+            if (dist < 0) return;
+            document.getElementById("days").innerText = Math.floor(dist / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+            document.getElementById("hours").innerText = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+            document.getElementById("minutes").innerText = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+            document.getElementById("seconds").innerText = Math.floor((dist % (1000 * 60)) / 1000).toString().padStart(2, '0');
+         }, 1000);
       }
 
       function copiarAlias(texto, btn) {
-          navigator.clipboard.writeText(texto);
-          const old = btn.innerText; btn.innerText = "¡OK!";
-          setTimeout(() => btn.innerText = old, 2000);
+         navigator.clipboard.writeText(texto);
+         if (navigator.vibrate) navigator.vibrate(50);
+         const old = btn.innerText; btn.innerText = "¡OK!";
+         setTimeout(() => btn.innerText = old, 2000);
       }
 
       function setFiltro(f, btn) {
-          filtroActual = f;
-          document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          renderizarLista();
+         filtroActual = f;
+         document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
+         btn.classList.add('active');
+         renderizarLista();
       }
 
-      loadDraft();
-      generarCaptcha();
-      cargarEstado();
-      iniciarCountdown();
-      setInterval(cargarEstado, 60000);
+      window.onload = () => {
+         loadDraft();
+         generarCaptcha();
+         cargarEstado();
+         iniciarCountdown();
+         setTimeout(cerrarModal, 3000);
+         setInterval(cargarEstado, 60000);
+      };
    </script>
 </body>
+
 </html>

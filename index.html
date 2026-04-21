@@ -490,6 +490,20 @@
         color: var(--danger) !important;
         transition: all 0.3s;
       }
+      .btn-validado {
+        animation: pulseSuccess 1.8s infinite;
+      }
+      @keyframes pulseSuccess {
+        0% {
+          box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 12px rgba(0, 230, 118, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
+        }
+      }
     </style>
   </head>
 
@@ -1018,15 +1032,40 @@
       function validarSlider(valor) {
         if (valor >= 95) {
           captchaValidado = true;
+
           const slider = document.getElementById("captchaSlider");
           const container = document.getElementById("sliderContainer");
           const texto = document.getElementById("captchaTexto");
+          const btn = document.getElementById("btnEnviar");
+
           slider.value = 100;
           slider.disabled = true;
+
           container.classList.add("slider-success");
-          texto.innerText = "✔️​ VALIDADO CORRECTAMENTE";
+
+          texto.innerText = "✔️ VALIDADO CORRECTAMENTE";
           texto.style.color = "var(--secondary)";
+
           if (navigator.vibrate) navigator.vibrate(50);
+
+          // 🔥 Evita repetir animación
+          if (!btn.classList.contains("btn-validado")) {
+            btn.classList.add("btn-validado");
+
+            btn.style.transition = "transform 0.15s ease, box-shadow 0.3s ease";
+            btn.style.boxShadow = "0 0 20px var(--success)";
+
+            // animación tipo "pop"
+            btn.style.transform = "scale(1.15)";
+
+            setTimeout(() => {
+              btn.style.transform = "scale(0.95)";
+            }, 120);
+
+            setTimeout(() => {
+              btn.style.transform = "scale(1)";
+            }, 220);
+          }
         }
       }
 

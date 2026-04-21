@@ -1120,13 +1120,17 @@
           nombre: nombreUsr,
           telefono: document.getElementById("telefono").value,
           tipo: tipoColab,
-          ingrediente: document.getElementById("ingrediente").value,
           cantidadKg:
             parseFloat(document.getElementById("cantidadKg").value) || 0,
           monto: parseFloat(document.getElementById("monto").value) || 0,
           porciones:
             parseInt(document.getElementById("porcionesInput").value) || 0,
         };
+
+        // SOLO incluir ingrediente si NO es dinero ni porciones
+        if (tipoColab === "ingredientes") {
+          data.ingrediente = document.getElementById("ingrediente").value;
+        }
 
         try {
           await fetch(URL, {

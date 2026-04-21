@@ -1,845 +1,752 @@
 <!doctype html>
 <html lang="es">
-
-<head>
-   <meta charset="UTF-8" />
-   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <title>Locro - IPEM 146 "Centenario"</title>
-   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-   <style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistemas Digitales - Resumen Clase 1</title>
+    <style>
+      /* Estilos optimizados para modernizar el diseño */
       :root {
-         --primary: #00d2ff;
-         --secondary: #003366;
-         --bg-dark: #000c1a;
-         --accent: #ffd700;
-         --success: #00e676;
-         --danger: #ff5252;
-         --glass: rgba(255, 255, 255, 0.05);
-         --glass-border: rgba(255, 255, 255, 0.15);
-      }
-
-      * {
-         box-sizing: border-box;
-         margin: 0;
-         padding: 0;
+        --primary: #2c3e50;
+        --secondary: #3498db;
+        --accent: #e67e22;
+        --bg: #f4f7f6;
+        --text: #333;
+        --white: #ffffff;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
       }
 
       body {
-         font-family: 'Inter', sans-serif;
-         color: #e0f2f1;
-         background: linear-gradient(135deg, var(--bg-dark) 0%, #003366 100%) fixed;
-         height: 100vh;
-         display: flex;
-         flex-direction: column;
-         overflow: hidden;
-      }
-
-      /* BOTÓN WHATSAPP FLOTANTE */
-      .btn-wa-float {
-         position: fixed;
-         bottom: 60px;
-         right: 20px;
-         background: #25d366;
-         color: white;
-         width: 55px;
-         height: 55px;
-         border-radius: 50%;
-         display: flex;
-         justify-content: center;
-         align-items: center;
-         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-         z-index: 10000;
-         text-decoration: none;
-         font-size: 24px;
-         transition: 0.3s;
-      }
-
-      .btn-wa-float:hover {
-         transform: scale(1.1);
-      }
-
-      .modal-overlay {
-         position: fixed;
-         top: 0;
-         left: 0;
-         width: 100%;
-         height: 100%;
-         background: rgba(0, 0, 0, 0.85);
-         backdrop-filter: blur(8px);
-         display: flex;
-         justify-content: center;
-         align-items: center;
-         z-index: 9999;
-         transition: opacity 0.5s ease;
-      }
-
-      .modal-content {
-         background: var(--secondary);
-         border: 2px solid var(--primary);
-         padding: 2rem;
-         border-radius: 20px;
-         text-align: center;
-         box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
-         max-width: 90%;
-      }
-
-      .modal-content h2 {
-         font-size: 2rem;
-         color: var(--accent);
-         margin-bottom: 1rem;
-         border: none;
-      }
-
-      .precio-destacado {
-         font-size: 3.5rem;
-         font-weight: 900;
-         color: var(--success);
-         display: block;
-         margin: 10px 0;
-      }
-
-      .incluye-queso {
-         font-size: 1.2rem;
-         color: #fff;
-         display: block;
-         margin-bottom: 20px;
-         font-style: italic;
-      }
-
-      .btn-cerrar-modal {
-         background: var(--primary);
-         color: var(--secondary);
-         border: none;
-         padding: 12px 30px;
-         border-radius: 8px;
-         font-weight: bold;
-         cursor: pointer;
-         font-size: 1rem;
+        font-family:
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        line-height: 1.6;
+        color: var(--text);
+        background-color: var(--bg);
+        margin: 0;
+        padding: 0;
       }
 
       header {
-         padding: 1rem;
-         text-align: center;
-         background: rgba(0, 0, 0, 0.4);
-         border-bottom: 1px solid var(--glass-border);
+        background: var(--primary);
+        color: var(--white);
+        padding: 3rem 1rem;
+        text-align: center;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
       }
 
       header h1 {
-         font-size: 1.2rem;
-         color: var(--primary);
-         text-transform: uppercase;
-         letter-spacing: 1px;
+        margin: 0;
+        font-size: 2.2rem;
+        letter-spacing: -1px;
+      }
+      header p {
+        margin: 8px 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
       }
 
-      .app-container {
-         display: grid;
-         grid-template-columns: 320px 1fr 340px;
-         gap: 15px;
-         padding: 15px;
-         flex: 1;
-         overflow: hidden;
+      .contenedor {
+        max-width: 900px;
+        margin: 30px auto;
+        padding: 0 20px;
       }
 
-      .panel {
-         background: var(--glass);
-         backdrop-filter: blur(20px);
-         border: 1px solid var(--glass-border);
-         border-radius: 16px;
-         padding: 1.2rem;
-         display: flex;
-         flex-direction: column;
-         overflow: hidden;
-         position: relative;
-      }
-
-      .enviando-overlay {
-         opacity: 0.5;
-         pointer-events: none;
-         filter: grayscale(0.5);
+      section {
+        background: var(--white);
+        margin-bottom: 30px;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: var(--shadow);
       }
 
       h2 {
-         font-size: 0.9rem;
-         margin-bottom: 0.8rem;
-         color: var(--primary);
-         border-bottom: 1px solid var(--glass-border);
-         padding-bottom: 6px;
-         text-transform: uppercase;
+        color: var(--primary);
+        border-left: 6px solid var(--secondary);
+        padding-left: 15px;
+        margin-top: 0;
+        font-size: 1.6rem;
       }
 
-      @keyframes shimmer {
-         0% {
-            opacity: 0.3;
-         }
-
-         50% {
-            opacity: 0.6;
-         }
-
-         100% {
-            opacity: 0.3;
-         }
+      h3 {
+        color: var(--secondary);
+        margin-top: 25px;
       }
 
-      .skeleton {
-         height: 60px;
-         background: var(--glass);
-         border-radius: 10px;
-         margin-bottom: 10px;
-         animation: shimmer 1.5s infinite;
+      .resumen {
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 18px;
+        border-radius: 10px;
+        border-left: 5px solid #4caf50;
+        font-weight: 600;
+        margin: 20px 0;
       }
 
-      @keyframes pulso-critico {
-         0% {
-            box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.4);
-         }
-
-         70% {
-            box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
-         }
-
-         100% {
-            box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
-         }
+      .ejemplo {
+        background: #fff9c4;
+        color: #5d4037;
+        padding: 18px;
+        border-radius: 10px;
+        border: 1px solid #ffe082;
+        font-family: "Consolas", "Monaco", monospace;
+        margin: 20px 0;
       }
 
-      .resaltar-critico {
-         animation: pulso-critico 2s infinite;
-         border: 2px solid var(--danger) !important;
-         background: rgba(255, 82, 82, 0.1) !important;
+      .tip {
+        background: #e3f2fd;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid var(--secondary);
+        margin: 15px 0;
       }
 
-      @keyframes pulso-casi-listo {
-         0% {
-            opacity: 1;
-         }
-
-         50% {
-            opacity: 0.7;
-         }
-
-         100% {
-            opacity: 1;
-         }
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 20px auto;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
 
-      .casi-listo {
-         animation: pulso-casi-listo 3s infinite;
-         border-left-color: var(--accent) !important;
+      .columnas {
+        display: flex;
+        gap: 25px;
+        flex-wrap: wrap;
+        margin-top: 20px;
       }
 
-      @keyframes autoScroll {
-
-         0%,
-         15% {
-            transform: translateY(0);
-         }
-
-         40%,
-         60% {
-            transform: translateY(-30%);
-         }
-
-         85%,
-         100% {
-            transform: translateY(0);
-         }
+      .columna {
+        flex: 1;
+        min-width: 280px;
+        background: #fcfcfc;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #eee;
       }
 
-      .scroll-automatico {
-         display: flex;
-         flex-direction: column;
-         animation: autoScroll 40s ease-in-out infinite;
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
       }
 
-      .scroll-automatico:hover {
-         animation-play-state: paused;
+      th,
+      td {
+        border: 1px solid #edf2f7;
+        padding: 14px;
+        text-align: left;
       }
 
-      .filtros-container {
-         display: flex;
-         gap: 5px;
-         margin-bottom: 10px;
+      th {
+        background: var(--secondary);
+        color: white;
+      }
+      tr:nth-child(even) {
+        background-color: #f8fafc;
       }
 
-      .btn-filtro {
-         flex: 1;
-         background: var(--glass);
-         border: 1px solid var(--glass-border);
-         color: white;
-         padding: 6px;
-         border-radius: 6px;
-         cursor: pointer;
-         font-size: 0.65rem;
-         transition: 0.3s;
+      .container {
+        border: 1px solid #e2e8f0;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
       }
 
-      .btn-filtro.active {
-         background: var(--primary);
-         color: var(--secondary);
-         font-weight: bold;
-      }
-
-      .estado-card {
-         background: rgba(0, 0, 0, 0.3);
-         padding: 12px;
-         border-radius: 10px;
-         margin-bottom: 10px;
-         border-left: 4px solid transparent;
-         transition: 0.2s;
-      }
-
-      .estado-info {
-         display: flex;
-         justify-content: space-between;
-         align-items: flex-end;
-         margin-bottom: 5px;
-      }
-
-      .ingrediente-nombre {
-         font-size: 0.8rem;
-         font-weight: bold;
-         color: var(--primary);
-      }
-
-      .falta-texto {
-         font-size: 0.7rem;
-         color: var(--accent);
-         font-weight: 900;
-      }
-
-      .barra-bg {
-         height: 8px;
-         background: rgba(255, 255, 255, 0.05);
-         border-radius: 10px;
-         overflow: hidden;
-         position: relative;
-      }
-
-      .barra-fill {
-         height: 100%;
-         transition: width 1.5s cubic-bezier(0.1, 0, 0.1, 1);
-      }
-
-      .ok {
-         border-left-color: var(--success);
-      }
-
-      .ok .barra-fill {
-         background: var(--success);
-      }
-
-      .medio {
-         border-left-color: var(--primary);
-      }
-
-      .medio .barra-fill {
-         background: var(--primary);
-      }
-
-      .falta {
-         border-left-color: var(--danger);
-      }
-
-      .falta .barra-fill {
-         background: var(--danger);
-      }
-
-      .barra-global-container {
-         margin-bottom: 15px;
-         padding: 10px;
-         background: rgba(255, 255, 255, 0.03);
-         border-radius: 10px;
-      }
-
-      input,
-      select {
-         width: 100%;
-         background: #fff;
-         border: 2px solid transparent;
-         padding: 12px;
-         border-radius: 10px;
-         margin-bottom: 12px;
-         color: #002244;
-         font-weight: 700;
-         outline: none;
-      }
-
-      button#btnEnviar {
-         background: var(--primary);
-         color: var(--secondary);
-         border: none;
-         padding: 16px;
-         border-radius: 10px;
-         font-weight: 900;
-         cursor: pointer;
-         text-transform: uppercase;
-         width: 100%;
-      }
-
-      button#btnEnviar:disabled {
-         background: #444;
-         color: #777;
-         cursor: not-allowed;
+      code {
+        display: block;
+        background: #1e1e1e;
+        color: #dcdcdc;
+        padding: 20px;
+        border-radius: 10px;
+        overflow-x: auto;
+        font-family: "Consolas", monospace;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        word-spacing: 10px;
+        white-space: pre-wrap; /* Mantiene el formato pero permite saltos si es necesario */
       }
 
       footer {
-         background: rgba(0, 0, 0, 0.6);
-         padding: 10px;
-         border-top: 1px solid var(--glass-border);
-         overflow: hidden;
+        text-align: center;
+        padding: 3rem;
+        color: #94a3b8;
+        font-size: 0.95rem;
       }
 
-      .marquee-text {
-         display: inline-block;
-         animation: marquee 35s linear infinite;
-         font-size: 0.8rem;
-         font-weight: bold;
-         color: var(--success);
-         text-transform: uppercase;
-         white-space: nowrap;
+      a {
+        color: var(--secondary);
+        text-decoration: none;
+        font-weight: bold;
+        transition: color 0.2s;
+      }
+      a:hover {
+        color: var(--accent);
+        text-decoration: underline;
       }
 
-      @keyframes marquee {
-         0% {
-            transform: translateX(100%);
-         }
-
-         100% {
-            transform: translateX(-100%);
-         }
+      /* Ajustes para checkboxes en la actividad */
+      ul {
+        list-style-type: none;
+        padding-left: 10px;
+      }
+      ul li {
+        margin-bottom: 8px;
       }
 
-      @media (max-width: 1100px) {
-         body {
-            overflow-y: auto;
-            height: auto;
-         }
-
-         .app-container {
-            grid-template-columns: 1fr;
-         }
-
-         .panel {
-            max-height: 550px;
-         }
-
-         .scroll-automatico {
-            animation: none;
-         }
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 1.5rem;
+        }
+        section {
+          padding: 20px;
+        }
       }
+    </style>
+  </head>
 
-      h6 {
-         text-align: center;
-         font-family: 'Courier New', Courier, monospace;
-      }
-   </style>
-</head>
+  <body>
+    <header>
+      <h1>IPEM 146 - Sistemas Digitales</h1>
+      <p>4TO A Tarde - Informática</p>
+      <p>Prof. J. Pantaleo</p>
+    </header>
 
-<body>
-   <div id="modalPrecio" class="modal-overlay">
-      <div class="modal-content">
-         <h2>🍲 Porción de Locro</h2>
-         <span class="precio-destacado">$8.000</span>
-         <span class="incluye-queso">(Incluye queso)</span>
-         <p>Gran Locro IPEM 146 - 10 de Mayo</p>
-         <p style="margin-top: 10px; font-size: 0.9rem;">Hacé tu pedido con anticipación al <strong>3544-586602</strong>
-         </p>
-         <br>
-         <button class="btn-cerrar-modal" onclick="cerrarModal()">ENTENDIDO</button>
-      </div>
-   </div>
-
-   <header>
-      <h1>IPEM 146 "Centenario" - Gran Locro 2026</h1>
-   </header>
-
-   <div class="app-container">
-      <aside class="panel">
-         <h2>🤝 Información y Cuentas</h2>
-         <div style="flex:1; overflow-y:auto;">
-            <div class="scroll-automatico">
-               <div class="instrucciones-box">
-                  <div
-                     style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
-                     <p
-                        style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">
-                        Paso 1</p>
-                     <p>📝 <strong>Registrate:</strong> Completá el formulario central.</p>
-                  </div>
-                  <div
-                     style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
-                     <p
-                        style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">
-                        Paso 2</p>
-                     <p>🍲 <strong>Elegí tu aporte:</strong> Doná insumos, dinero o comprá porciones.</p>
-                  </div>
-                  <div
-                     style="background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
-                     <p
-                        style="color: var(--primary); font-weight: bold; font-size: 0.75rem; text-transform: uppercase;">
-                        Paso 3</p>
-                     <p>🍲 <strong>Entrega/retiro:</strong> Acercate a dirección para dejar lo donado o retirar tarjeta.
-                        <strong>El 10 de mayo ¡Traer recipiente!</strong></p>
-                  </div>
-                  <div
-                     style="background: rgba(0,229,118,0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--success);">
-                     <p style="color: var(--success); font-weight: bold; font-size: 0.95rem;">VALOR PORCIÓN: $8.000 (c/
-                        queso)</p>
-                  </div>
-
-                  <div
-                     style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--primary); display: flex; justify-content: space-between; align-items: center;">
-                     <div><small style="opacity:0.7">LOURDES ROMINA TORRES LOPEZ</small><br><span
-                           style="color:var(--accent); font-family:monospace; font-weight:bold;">lou.romina.tl</span>
-                     </div>
-                     <button onclick="copiarAlias('lou.romina.tl', this)"
-                        style="background:var(--primary); border:none; padding:5px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.6rem;">COPIAR</button>
-                  </div>
-                  <div
-                     style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--primary); display: flex; justify-content: space-between; align-items: center;">
-                     <div><small style="opacity:0.7">GLADYS YOHANA VALLEJOS</small><br><span
-                           style="color:var(--accent); font-family:monospace; font-weight:bold;">GVALLEJOS8964.NX.ARS</span>
-                     </div>
-                     <button onclick="copiarAlias('GVALLEJOS8964.NX.ARS', this)"
-                        style="background:var(--primary); border:none; padding:5px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.6rem;">COPIAR</button>
-                  </div>
-                  <div
-                     style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--primary); display: flex; justify-content: space-between; align-items: center;">
-                     <div><small style="opacity:0.7">MARIA ADRIANA CORDOBA</small><br><span
-                           style="color:var(--accent); font-family:monospace; font-weight:bold;">adrianacordoba1203</span>
-                     </div>
-                     <button onclick="copiarAlias('adrianacordoba1203', this)"
-                        style="background:var(--primary); border:none; padding:5px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.6rem;">COPIAR</button>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </aside>
-
-      <main class="panel" id="panelCentral">
-         <div id="countdown"
-            style="margin-bottom: 15px; padding: 12px; background: rgba(0, 0, 0, 0.4); border-radius: 12px; border: 1px solid var(--primary); text-align: center;">
-            <div style="display: flex; justify-content: center; gap: 12px;">
-               <div><span id="days">00</span><br><small style="font-size:0.5rem">DÍAS</small></div>
-               <div style="color: var(--primary);">:</div>
-               <div><span id="hours">00</span><br><small style="font-size:0.5rem">HORAS</small></div>
-               <div style="color: var(--primary);">:</div>
-               <div><span id="minutes">00</span><br><small style="font-size:0.5rem">MIN</small></div>
-               <div style="color: var(--primary);">:</div>
-               <div><span id="seconds" style="color: var(--success);">00</span><br><small
-                     style="font-size:0.5rem">SEG</small></div>
-            </div>
-         </div>
-
-         <form id="formRegistro" onsubmit="enviarDatos(event)">
-            <input id="nombre" placeholder="Nombre y Apellido" required oninput="saveDraft()" />
-            <input type="tel" id="telefono" placeholder="WhatsApp (ej: 3544555555)" required inputmode="tel"
-               oninput="this.value = this.value.replace(/[^0-9]/g, ''); saveDraft()" minlength="10" />
-
-            <select id="tipo" onchange="mostrarCampos()" required>
-               <option value="">¿Cómo colaborarás?</option>
-               <option value="ingredientes">Insumos/Ingredientes 🍲</option>
-               <option value="dinero">Donar Dinero 💸</option>
-               <option value="porciones">Comprar Porciones ($8000 c/queso) 🎟️</option>
-            </select>
-
-            <div id="divIngredientes" style="display: none">
-               <select id="ingrediente" onchange="actualizarMaximo()"></select>
-               <input type="number" step="0.01" id="cantidadKg" placeholder="Cantidad" oninput="validarInput()"
-                  inputmode="decimal" />
-            </div>
-
-            <div id="divDinero" style="display: none">
-               <input type="number" id="monto" placeholder="Monto $" oninput="validarInput()" inputmode="numeric" />
-            </div>
-
-            <div id="divPorciones" style="display: none">
-               <input type="number" id="porcionesInput" placeholder="Cantidad de porciones"
-                  oninput="calcularTotalPorciones()" inputmode="numeric" />
-               <p id="txtTotalVenta"
-                  style="color: var(--success); font-weight: bold; margin-bottom: 10px; text-align: center; font-size: 0.9rem;">
-               </p>
-            </div>
-
-            <div id="captchaBox"
-               style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--glass-border);">
-               <label id="captchaTexto" style="font-size: 0.8rem; color: var(--primary); font-weight: bold;"></label>
-               <input type="number" id="captchaInput" placeholder="Respuesta" required inputmode="numeric" />
-            </div>
-
-            <button type="submit" id="btnEnviar">Registrar Compromiso</button>
-            <div id="mensaje" style="text-align:center; margin-top:10px; font-size: 0.8rem;"></div>
-         </form>
-      </main>
-
-      <section class="panel">
-         <h2>📊 Estado Actual</h2>
-         <div class="barra-global-container">
-            <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-bottom:5px;">
-               <span>PROGRESO GENERAL</span>
-               <span id="txtGlobal" style="color:var(--success); font-weight:bold;">0%</span>
-            </div>
-            <div class="barra-bg">
-               <div id="barraGlobal" class="barra-fill" style="background:var(--success); width:0%;"></div>
-            </div>
-         </div>
-         <div class="filtros-container">
-            <button class="btn-filtro active" onclick="setFiltro('todos', this)">Todos</button>
-            <button class="btn-filtro" onclick="setFiltro('faltantes', this)">Faltan</button>
-            <button class="btn-filtro" onclick="setFiltro('listos', this)">Listos</button>
-         </div>
-         <div id="estadoIngredientes" style="overflow-y: auto; flex: 1;">
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
-            <div class="skeleton"></div>
-         </div>
+    <div class="contenedor">
+      <section>
+        <h2>Sistema</h2>
+        <p>
+          El concepto de sistema se refiere a un conjunto de elementos que están
+          relacionados entre sí y trabajan juntos para cumplir una función o
+          alcanzar un objetivo.
+        </p>
       </section>
-   </div>
 
-   <a href="https://wa.me/5493544586602?text=Hola!%20Hago%20mi%20pedido%20o%20consulta%20para%20el%20Gran%20Locro%20del%2010%20de%20Mayo"
-      target="_blank" class="btn-wa-float">
-      💬
-   </a>
+      <section>
+        <h2>Sistema Digital</h2>
+        <p>
+          Un sistema digital es un conjunto de dispositivos electrónicos que
+          procesan, almacenan o transmiten información usando señales digitales
+          representadas por <b>0 y 1</b>.
+        </p>
 
-   <footer>
-      <div class="marquee-text">IPEM 146 "Centenario" - Cooperación Solidaria para el Gran Locro del 10 de Mayo -
-         ¡Sumate con tu aporte! - Entrega desde las 12:30 hs en el SUM de la escuela</div>
-      <div>
-         <h6>Diseño y programación Dpto de Informática - 2026</h6>
-      </div>
-   </footer>
+        <h3>Características principales</h3>
+        <ul>
+          <li>• Utiliza señales binarias (0 y 1).</li>
+          <li>• La información se procesa mediante circuitos lógicos.</li>
+          <li>
+            • Es más preciso y resistente al ruido que los sistemas analógicos.
+          </li>
+        </ul>
 
-   <script>
-      const PRECIO_PORCION = 8000;
-      const URL = "https://script.google.com/macros/s/AKfycbyHhEYb-cLtwJZ-TCHh_R_JJWnwHw_f_saudBEGTbUXcbXey2MgeFwP39iQdBOagosaYA/exec";
-      const WHATSAPP_COORDINADOR = "5493544586602"; // Número actualizado según folleto
+        <h3>Componentes básicos</h3>
+        <ul>
+          <li><b>Entradas:</b> reciben datos (teclado, sensores).</li>
+          <li><b>Procesamiento:</b> puertas lógicas y circuitos digitales.</li>
+          <li>
+            <b>Salidas:</b> muestran o envían el resultado (pantalla,
+            impresora).
+          </li>
+        </ul>
 
-      const objetivos = {
-         "Maíz": { meta: 60, icon: "🌽" }, "Porotos": { meta: 50, icon: "🫘" }, "Chorizos": { meta: 20, icon: "🌭" },
-         "Zapallo criollo": { meta: 80, icon: "🎃" }, "Falda": { meta: 60, icon: "🥩" }, "Carnaza": { meta: 50, icon: "🍖" },
-         "Carne de cerdo (paleta)": { meta: 60, icon: "🐖" }, "Cueritos de cerdo": { meta: 25, icon: "🥓" },
-         "Mondongo": { meta: 50, icon: "🍲" }, "Cebolla (1 bolsa)": { meta: 1, icon: "🧅" },
-         "Cebolla de verdeo (atados)": { meta: 10, icon: "🌿" }, "Aceite (litros)": { meta: 20, icon: "🧴" },
-         "Queso cremoso (hormas)": { meta: 3, icon: "🧀" }, "Grasa de cerdo": { meta: 5, icon: "🍯" },
-         "Sal gruesa": { meta: 5, icon: "🧂" }, "Pimienta": { meta: 0.5, icon: "🧂" },
-         "Pimentón": { meta: 0.5, icon: "🌶️" }, "Orégano": { meta: 0.5, icon: "🌿" },
-         "Ají molido": { meta: 1, icon: "🌶️" }, "Gas (garrafas de 10kg)": { meta: 5, icon: "🔥" }
-      };
+        <h3>Ejemplos</h3>
+        <ul>
+          <li>• Computadoras</li>
+          <li>• Teléfonos celulares</li>
+          <li>• Calculadoras</li>
+          <li>• Relojes digitales</li>
+          <li>• Consolas de videojuegos</li>
+        </ul>
 
-      let captchaCorrecto = 0, datosActuales = {}, filtroActual = 'todos';
+        <div class="resumen">
+          ✔ Un sistema digital trabaja con información en forma de bits (0 y 1).
+        </div>
+      </section>
 
-      function cerrarModal() {
-         const modal = document.getElementById('modalPrecio');
-         if (modal) {
-            modal.style.opacity = '0';
-            setTimeout(() => { modal.style.display = 'none'; }, 500);
-         }
-      }
+      <section>
+        <h2>Sistema Analógico</h2>
+        <p>
+          Un sistema analógico representa y procesa información mediante señales
+          continuas.
+        </p>
 
-      function calcularTotalPorciones() {
-         const cant = parseInt(document.getElementById("porcionesInput").value) || 0;
-         const total = cant * PRECIO_PORCION;
-         const txt = document.getElementById("txtTotalVenta");
-         txt.innerText = cant > 0 ? `Total a transferir: $${total.toLocaleString()}` : "";
-         validarInput();
-      }
+        <h3>Características</h3>
+        <ul>
+          <li>• Utiliza señales continuas.</li>
+          <li>• Los valores cambian de forma progresiva.</li>
+          <li>• Es más sensible al ruido.</li>
+        </ul>
 
-      const selIng = document.getElementById("ingrediente");
-      Object.entries(objetivos).forEach(([nombre, info]) => {
-         let opt = document.createElement("option"); opt.value = nombre; opt.text = `${info.icon} ${nombre}`; selIng.add(opt);
-      });
+        <h3>Ejemplos</h3>
+        <ul>
+          <li>• Reloj con agujas</li>
+          <li>• Radio analógica</li>
+          <li>• Termómetro de mercurio</li>
+        </ul>
 
-      function saveDraft() {
-         localStorage.setItem('locro_nombre', document.getElementById('nombre').value);
-         localStorage.setItem('locro_tel', document.getElementById('telefono').value);
-      }
+        <div class="resumen">✔ Un sistema analógico usa señales continuas.</div>
+      </section>
 
-      function loadDraft() {
-         document.getElementById('nombre').value = localStorage.getItem('locro_nombre') || '';
-         document.getElementById('telefono').value = localStorage.getItem('locro_tel') || '';
-      }
+      <section>
+        <h2>BIT</h2>
+        <p>
+          Un bit (binary digit) es la unidad más pequeña de información en
+          informática.
+        </p>
 
-      function generarCaptcha() {
-         const a = Math.floor(Math.random() * 9) + 1, b = Math.floor(Math.random() * 9) + 1;
-         captchaCorrecto = a + b;
-         document.getElementById("captchaTexto").innerText = `Seguridad: ¿Cuánto es ${a} + ${b}?`;
-         document.getElementById("captchaInput").value = "";
-      }
+        <h3>Características</h3>
+        <ul>
+          <li>• Solo puede tener dos valores: 0 o 1.</li>
+          <li>• Representa estados como encendido/apagado.</li>
+        </ul>
 
-      function mostrarCampos() {
-         const t = document.getElementById("tipo").value;
-         document.getElementById("divIngredientes").style.display = t === "ingredientes" ? "block" : "none";
-         document.getElementById("divDinero").style.display = t === "dinero" ? "block" : "none";
-         document.getElementById("divPorciones").style.display = t === "porciones" ? "block" : "none";
-         if (t === "ingredientes") actualizarMaximo();
-         validarInput();
-      }
+        <h3>Relación con otras unidades</h3>
+        <ul>
+          <li>• 8 bits = 1 byte</li>
+          <li>• Los bytes representan letras, números y símbolos.</li>
+        </ul>
 
-      function actualizarMaximo() {
-         const ing = document.getElementById("ingrediente").value;
-         const input = document.getElementById("cantidadKg");
-         const falta = Math.max(objetivos[ing].meta - (datosActuales[ing] || 0), 0);
-         input.max = falta.toFixed(2);
-         input.placeholder = falta > 0 ? `Máximo: ${falta.toFixed(1)} Unid/Kg` : "CUPO LLENO";
-         input.disabled = (falta <= 0);
-         validarInput();
-      }
+        <div class="resumen">
+          ✔ Un bit es la unidad básica de información digital.
+        </div>
+      </section>
 
-      function validarInput() {
-         const tipo = document.getElementById("tipo").value, btn = document.getElementById("btnEnviar"), msg = document.getElementById("mensaje");
-         btn.disabled = false; msg.innerText = "";
-         if (tipo === "ingredientes") {
-            const cant = parseFloat(document.getElementById("cantidadKg").value) || 0;
-            const max = parseFloat(document.getElementById("cantidadKg").max) || 0;
-            if (max <= 0) { msg.innerText = "❌ Ingrediente completo."; btn.disabled = true; }
-            else if (cant > max) { msg.innerText = `⚠️ Máximo: ${max}`; btn.disabled = true; }
-         }
-      }
+      <section>
+        <h2>Sistema Binario</h2>
+        <p>El sistema binario utiliza solo dos números: <b>0 y 1</b>.</p>
 
-      async function enviarDatos(e) {
-         e.preventDefault();
-         if (parseInt(document.getElementById("captchaInput").value) !== captchaCorrecto) {
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-            alert("Respuesta incorrecta.");
-            return;
-         }
+        <h3>Características</h3>
+        <ul>
+          <li>• Su base es 2.</li>
+          <li>• Cada posición representa una potencia de 2.</li>
+          <li>• Es el sistema utilizado por las computadoras.</li>
+        </ul>
 
-         const btn = document.getElementById("btnEnviar");
-         const panel = document.getElementById("panelCentral");
-         const tipoColab = document.getElementById("tipo").value;
-         const nombreUsr = document.getElementById("nombre").value.toUpperCase();
+        <div class="ejemplo">Ejemplo: 1011 = 8 + 0 + 2 + 1 = 11</div>
+      </section>
 
-         btn.disabled = true; btn.innerHTML = "⌛ ENVIANDO...";
-         panel.classList.add("enviando-overlay");
+      <section>
+        <h2>Conversiones</h2>
 
-         const data = {
-            nombre: nombreUsr,
-            telefono: document.getElementById("telefono").value,
-            tipo: tipoColab,
-            ingrediente: document.getElementById("ingrediente").value,
-            cantidadKg: parseFloat(document.getElementById("cantidadKg").value) || 0,
-            monto: parseFloat(document.getElementById("monto").value) || 0,
-            porciones: parseInt(document.getElementById("porcionesInput").value) || 0
-         };
+        <h3>Decimal → Binario</h3>
+        <p>Dividir entre 2 y tomar los restos.</p>
+        <img
+          class="dec_bin"
+          src="dec a bin.jpg"
+          alt="Gráfico de Decimal a Binario"
+        />
 
-         try {
-            await fetch(URL, { method: "POST", mode: "no-cors", body: JSON.stringify(data) });
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        <h3>Binario → Decimal</h3>
+        <p>Sumar potencias de 2 según cada bit.</p>
+        <img
+          class="dec_bin"
+          src="bin a dec.jpg"
+          alt="Gráfico de Binario a Decimal"
+        />
 
-            const textoWA = encodeURIComponent(`¡Hola! Soy ${nombreUsr}. Hice mi pedido/compromiso para el Locro (${tipoColab}). ¡Muchas gracias!`);
-            const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${textoWA}`;
+        <h2>Conversión Automática</h2>
+        <p>
+          Para convertir números entre sistemas numéricos también se puede usar
+          una calculadora en modo programador o herramientas online.
+        </p>
+        <p>
+          Calculadora online:
+          <a
+            href="https://www.unitjuggler.com/numbersystems-convertir-decimal-a-binary.html?val=0"
+            target="_blank"
+          >
+            Convertidor Decimal a Binario
+          </a>
+        </p>
+      </section>
 
-            let avisoExtra = (tipoColab === 'dinero' || tipoColab === 'porciones')
-               ? `<br><a href="${urlWA}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">📱 CLIC AQUÍ para avisar por WhatsApp</a>`
-               : `<br><small style='color:var(--primary)'>Gracias por tu aporte solidario.</small>`;
+      <section>
+        <h2>Tabla Ascii</h2>
+        <img class="ascii" src="ascii.jpg" alt="Tabla ASCII completa" />
+      </section>
 
-            document.getElementById("mensaje").innerHTML = `<span style='color:var(--success)'>✅ COMPROMISO REGISTRADO.</span>${avisoExtra}`;
-            document.getElementById("formRegistro").reset();
-            document.getElementById("txtTotalVenta").innerText = "";
+      <section>
+        <h2>🧠 Ejercicios</h2>
+        <div class="columnas">
+          <div class="columna">
+            <h3>🔤 ASCII</h3>
+            <h4>🔢 Número → carácter</h4>
+            <ol>
+              <li>65 = ______</li>
+              <li>97 = ______</li>
+              <li>48 = ______</li>
+              <li>64 = ______</li>
+            </ol>
+            <h4>🔐 Decodificar</h4>
+            <ol>
+              <li>72 79 76 65 = ______</li>
+              <li>80 67 = ______</li>
+            </ol>
+          </div>
 
-            localStorage.removeItem('locro_nombre');
-            localStorage.removeItem('locro_tel');
+          <div class="columna">
+            <h3>🔢 Sistemas Numéricos</h3>
+            <h4>🔢 Binario → Decimal</h4>
+            <ol>
+              <li>101₂ = ______</li>
+              <li>1101₂ = ______</li>
+              <li>1111₂ = ______</li>
+            </ol>
+            <h4>🔄 Decimal → Binario</h4>
+            <ol>
+              <li>5₁₀ = ______</li>
+              <li>10₁₀ = ______</li>
+              <li>18₁₀ = ______</li>
+            </ol>
+          </div>
+        </div>
 
-            mostrarCampos(); generarCaptcha();
-            setTimeout(cargarEstado, 2000);
-         } catch (e) {
-            document.getElementById("mensaje").innerText = "❌ Error al enviar.";
-         }
-         finally {
-            btn.innerHTML = "REGISTRAR COMPROMISO";
-            btn.disabled = false;
-            panel.classList.remove("enviando-overlay");
-         }
-      }
+        <div class="ejemplo" style="margin-top: 20px">
+          <h2>Descubrí el mensaje secreto</h2>
+          <p>
+            Convierte los números binarios a decimal, busca en la tabla y arma
+            la frase:
+          </p>
+          <code
+            >01000101 01010011 00100000 01010101 01001110 00100000 01001010
+            01010101 01000101 01000111 01001111 00100000 01000100 01000101
+            00100000 01001100 01000001 01000000 01010000 01010010 01001111
+            01000111 01010010 01000001 01001101 01000001 01000011 01001001
+            01001111 01001110 00100000 01001100 01000001 00100000 01010100
+            01000101 01000011 01001110 01001111 01001100 01001111 01000111
+            01001001 01000001 00100000 01000101 01010011 00100000 01000110
+            01010101 01010100 01010101 01010010 01001111</code
+          >
+        </div>
+      </section>
 
-      function cargarEstado() {
-         fetch(URL).then(r => r.json()).then(data => {
-            datosActuales = data;
-            renderizarLista();
-         }).catch(e => console.error("Error de carga", e));
-      }
+      <section id="hard">
+        <h2>Hardware</h2>
+        <p class="tip">
+          El hardware se refiere a todas las partes físicas de una
+          computadora... componentes tangibles que puedes ver y tocar.
+        </p>
 
-      function obtenerUnidad(i) {
-         if (i.includes("bolsa")) return "Bolsa";
-         if (i.includes("atados")) return "Atados";
-         if (i.includes("litros")) return "L";
-         if (i.includes("hormas")) return "Hormas";
-         if (i.includes("garrafas")) return "Garrafas";
-         return "Kg";
-      }
+        <h2>Componentes de PC</h2>
+        <h3>1. Procesador (CPU)</h3>
+        <p><b>Función:</b> Ejecuta instrucciones y controla el PC.</p>
+        <ul>
+          <li>• <b>Núcleos:</b> Más núcleos = mejor multitarea.</li>
+          <li>• <b>Frecuencia (GHz):</b> Velocidad de operación.</li>
+        </ul>
 
-      function renderizarLista() {
-         const contenedor = document.getElementById("estadoIngredientes");
-         if (!contenedor) return;
-         contenedor.innerHTML = "";
-         let totM = 0, totA = 0;
-         const lista = Object.keys(objetivos).map(nombre => {
-            const val = parseFloat(datosActuales[nombre]) || 0, meta = objetivos[nombre].meta;
-            totM += meta; totA += Math.min(val, meta);
-            return { nombre, val, meta, porc: Math.min((val / meta) * 100, 100), icon: objetivos[nombre].icon };
-         }).sort((a, b) => a.porc - b.porc);
+        <h3>2. Placa base (Motherboard)</h3>
+        <p>Une todos los componentes y permite la comunicación entre ellos.</p>
 
-         const totalG = (totA / totM * 100);
-         const barraG = document.getElementById("barraGlobal");
-         const txtG = document.getElementById("txtGlobal");
-         if (barraG) barraG.style.width = totalG + "%";
-         if (txtG) txtG.innerText = totalG.toFixed(1) + "%";
+        <h3>3. Memoria RAM</h3>
+        <p>Almacena temporalmente datos para uso rápido de la CPU.</p>
 
-         lista.forEach((item, index) => {
-            if (filtroActual === 'faltantes' && item.porc >= 100) return;
-            if (filtroActual === 'listos' && item.porc < 100) return;
-            let falta = Math.max(item.meta - item.val, 0);
-            let clase = item.porc >= 100 ? "ok" : (item.porc >= 60 ? "medio" : "falta");
+        <h3>4. Almacenamiento</h3>
+        <ul>
+          <li>• <b>HDD:</b> Económico, gran capacidad, lento.</li>
+          <li>• <b>SSD:</b> Muy rápido, carga veloz de programas.</li>
+        </ul>
 
-            let critico = (index < 3 && item.porc < 100) ? "resaltar-critico" : "";
-            let casiListo = (item.porc >= 90 && item.porc < 100) ? "casi-listo" : "";
+        <div class="tip">
+          <b>Recomendación:</b> Usar SSD para el sistema y HDD para archivos
+          grandes.
+        </div>
 
-            contenedor.innerHTML += `<div class="estado-card ${clase} ${critico} ${casiListo}">
-                  <div class="estado-info">
-                      <span class="ingrediente-nombre">${item.icon} ${item.nombre}</span>
-                      <span class="falta-texto">${falta > 0 ? 'Faltan ' + falta.toFixed(1) + ' ' + obtenerUnidad(item.nombre) : 'LISTO ✅'}</span>
-                  </div>
-                  <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
-              </div>`;
-         });
-      }
+        <h3>5. Tarjeta gráfica (GPU)</h3>
+        <p>Procesa gráficos y video. Vital para juegos y diseño.</p>
 
-      function iniciarCountdown() {
-         const fecha = new Date('May 10, 2026 12:30:00').getTime();
-         setInterval(() => {
-            const dist = fecha - new Date().getTime();
-            if (dist < 0) return;
-            document.getElementById("days").innerText = Math.floor(dist / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-            document.getElementById("hours").innerText = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-            document.getElementById("minutes").innerText = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-            document.getElementById("seconds").innerText = Math.floor((dist % (1000 * 60)) / 1000).toString().padStart(2, '0');
-         }, 1000);
-      }
+        <a
+          href="https://mega.nz/file/IpknEZiS#4A_Gju3PnrC1lvkh_F_2uUQYqfv6kUJvDspD81G3IQU"
+          >Simulador de Ensamble PC</a
+        >
+      </section>
 
-      function copiarAlias(texto, btn) {
-         navigator.clipboard.writeText(texto);
-         if (navigator.vibrate) navigator.vibrate(50);
-         const old = btn.innerText; btn.innerText = "¡OK!";
-         setTimeout(() => btn.innerText = old, 2000);
-      }
+      <section>
+        <h1>🧠 Actividad Práctica</h1>
+        <div class="container">
+          <h3>Parte 2: Verdadero o Falso</h3>
+          <ul>
+            <li>⬜ Un SSD es más lento que un HDD.</li>
+            <li>⬜ La RAM almacena datos de forma permanente.</li>
+            <li>⬜ La GPU es importante para videojuegos.</li>
+          </ul>
+        </div>
 
-      function setFiltro(f, btn) {
-         filtroActual = f;
-         document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
-         btn.classList.add('active');
-         renderizarLista();
-      }
+        <div class="container">
+          <h3>Parte 3: Relacionar conceptos</h3>
+          <table>
+            <tr>
+              <th>Componente</th>
+              <th>Función</th>
+            </tr>
+            <tr>
+              <td>CPU</td>
+              <td>....................................</td>
+            </tr>
+            <tr>
+              <td>RAM</td>
+              <td>....................................</td>
+            </tr>
+            <tr>
+              <td>SSD</td>
+              <td>....................................</td>
+            </tr>
+          </table>
+        </div>
+      </section>
 
-      window.onload = () => {
-         loadDraft();
-         generarCaptcha();
-         cargarEstado();
-         iniciarCountdown();
-         setTimeout(cerrarModal, 3000);
-         setInterval(cargarEstado, 60000);
-      };
-   </script>
-</body>
+      <section>
+        <h2>Software: El "Cerebro" Lógico</h2>
+        <p>
+          El software es el conjunto de instrucciones, datos y programas que
+          permiten que el hardware realice tareas específicas. Si el hardware es
+          el cuerpo, el software es la mente.
+        </p>
 
+        <div class="tip">
+          <strong>¿Cómo funciona?</strong> El software traduce nuestras
+          necesidades a un lenguaje que el procesador entiende (binario),
+          pasando por diferentes niveles de abstracción.
+        </div>
+
+        <h3>1. Clasificación Detallada</h3>
+        <div class="columnas">
+          <div class="columna">
+            <h4>Sistemas Operativos</h4>
+            <p>
+              Es el software base. Gestiona los recursos del hardware y permite
+              la interacción con el usuario.
+            </p>
+            <ul>
+              <li>• <b>Ejemplos:</b> Windows, macOS, Linux, Android, iOS.</li>
+            </ul>
+          </div>
+          <div class="columna">
+            <h4>Software de Aplicación</h4>
+            <p>
+              Programas diseñados para realizar tareas específicas para el
+              usuario final.
+            </p>
+            <ul>
+              <li>
+                • <b>Ejemplos:</b> Office, Navegadores, Editores de fotos,
+                Juegos.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>2. Software de Programación</h3>
+        <p>
+          Son las herramientas que usan los desarrolladores para crear otros
+          programas. Incluyen editores de texto, compiladores e intérpretes.
+        </p>
+        <div class="ejemplo">
+          Lógica de programación: Entrada → Algoritmo (Proceso) → Salida
+        </div>
+
+        <h3>3. Licenciamiento: ¿Libre o Propietario?</h3>
+        <table>
+          <tr>
+            <th>Tipo</th>
+            <th>Características</th>
+            <th>Ejemplos</th>
+          </tr>
+          <tr>
+            <td><b>Software Libre</b></td>
+            <td>
+              Se puede ver el código, modificarlo y compartirlo libremente.
+            </td>
+            <td>Linux, VLC, LibreOffice.</td>
+          </tr>
+          <tr>
+            <td><b>Software Propietario</b></td>
+            <td>
+              El código es cerrado y pertenece a una empresa; suele requerir
+              pago.
+            </td>
+            <td>Windows, Photoshop, iOS.</td>
+          </tr>
+        </table>
+
+        <h3>4. Firmware: El puente</h3>
+        <p>
+          Es un tipo de software específico que está grabado directamente en los
+          circuitos integrados (hardware). Su función es controlar el
+          funcionamiento del dispositivo a nivel físico.
+          <i>Ejemplo: La BIOS de una computadora.</i>
+        </p>
+
+        <div class="resumen">
+          ✔ Sin software, el hardware es solo metal y plástico sin utilidad. El
+          equilibrio entre ambos define el rendimiento de un sistema.
+        </div>
+      </section>
+Esta es la versión final optimizada de tu guía. He unificado todas las secciones, corregido la anidación de las etiquetas (había secciones dentro de otras) y pulido la semántica para que sea un documento técnico impecable.
+
+HTML
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Maestra de Visual Studio Code</title>
+</head>
+<body>
+
+    <section id="instalacion">
+        <header>
+            <p><em>Software de Programación: Visual Studio Code</em></p>
+            <h1>Guía de Instalación para Windows</h1>
+        </header>
+
+        <h2>1. Obtener el archivo</h2>
+        <p>
+            Entra en la web oficial:
+            <a href="https://code.visualstudio.com/">code.visualstudio.com</a>.
+        </p>
+        <p>
+            Haz clic en el botón azul <strong>"Download for Windows"</strong>. Se
+            descargará el instalador (ej. <em>VSCodeUserSetup-x64.exe</em>).
+        </p>
+
+        <hr />
+
+        <h3>2. Ejecución y Configuración (Paso Crítico)</h3>
+        <p>
+            Inicia el instalador. Durante el proceso, presta atención a la
+            <strong>Selección de tareas adicionales</strong>. Es fundamental
+            marcar todas las casillas:
+        </p>
+        <ul>
+            <li>[x] Crear un acceso directo en el escritorio.</li>
+            <strong>
+            <li>[x] Agregar la acción "Abrir con Code" al menú contextual de archivos.</li>
+            </strong>
+            <li>[x] Registrar Code como editor para tipos de archivo admitidos.</li>
+          
+        </ul>
+
+        <p>Finalmente, haz clic en <strong>Instalar</strong> y luego en <strong>Finalizar</strong>.</p>
+    </section>
+
+    <hr />
+
+    <section id="configuracion">
+        <h1>Configuración y Extensiones Web (HTML & CSS)</h1>
+        <p>Ajustes esenciales para trabajar con diseño web de forma eficiente.</p>
+
+        <h2>1. El "Auto-Guardado"</h2>
+        <p>Para no perder cambios ni olvidar guardar manualmente:</p>
+        <ul>
+            <li>Ve a <strong>Archivo &gt; Autoguardado</strong>.</li>
+        </ul>
+
+        <article id="productividad-visual">
+            <h3>Productividad Visual</h3>
+            <li>Busca en extensiones (<code>Ctrl + Shift + X</code></li>
+            <ul>
+                <li><strong>Live Server:</strong> Actualización automática del navegador al guardar.</li>
+                <li><strong>Color Highlight:</strong> Visualización de colores directamente en el código CSS.</li>
+                <li><strong>CSS Peek:</strong> Acceso rápido a los estilos desde el archivo HTML usando <code>Ctrl + Clic</code>.</li>
+            </ul>
+        </article>
+
+        <article id="escritura-orden">
+            <h3>Escritura y Orden</h3>
+            <ul>
+                <li><strong>Auto Rename Tag:</strong> Sincronización automática de etiquetas de apertura y cierre.</li>
+                <li><strong>Prettier:</strong> Formateador automático de código (<code>Shift + Alt + F</code>).</li>
+                <li><strong>IntelliSense for CSS:</strong> Autocompletado inteligente de clases CSS en HTML.</li>
+            </ul>
+        </article>
+        
+        <p><em>Consejo: Mantén instaladas solo las que uses para que VS Code siga siendo rápido.</em></p>
+    </section>
+
+    <hr />
+
+    <section id="personalizacion">
+        <h1>Personalización: Idioma, Temas e Iconos</h1>
+
+        <h2>1. Cambiar el idioma a Español</h2>
+        <ol>
+            <li>Busca en extensiones (<code>Ctrl + Shift + X</code>): <strong>"Spanish Language Pack"</strong>.</li>
+            <li>Instala y selecciona <strong>"Change Language and Restart"</strong> en el aviso emergente.</li>
+        </ol>
+
+        <h2>2. Temas y Estética</h2>
+        <ul>
+            <li><strong>Colores:</strong> Presiona <code>Ctrl + K + T</code> para elegir un tema visual.</li>
+            <li><strong>Iconos:</strong> Instala la extensión <strong>"Material Icon Theme"</strong> para identificar archivos visualmente.</li>
+        </ul>
+
+      
+    </section>
+
+    <hr />
+
+    <section id="atajos-vscode">
+        <h1>Guía Rápida de Atajos y Trucos</h1>
+        <p>Domina el teclado para programar con la velocidad de un profesional.</p>
+
+        <h2>🚀 VELOCIDAD (Emmet & Estructura)</h2>
+        <ul>
+            <li><strong>Estructura HTML rápida:</strong> <code>!</code> + <code>Enter</code>.</li>
+            <li><strong>Cierre de Etiquetas:</strong> <code>Nombre de etiqueta</code> + <code>Tab</code>.</li>
+            <li><strong>Texto de relleno:</strong> <code>lorem</code> + <code>Enter</code>.</li>
+        </ul>
+
+        <h2>🎨 EDICIÓN (Magia con el cursor)</h2>
+        <table border="1" cellpadding="5" style="width: 100%; text-align: left;">
+            <thead>
+                <tr style="background-color: #f2f2f2;">
+                    <th>Acción</th>
+                    <th>Teclas</th>
+                    <th>Efecto</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Multicursor</strong></td>
+                    <td><code>Alt + Clic</code></td>
+                    <td>Escribe en varios lugares a la vez.</td>
+                </tr>
+                <tr>
+                    <td><strong>Selección Múltiple</strong></td>
+                    <td><code>Ctrl + D</code></td>
+                    <td>Selecciona la palabra actual y la siguiente igual.</td>
+                </tr>
+                <tr>
+                    <td><strong>Clonación</strong></td>
+                    <td><code>Shift + Alt + ↓</code></td>
+                    <td>Duplica la línea hacia abajo.</td>
+                </tr>
+                <tr>
+                    <td><strong>Teletransporte</strong></td>
+                    <td><code>Alt + ↑ / ↓</code></td>
+                    <td>Mueve una línea entera de lugar.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>🧹 ORDEN Y VISTA</h2>
+        <ul>
+            <li><strong>Auto-Formateo:</strong> <code>Shift + Alt + F</code>.</li>
+            <li><strong>Ajuste de Línea:</strong> <code>Alt + Z</code> (Para que el código no se desborde).</li>
+            <li><strong>Comentar bloque:</strong> <code>Ctrl + /</code>.</li>
+            <li><strong>Modo Zen:</strong> <code>Ctrl + K</code> → <code>Z</code> (Pantalla limpia).</li>
+            <li><strong>Zoom:</strong> <code>Ctrl + "+" / "-"</code> (Aumentar/Reducir) y <code>Ctrl + 0</code> (Reset).</li>
+        </ul>
+    </section>
+    </div>
+
+    <footer>
+      <p>IPEM 146 - Sistemas Digitales | Clase 1 y 2 | 2026</p>
+    </footer>
+  </bode>
 </html>

@@ -171,11 +171,9 @@
         0% {
           opacity: 0.3;
         }
-
         50% {
           opacity: 0.6;
         }
-
         100% {
           opacity: 0.3;
         }
@@ -193,11 +191,9 @@
         0% {
           box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.4);
         }
-
         70% {
           box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
         }
-
         100% {
           box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
         }
@@ -213,11 +209,9 @@
         0% {
           opacity: 1;
         }
-
         50% {
           opacity: 0.7;
         }
-
         100% {
           opacity: 1;
         }
@@ -233,12 +227,10 @@
         15% {
           transform: translateY(0);
         }
-
         40%,
         60% {
           transform: translateY(-30%);
         }
-
         85%,
         100% {
           transform: translateY(0);
@@ -323,23 +315,18 @@
       .ok {
         border-left-color: var(--success);
       }
-
       .ok .barra-fill {
         background: var(--success);
       }
-
       .medio {
         border-left-color: var(--primary);
       }
-
       .medio .barra-fill {
         background: var(--primary);
       }
-
       .falta {
         border-left-color: var(--danger);
       }
-
       .falta .barra-fill {
         background: var(--danger);
       }
@@ -349,6 +336,57 @@
         padding: 10px;
         background: rgba(255, 255, 255, 0.03);
         border-radius: 10px;
+      }
+
+      /* ESTILOS NUEVOS CAPTCHA SLIDER */
+      #captchaBox {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        border: 1px solid var(--glass-border);
+      }
+      .slider-container {
+        width: 100%;
+        height: 20px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 20px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .slider-text {
+        font-size: 1.2rem;
+        color: var(--primary);
+        z-index: 1;
+      }
+      #captchaSlider {
+        appearance: none;
+        -webkit-appearance: none;
+
+        width: 100%;
+        height: 24px; /* FIX IMPORTANTE: NO 100% */
+
+        background: transparent;
+
+        position: absolute;
+        z-index: 2;
+
+        cursor: pointer;
+        margin: 0;
+      }
+      #captchaSlider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 50px;
+        height: 40px;
+        background: var(--primary);
+        border-radius: 20px;
+        box-shadow: 0 0 10px var(--primary);
+      }
+      .slider-success {
+        background: rgba(5, 255, 68, 0.943) !important;
       }
 
       input,
@@ -403,7 +441,6 @@
         0% {
           transform: translateX(100%);
         }
-
         100% {
           transform: translateX(-100%);
         }
@@ -414,15 +451,12 @@
           overflow-y: auto;
           height: auto;
         }
-
         .app-container {
           grid-template-columns: 1fr;
         }
-
         .panel {
           max-height: 550px;
         }
-
         .scroll-automatico {
           animation: none;
         }
@@ -431,6 +465,30 @@
       h6 {
         text-align: center;
         font-family: "Courier New", Courier, monospace;
+      }
+      /* Animación de sacudida para error */
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+
+      .shake-error {
+        animation: shake 0.3s ease-in-out 0s 2;
+        border: 1px solid var(--danger) !important;
+        box-shadow: 0 0 10px rgba(255, 82, 82, 0.3);
+      }
+
+      .texto-error {
+        color: var(--danger) !important;
+        transition: all 0.3s;
       }
     </style>
   </head>
@@ -780,31 +838,20 @@
             ></p>
           </div>
 
-          <div
-            id="captchaBox"
-            style="
-              background: rgba(0, 0, 0, 0.3);
-              padding: 10px;
-              border-radius: 10px;
-              margin-bottom: 10px;
-              border: 1px solid var(--glass-border);
-            "
-          >
-            <label
-              id="captchaTexto"
-              style="
-                font-size: 0.8rem;
-                color: var(--primary);
-                font-weight: bold;
-              "
-            ></label>
-            <input
-              type="number"
-              id="captchaInput"
-              placeholder="Respuesta"
-              required
-              inputmode="numeric"
-            />
+          <div id="captchaBox">
+            <div class="slider-container" id="sliderContainer">
+              <span class="slider-text" id="captchaTexto"
+                >Deslizá para validar ➔</span
+              >
+              <input
+                type="range"
+                id="captchaSlider"
+                min="0"
+                max="100"
+                value="0"
+                oninput="validarSlider(this.value)"
+              />
+            </div>
           </div>
 
           <button type="submit" id="btnEnviar">Registrar Compromiso</button>
@@ -864,9 +911,8 @@
       href="https://wa.me/5493544586602?text=Hola!%20Hago%20mi%20pedido%20o%20consulta%20para%20el%20Gran%20Locro%20del%2010%20de%20Mayo"
       target="_blank"
       class="btn-wa-float"
+      >💬</a
     >
-      💬
-    </a>
 
     <footer>
       <div class="marquee-text">
@@ -874,16 +920,14 @@
         de Mayo - ¡Sumate con tu aporte! - Entrega desde las 12:30 hs en el SUM
         de la escuela
       </div>
-      <div>
-        <h6>Diseño y programación Dpto de Informática - 2026</h6>
-      </div>
+      <div><h6>Diseño y programación Dpto de Informática - 2026</h6></div>
     </footer>
 
     <script>
       const PRECIO_PORCION = 8000;
       const URL =
         "https://script.google.com/macros/s/AKfycbwH4K3F8GO7wcg4kONTyfdQxgmWMefiZqSVy7S-svbF9rr5n1t0UY-t5OscJoLpR8bNhA/exec";
-      const WHATSAPP_COORDINADOR = "5493544586602"; // Número actualizado según folleto
+      const WHATSAPP_COORDINADOR = "5493544586602";
 
       const objetivos = {
         Maíz: { meta: 60, icon: "🌽" },
@@ -908,7 +952,7 @@
         "Gas (garrafas de 10kg)": { meta: 5, icon: "🔥" },
       };
 
-      let captchaCorrecto = 0,
+      let captchaValidado = false,
         datosActuales = {},
         filtroActual = "todos";
 
@@ -958,13 +1002,32 @@
           localStorage.getItem("locro_tel") || "";
       }
 
-      function generarCaptcha() {
-        const a = Math.floor(Math.random() * 9) + 1,
-          b = Math.floor(Math.random() * 9) + 1;
-        captchaCorrecto = a + b;
-        document.getElementById("captchaTexto").innerText =
-          `Seguridad: ¿Cuánto es ${a} + ${b}?`;
-        document.getElementById("captchaInput").value = "";
+      /* FUNCIONES DEL SLIDER CAPTCHA */
+      function resetCaptcha() {
+        captchaValidado = false;
+        const slider = document.getElementById("captchaSlider");
+        const container = document.getElementById("sliderContainer");
+        const texto = document.getElementById("captchaTexto");
+        slider.value = 0;
+        slider.disabled = false;
+        container.classList.remove("slider-success");
+        texto.innerText = "Seguridad: Deslizá a la derecha";
+        texto.style.color = "var(--primary)";
+      }
+
+      function validarSlider(valor) {
+        if (valor >= 95) {
+          captchaValidado = true;
+          const slider = document.getElementById("captchaSlider");
+          const container = document.getElementById("sliderContainer");
+          const texto = document.getElementById("captchaTexto");
+          slider.value = 100;
+          slider.disabled = true;
+          container.classList.add("slider-success");
+          texto.innerText = "✔️​ VALIDADO CORRECTAMENTE";
+          texto.style.color = "var(--secondary)";
+          if (navigator.vibrate) navigator.vibrate(50);
+        }
       }
 
       function mostrarCampos() {
@@ -1016,13 +1079,32 @@
 
       async function enviarDatos(e) {
         e.preventDefault();
-        if (
-          parseInt(document.getElementById("captchaInput").value) !==
-          captchaCorrecto
-        ) {
+        if (!captchaValidado) {
+          // Vibración (si está disponible)
           if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-          alert("Respuesta incorrecta.");
-          return;
+
+          const captchaBox = document.getElementById("captchaBox");
+          const captchaTexto = document.getElementById("captchaTexto");
+
+          // Guardamos el texto original
+          const textoOriginal = captchaTexto.innerText;
+
+          // Aplicamos efectos visuales de error
+          captchaBox.classList.add("shake-error");
+          captchaTexto.innerText = "⚠️ DESLIZÁ PARA VALIDAR";
+          captchaTexto.classList.add("texto-error");
+
+          // Quitamos los efectos después de 1.5 segundos
+          setTimeout(() => {
+            captchaBox.classList.remove("shake-error");
+            captchaTexto.classList.remove("texto-error");
+            // Solo restauramos el texto si el usuario aún no ha validado
+            if (!captchaValidado) {
+              captchaTexto.innerText = textoOriginal;
+            }
+          }, 1500);
+
+          return; // Detiene el envío
         }
 
         const btn = document.getElementById("btnEnviar");
@@ -1068,12 +1150,10 @@
             `<span style='color:var(--success)'>✅ COMPROMISO REGISTRADO.</span>${avisoExtra}`;
           document.getElementById("formRegistro").reset();
           document.getElementById("txtTotalVenta").innerText = "";
-
           localStorage.removeItem("locro_nombre");
           localStorage.removeItem("locro_tel");
-
           mostrarCampos();
-          generarCaptcha();
+          resetCaptcha();
           setTimeout(cargarEstado, 2000);
         } catch (e) {
           document.getElementById("mensaje").innerText = "❌ Error al enviar.";
@@ -1137,7 +1217,6 @@
           let falta = Math.max(item.meta - item.val, 0);
           let clase =
             item.porc >= 100 ? "ok" : item.porc >= 60 ? "medio" : "falta";
-
           let critico = index < 3 && item.porc < 100 ? "resaltar-critico" : "";
           let casiListo =
             item.porc >= 90 && item.porc < 100 ? "casi-listo" : "";
@@ -1199,7 +1278,7 @@
 
       window.onload = () => {
         loadDraft();
-        generarCaptcha();
+        resetCaptcha();
         cargarEstado();
         iniciarCountdown();
         setTimeout(cerrarModal, 3000);

@@ -1118,42 +1118,35 @@
 
       async function enviarDatos(e) {
         e.preventDefault();
-        if (!captchaValidado) {
-          // Vibración (si está disponible)
-          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
 
+        if (!captchaValidado) {
+          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
           const captchaBox = document.getElementById("captchaBox");
           const captchaTexto = document.getElementById("captchaTexto");
-
-          // Guardamos el texto original
-          const textoOriginal = captchaTexto.innerText;
-
-          // Aplicamos efectos visuales de error
           captchaBox.classList.add("shake-error");
           captchaTexto.innerText = "⚠️ DESLIZÁ PARA VALIDAR";
-          captchaTexto.classList.add("texto-error");
-
-          // Quitamos los efectos después de 1.5 segundos
-          setTimeout(() => {
-            captchaBox.classList.remove("shake-error");
-            captchaTexto.classList.remove("texto-error");
-            // Solo restauramos el texto si el usuario aún no ha validado
-            if (!captchaValidado) {
-              captchaTexto.innerText = textoOriginal;
-            }
-          }, 1500);
-
-          return; // Detiene el envío
+          setTimeout(() => captchaBox.classList.remove("shake-error"), 1500);
+          return;
         }
 
         const btn = document.getElementById("btnEnviar");
         const panel = document.getElementById("panelCentral");
+        const mensajeDiv = document.getElementById("mensaje");
         const tipoColab = document.getElementById("tipo").value;
         const nombreUsr = document.getElementById("nombre").value.toUpperCase();
 
         btn.disabled = true;
-        btn.innerHTML = "⌛ ENVIANDO...";
+        btn.innerHTML = "⌛ PROCESANDO...";
         panel.classList.add("enviando-overlay");
+
+        // Definimos la unidad de medida según el tipo de ingrediente
+        const ingSeleccionado = document.getElementById("ingrediente").value;
+        const unidad =
+          ingSeleccionado.includes("Cebolla") ||
+          ingSeleccionado.includes("Queso") ||
+          ingSeleccionado.includes("Gas")
+            ? "Unid/Atado"
+            : "Kg";
 
         const data = {
           nombre: nombreUsr,
@@ -1164,49 +1157,72 @@
           monto: parseFloat(document.getElementById("monto").value) || 0,
           porciones:
             parseInt(document.getElementById("porcionesInput").value) || 0,
+          ingrediente: tipoColab === "ingredientes" ? ingSeleccionado : "",
         };
 
-        // SOLO incluir ingrediente si NO es dinero ni porciones
-        if (tipoColab === "ingredientes") {
-          data.ingrediente = document.getElementById("ingrediente").value;
-        }
-
         try {
+          // Registro en Google Sheets
           await fetch(URL, {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify(data),
           });
+
           confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
 
-          const textoWA = encodeURIComponent(
-            `¡Hola! Soy ${nombreUsr}. Hice mi pedido/compromiso para el Locro (${tipoColab}). ¡Muchas gracias!`,
-          );
-          const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${textoWA}`;
+          // --- MEJORA DEL MENSAJE DE WHATSAPP ---
+          let resumenAporte = "";
+          let icono = "";
 
-          let avisoExtra =
-            tipoColab === "dinero" || tipoColab === "porciones"
-              ? `<br><a href="${urlWA}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">📱 CLIC AQUÍ para avisar por WhatsApp</a>`
-              : `<br><small style='color:var(--primary)'>Gracias por tu aporte solidario.</small>`;
+          if (tipoColab === "ingredientes") {
+            icono = "🍲";
+            resumenAporte = `*Insumo:* ${data.ingrediente}\n📍 *Cantidad:* ${data.cantidadKg} ${unidad}`;
+          } else if (tipoColab === "dinero") {
+            icono = "💸";
+            resumenAporte = `*Donación de Dinero*\n📍 *Monto:* $${data.monto.toLocaleString()}`;
+          } else if (tipoColab === "porciones") {
+            icono = "🎟️";
+            resumenAporte = `*Compra de Porciones*\n📍 *Cantidad:* ${data.porciones}\n📍 *Total:* $${(data.porciones * 8000).toLocaleString()}`;
+          }
 
-          document.getElementById("mensaje").innerHTML =
-            `<span style='color:var(--success)'>✅ COMPROMISO REGISTRADO.</span>${avisoExtra}`;
+          const msjWA =
+            `*NUEVO COMPROMISO - GRAN LOCRO 2026*\n\n` +
+            `👤 *Nombre:* ${nombreUsr}\n` +
+            `📞 *CONTACTO:* ${data.telefono}\n\n` +
+            `${icono} ${resumenAporte}\n\n` +
+            `_Este mensaje confirma mi registro a travéz de web oficial._\n` +
+            `¡Muchas gracias! 🤝`;
+
+          const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${encodeURIComponent(msjWA)}`;
+          // ---------------------------------------
+
           document.getElementById("formRegistro").reset();
-          document.getElementById("txtTotalVenta").innerText = "";
           localStorage.removeItem("locro_nombre");
           localStorage.removeItem("locro_tel");
           mostrarCampos();
           resetCaptcha();
-          setTimeout(cargarEstado, 2000);
-        } catch (e) {
-          document.getElementById("mensaje").innerText = "❌ Error al enviar.";
+
+          mensajeDiv.innerHTML = `
+      <div style="margin-top:20px; padding:20px; background:rgba(0,210,255,0.05); border-radius:15px; border:2px solid var(--primary); text-align:center;">
+        <p style="color:var(--success); font-weight:bold; margin-bottom:5px; font-size:1.1rem;">¡TODO LISTO!</p>
+        <p style="font-size:0.85rem; margin-bottom:20px; color:#b0bec5;">Tus datos fueron guardados. Hacé clic abajo para enviar el resumen al coordinador.</p>
+        <a href="${urlWA}" target="_blank" 
+           style="display:block; background:#25d366; color:white; text-decoration:none; padding:15px; border-radius:10px; font-weight:900; font-size:1rem; box-shadow: 0 4px 15px rgba(37,211,102,0.4); transition:0.3s;">
+           📱 ENVIAR A WHATSAPP
+        </a>
+      </div>
+    `;
+
+          if (typeof cargarEstado === "function")
+            setTimeout(cargarEstado, 2000);
+        } catch (error) {
+          mensajeDiv.innerHTML = `<p style="color:var(--danger)">❌ Error al registrar el compromiso.</p>`;
         } finally {
-          btn.innerHTML = "REGISTRAR COMPROMISO";
           btn.disabled = false;
+          btn.innerHTML = "REGISTRAR COMPROMISO";
           panel.classList.remove("enviando-overlay");
         }
       }
-
       function cargarEstado() {
         fetch(URL)
           .then((r) => r.json())

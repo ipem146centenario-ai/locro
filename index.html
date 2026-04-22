@@ -938,416 +938,453 @@
     </footer>
 
     <script>
-      const PRECIO_PORCION = 8000;
-      const URL =
-        "https://script.google.com/macros/s/AKfycbwH4K3F8GO7wcg4kONTyfdQxgmWMefiZqSVy7S-svbF9rr5n1t0UY-t5OscJoLpR8bNhA/exec";
-      const WHATSAPP_COORDINADOR = "5493544586602";
+            const PRECIO_PORCION = 8000;
+            const URL =
+              "https://script.google.com/macros/s/AKfycbwH4K3F8GO7wcg4kONTyfdQxgmWMefiZqSVy7S-svbF9rr5n1t0UY-t5OscJoLpR8bNhA/exec";
+            const WHATSAPP_COORDINADOR = "5493544586602";
 
-      const objetivos = {
-        Maíz: { meta: 60, icon: "🌽" },
-        Porotos: { meta: 50, icon: "🫘" },
-        Chorizos: { meta: 20, icon: "🌭" },
-        "Zapallo criollo": { meta: 80, icon: "🎃" },
-        Falda: { meta: 60, icon: "🥩" },
-        Carnaza: { meta: 50, icon: "🍖" },
-        "Carne de cerdo (paleta)": { meta: 60, icon: "🐖" },
-        "Cueritos de cerdo": { meta: 25, icon: "🥓" },
-        Mondongo: { meta: 50, icon: "🍲" },
-        "Cebolla (1 bolsa)": { meta: 1, icon: "🧅" },
-        "Cebolla de verdeo (atados)": { meta: 10, icon: "🌿" },
-        "Aceite (litros)": { meta: 20, icon: "🧴" },
-        "Queso cremoso (hormas)": { meta: 3, icon: "🧀" },
-        "Grasa de cerdo": { meta: 5, icon: "🍯" },
-        "Sal gruesa": { meta: 5, icon: "🧂" },
-        Pimienta: { meta: 0.5, icon: "🧂" },
-        Pimentón: { meta: 0.5, icon: "🌶️" },
-        Orégano: { meta: 0.5, icon: "🌿" },
-        "Ají molido": { meta: 1, icon: "🌶️" },
-        "Gas (garrafas de 10kg)": { meta: 5, icon: "🔥" },
-      };
-
-      let captchaValidado = false,
-        datosActuales = {},
-        filtroActual = "todos";
-
-      function cerrarModal() {
-        const modal = document.getElementById("modalPrecio");
-        if (modal) {
-          modal.style.opacity = "0";
-          setTimeout(() => {
-            modal.style.display = "none";
-          }, 500);
-        }
-      }
-
-      function calcularTotalPorciones() {
-        const cant =
-          parseInt(document.getElementById("porcionesInput").value) || 0;
-        const total = cant * PRECIO_PORCION;
-        const txt = document.getElementById("txtTotalVenta");
-        txt.innerText =
-          cant > 0 ? `Total a transferir: $${total.toLocaleString()}` : "";
-        validarInput();
-      }
-
-      const selIng = document.getElementById("ingrediente");
-      Object.entries(objetivos).forEach(([nombre, info]) => {
-        let opt = document.createElement("option");
-        opt.value = nombre;
-        opt.text = `${info.icon} ${nombre}`;
-        selIng.add(opt);
-      });
-
-      function saveDraft() {
-        localStorage.setItem(
-          "locro_nombre",
-          document.getElementById("nombre").value,
-        );
-        localStorage.setItem(
-          "locro_tel",
-          document.getElementById("telefono").value,
-        );
-      }
-
-      function loadDraft() {
-        document.getElementById("nombre").value =
-          localStorage.getItem("locro_nombre") || "";
-        document.getElementById("telefono").value =
-          localStorage.getItem("locro_tel") || "";
-      }
-
-      /* FUNCIONES DEL SLIDER CAPTCHA */
-      function resetCaptcha() {
-        captchaValidado = false;
-        const slider = document.getElementById("captchaSlider");
-        const container = document.getElementById("sliderContainer");
-        const texto = document.getElementById("captchaTexto");
-        slider.value = 0;
-        slider.disabled = false;
-        container.classList.remove("slider-success");
-        texto.innerText = "Seguridad: Deslizá a la derecha";
-        texto.style.color = "var(--primary)";
-      }
-
-      function validarSlider(valor) {
-        if (valor >= 95) {
-          captchaValidado = true;
-
-          const slider = document.getElementById("captchaSlider");
-          const container = document.getElementById("sliderContainer");
-          const texto = document.getElementById("captchaTexto");
-          const btn = document.getElementById("btnEnviar");
-
-          slider.value = 100;
-          slider.disabled = true;
-
-          container.classList.add("slider-success");
-
-          texto.innerText = "✔️ VALIDADO CORRECTAMENTE";
-          texto.style.color = "var(--secondary)";
-
-          if (navigator.vibrate) navigator.vibrate(50);
-
-          // 🔥 Evita repetir animación
-          if (!btn.classList.contains("btn-validado")) {
-            btn.classList.add("btn-validado");
-
-            btn.style.transition = "transform 0.15s ease, box-shadow 0.3s ease";
-            btn.style.boxShadow = "0 0 20px var(--success)";
-
-            // animación tipo "pop"
-            btn.style.transform = "scale(1.15)";
-
-            setTimeout(() => {
-              btn.style.transform = "scale(0.95)";
-            }, 120);
-
-            setTimeout(() => {
-              btn.style.transform = "scale(1)";
-            }, 220);
-          }
-        }
-      }
-
-      function mostrarCampos() {
-        const t = document.getElementById("tipo").value;
-        document.getElementById("divIngredientes").style.display =
-          t === "ingredientes" ? "block" : "none";
-        document.getElementById("divDinero").style.display =
-          t === "dinero" ? "block" : "none";
-        document.getElementById("divPorciones").style.display =
-          t === "porciones" ? "block" : "none";
-        if (t === "ingredientes") actualizarMaximo();
-        validarInput();
-      }
-
-      function actualizarMaximo() {
-        const ing = document.getElementById("ingrediente").value;
-        const input = document.getElementById("cantidadKg");
-        const falta = Math.max(
-          objetivos[ing].meta - (datosActuales[ing] || 0),
-          0,
-        );
-        input.max = falta.toFixed(2);
-        input.placeholder =
-          falta > 0 ? `Máximo: ${falta.toFixed(1)} Unid/Kg` : "CUPO LLENO";
-        input.disabled = falta <= 0;
-        validarInput();
-      }
-
-      function validarInput() {
-        const tipo = document.getElementById("tipo").value,
-          btn = document.getElementById("btnEnviar"),
-          msg = document.getElementById("mensaje");
-        btn.disabled = false;
-        msg.innerText = "";
-        if (tipo === "ingredientes") {
-          const cant =
-            parseFloat(document.getElementById("cantidadKg").value) || 0;
-          const max =
-            parseFloat(document.getElementById("cantidadKg").max) || 0;
-          if (max <= 0) {
-            msg.innerText = "❌ Ingrediente completo.";
-            btn.disabled = true;
-          } else if (cant > max) {
-            msg.innerText = `⚠️ Máximo: ${max}`;
-            btn.disabled = true;
-          }
-        }
-      }
-
-      async function enviarDatos(e) {
-        e.preventDefault();
-
-        if (!captchaValidado) {
-          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-          const captchaBox = document.getElementById("captchaBox");
-          const captchaTexto = document.getElementById("captchaTexto");
-          captchaBox.classList.add("shake-error");
-          captchaTexto.innerText = "⚠️ DESLIZÁ PARA VALIDAR";
-          setTimeout(() => captchaBox.classList.remove("shake-error"), 1500);
-          return;
-        }
-
-        const btn = document.getElementById("btnEnviar");
-        const panel = document.getElementById("panelCentral");
-        const mensajeDiv = document.getElementById("mensaje");
-        const tipoColab = document.getElementById("tipo").value;
-        const nombreUsr = document.getElementById("nombre").value.toUpperCase();
-
-        btn.disabled = true;
-        btn.innerHTML = "⌛ PROCESANDO...";
-        panel.classList.add("enviando-overlay");
-
-        // Definimos la unidad de medida según el tipo de ingrediente
-        const ingSeleccionado = document.getElementById("ingrediente").value;
-        const unidad =
-          ingSeleccionado.includes("Cebolla") ||
-          ingSeleccionado.includes("Queso") ||
-          ingSeleccionado.includes("Gas")
-            ? "Unid/Atado"
-            : "Kg";
-
-        const data = {
-          nombre: nombreUsr,
-          telefono: document.getElementById("telefono").value,
-          tipo: tipoColab,
-          cantidadKg:
-            parseFloat(document.getElementById("cantidadKg").value) || 0,
-          monto: parseFloat(document.getElementById("monto").value) || 0,
-          porciones:
-            parseInt(document.getElementById("porcionesInput").value) || 0,
-          ingrediente: tipoColab === "ingredientes" ? ingSeleccionado : "",
-        };
-
-        try {
-          // Registro en Google Sheets
-          await fetch(URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify(data),
-          });
-
-          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-
-          // --- MEJORA DEL MENSAJE DE WHATSAPP ---
-          let resumenAporte = "";
-          let icono = "";
-
-          if (tipoColab === "ingredientes") {
-            icono = "🍲";
-            resumenAporte = `*Insumo:* ${data.ingrediente}\n📍 *Cantidad:* ${data.cantidadKg} ${unidad}`;
-          } else if (tipoColab === "dinero") {
-            icono = "💸";
-            resumenAporte = `*Donación de Dinero*\n📍 *Monto:* $${data.monto.toLocaleString()}`;
-          } else if (tipoColab === "porciones") {
-            icono = "🎟️";
-            resumenAporte = `*Compra de Porciones*\n📍 *Cantidad:* ${data.porciones}\n📍 *Total:* $${(data.porciones * 8000).toLocaleString()}`;
-          }
-
-          const msjWA =
-            `*NUEVO COMPROMISO - GRAN LOCRO 2026*\n\n` +
-            `👤 *Nombre:* ${nombreUsr}\n` +
-            `📞 *CONTACTO:* ${data.telefono}\n\n` +
-            `${icono} ${resumenAporte}\n\n` +
-            `_Este mensaje confirma mi registro a travéz de web oficial._\n` +
-            `¡Muchas gracias! 🤝`;
-
-          const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${encodeURIComponent(msjWA)}`;
-          // ---------------------------------------
-
-          document.getElementById("formRegistro").reset();
-          localStorage.removeItem("locro_nombre");
-          localStorage.removeItem("locro_tel");
-          mostrarCampos();
-          resetCaptcha();
-
-          mensajeDiv.innerHTML = `
-      <div style="margin-top:20px; padding:20px; background:rgba(0,210,255,0.05); border-radius:15px; border:2px solid var(--primary); text-align:center;">
-        <p style="color:var(--success); font-weight:bold; margin-bottom:5px; font-size:1.1rem;">¡TODO LISTO!</p>
-        <p style="font-size:0.85rem; margin-bottom:20px; color:#b0bec5;">Tus datos fueron guardados. Hacé clic abajo para enviar el resumen al coordinador.</p>
-        <a href="${urlWA}" target="_blank" 
-           style="display:block; background:#25d366; color:white; text-decoration:none; padding:15px; border-radius:10px; font-weight:900; font-size:1rem; box-shadow: 0 4px 15px rgba(37,211,102,0.4); transition:0.3s;">
-           📱 ENVIAR A WHATSAPP
-        </a>
-      </div>
-    `;
-
-          if (typeof cargarEstado === "function")
-            setTimeout(cargarEstado, 2000);
-        } catch (error) {
-          mensajeDiv.innerHTML = `<p style="color:var(--danger)">❌ Error al registrar el compromiso.</p>`;
-        } finally {
-          btn.disabled = false;
-          btn.innerHTML = "REGISTRAR COMPROMISO";
-          panel.classList.remove("enviando-overlay");
-        }
-      }
-      function cargarEstado() {
-        fetch(URL)
-          .then((r) => r.json())
-          .then((data) => {
-            datosActuales = data;
-            renderizarLista();
-          })
-          .catch((e) => console.error("Error de carga", e));
-      }
-
-      function obtenerUnidad(i) {
-        if (i.includes("bolsa")) return "Bolsa";
-        if (i.includes("atados")) return "Atados";
-        if (i.includes("litros")) return "L";
-        if (i.includes("hormas")) return "Hormas";
-        if (i.includes("garrafas")) return "Garrafas";
-        return "Kg";
-      }
-
-      function renderizarLista() {
-        const contenedor = document.getElementById("estadoIngredientes");
-        if (!contenedor) return;
-        contenedor.innerHTML = "";
-        let totM = 0,
-          totA = 0;
-        const lista = Object.keys(objetivos)
-          .map((nombre) => {
-            const val = parseFloat(datosActuales[nombre]) || 0,
-              meta = objetivos[nombre].meta;
-            totM += meta;
-            totA += Math.min(val, meta);
-            return {
-              nombre,
-              val,
-              meta,
-              porc: Math.min((val / meta) * 100, 100),
-              icon: objetivos[nombre].icon,
+            const objetivos = {
+              Maíz: { meta: 60, icon: "🌽" },
+              Porotos: { meta: 50, icon: "🫘" },
+              Chorizos: { meta: 20, icon: "🌭" },
+              "Zapallo criollo": { meta: 80, icon: "🎃" },
+              Falda: { meta: 60, icon: "🥩" },
+              Carnaza: { meta: 50, icon: "🍖" },
+              "Carne de cerdo (paleta)": { meta: 60, icon: "🐖" },
+              "Cueritos de cerdo": { meta: 25, icon: "🥓" },
+              Mondongo: { meta: 50, icon: "🍲" },
+              "Cebolla (1 bolsa)": { meta: 1, icon: "🧅" },
+              "Cebolla de verdeo (atados)": { meta: 10, icon: "🌿" },
+              "Aceite (litros)": { meta: 20, icon: "🧴" },
+              "Queso cremoso (hormas)": { meta: 3, icon: "🧀" },
+              "Grasa de cerdo": { meta: 5, icon: "🍯" },
+              "Sal gruesa": { meta: 5, icon: "🧂" },
+              Pimienta: { meta: 0.5, icon: "🧂" },
+              Pimentón: { meta: 0.5, icon: "🌶️" },
+              Orégano: { meta: 0.5, icon: "🌿" },
+              "Ají molido": { meta: 1, icon: "🌶️" },
+              "Gas (garrafas de 10kg)": { meta: 5, icon: "🔥" },
             };
-          })
-          .sort((a, b) => a.porc - b.porc);
 
-        const totalG = (totA / totM) * 100;
-        const barraG = document.getElementById("barraGlobal");
-        const txtG = document.getElementById("txtGlobal");
-        if (barraG) barraG.style.width = totalG + "%";
-        if (txtG) txtG.innerText = totalG.toFixed(1) + "%";
+            let captchaValidado = false,
+              datosActuales = {},
+              filtroActual = "todos";
 
-        lista.forEach((item, index) => {
-          if (filtroActual === "faltantes" && item.porc >= 100) return;
-          if (filtroActual === "listos" && item.porc < 100) return;
-          let falta = Math.max(item.meta - item.val, 0);
-          let clase =
-            item.porc >= 100 ? "ok" : item.porc >= 60 ? "medio" : "falta";
-          let critico = index < 3 && item.porc < 100 ? "resaltar-critico" : "";
-          let casiListo =
-            item.porc >= 90 && item.porc < 100 ? "casi-listo" : "";
+            function cerrarModal() {
+              const modal = document.getElementById("modalPrecio");
+              if (modal) {
+                modal.style.opacity = "0";
+                setTimeout(() => {
+                  modal.style.display = "none";
+                }, 500);
+              }
+            }
 
-          contenedor.innerHTML += `<div class="estado-card ${clase} ${critico} ${casiListo}">
-                  <div class="estado-info">
-                      <span class="ingrediente-nombre">${item.icon} ${item.nombre}</span>
-                      <span class="falta-texto">${falta > 0 ? "Faltan " + falta.toFixed(1) + " " + obtenerUnidad(item.nombre) : "LISTO ✅"}</span>
-                  </div>
-                  <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
-              </div>`;
-        });
-      }
+            function calcularTotalPorciones() {
+              const cant =
+                parseInt(document.getElementById("porcionesInput").value) || 0;
+              const total = cant * PRECIO_PORCION;
+              const txt = document.getElementById("txtTotalVenta");
+              txt.innerText =
+                cant > 0 ? `Total a transferir: $${total.toLocaleString()}` : "";
+              validarInput();
+            }
 
+            const selIng = document.getElementById("ingrediente");
+            Object.entries(objetivos).forEach(([nombre, info]) => {
+              let opt = document.createElement("option");
+              opt.value = nombre;
+              opt.text = `${info.icon} ${nombre}`;
+              selIng.add(opt);
+            });
+
+            function saveDraft() {
+              localStorage.setItem(
+                "locro_nombre",
+                document.getElementById("nombre").value,
+              );
+              localStorage.setItem(
+                "locro_tel",
+                document.getElementById("telefono").value,
+              );
+            }
+
+            function loadDraft() {
+              document.getElementById("nombre").value =
+                localStorage.getItem("locro_nombre") || "";
+              document.getElementById("telefono").value =
+                localStorage.getItem("locro_tel") || "";
+            }
+
+            /* FUNCIONES DEL SLIDER CAPTCHA */
+            function resetCaptcha() {
+              captchaValidado = false;
+              const slider = document.getElementById("captchaSlider");
+              const container = document.getElementById("sliderContainer");
+              const texto = document.getElementById("captchaTexto");
+              slider.value = 0;
+              slider.disabled = false;
+              container.classList.remove("slider-success");
+              texto.innerText = "Seguridad: Deslizá a la derecha";
+              texto.style.color = "var(--primary)";
+            }
+
+            function validarSlider(valor) {
+              if (valor >= 95) {
+                captchaValidado = true;
+
+                const slider = document.getElementById("captchaSlider");
+                const container = document.getElementById("sliderContainer");
+                const texto = document.getElementById("captchaTexto");
+                const btn = document.getElementById("btnEnviar");
+
+                slider.value = 100;
+                slider.disabled = true;
+
+                container.classList.add("slider-success");
+
+                texto.innerText = "✔️ VALIDADO CORRECTAMENTE";
+                texto.style.color = "var(--secondary)";
+
+                if (navigator.vibrate) navigator.vibrate(50);
+
+                // 🔥 Evita repetir animación
+                if (!btn.classList.contains("btn-validado")) {
+                  btn.classList.add("btn-validado");
+
+                  btn.style.transition = "transform 0.15s ease, box-shadow 0.3s ease";
+                  btn.style.boxShadow = "0 0 20px var(--success)";
+
+                  // animación tipo "pop"
+                  btn.style.transform = "scale(1.15)";
+
+                  setTimeout(() => {
+                    btn.style.transform = "scale(0.95)";
+                  }, 120);
+
+                  setTimeout(() => {
+                    btn.style.transform = "scale(1)";
+                  }, 220);
+                }
+              }
+            }
+
+            function mostrarCampos() {
+              const t = document.getElementById("tipo").value;
+              document.getElementById("divIngredientes").style.display =
+                t === "ingredientes" ? "block" : "none";
+              document.getElementById("divDinero").style.display =
+                t === "dinero" ? "block" : "none";
+              document.getElementById("divPorciones").style.display =
+                t === "porciones" ? "block" : "none";
+              if (t === "ingredientes") actualizarMaximo();
+              validarInput();
+            }
+
+            function actualizarMaximo() {
+              const ing = document.getElementById("ingrediente").value;
+              const input = document.getElementById("cantidadKg");
+              const falta = Math.max(
+                objetivos[ing].meta - (datosActuales[ing] || 0),
+                0,
+              );
+              input.max = falta.toFixed(2);
+              input.placeholder =
+                falta > 0 ? `Máximo: ${falta.toFixed(1)} Unid/Kg` : "CUPO LLENO";
+              input.disabled = falta <= 0;
+              validarInput();
+            }
+
+            function validarInput() {
+              const tipo = document.getElementById("tipo").value,
+                btn = document.getElementById("btnEnviar"),
+                msg = document.getElementById("mensaje");
+              btn.disabled = false;
+              msg.innerText = "";
+              if (tipo === "ingredientes") {
+                const cant =
+                  parseFloat(document.getElementById("cantidadKg").value) || 0;
+                const max =
+                  parseFloat(document.getElementById("cantidadKg").max) || 0;
+                if (max <= 0) {
+                  msg.innerText = "❌ Ingrediente completo.";
+                  btn.disabled = true;
+                } else if (cant > max) {
+                  msg.innerText = `⚠️ Máximo: ${max}`;
+                  btn.disabled = true;
+                }
+              }
+            }
+
+            async function enviarDatos(e) {
+              e.preventDefault();
+
+              if (!captchaValidado) {
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                const captchaBox = document.getElementById("captchaBox");
+                const captchaTexto = document.getElementById("captchaTexto");
+                captchaBox.classList.add("shake-error");
+                captchaTexto.innerText = "⚠️ DESLIZÁ PARA VALIDAR";
+                setTimeout(() => captchaBox.classList.remove("shake-error"), 1500);
+                return;
+              }
+
+              const btn = document.getElementById("btnEnviar");
+              const panel = document.getElementById("panelCentral");
+              const mensajeDiv = document.getElementById("mensaje");
+              const tipoColab = document.getElementById("tipo").value;
+              const nombreUsr = document.getElementById("nombre").value.toUpperCase();
+
+              btn.disabled = true;
+              btn.innerHTML = "⌛ PROCESANDO...";
+              panel.classList.add("enviando-overlay");
+
+              // Definimos la unidad de medida según el tipo de ingrediente
+              const ingSeleccionado = document.getElementById("ingrediente").value;
+              const unidad =
+                ingSeleccionado.includes("Cebolla") ||
+                ingSeleccionado.includes("Queso") ||
+                ingSeleccionado.includes("Gas")
+                  ? "Unid/Atado"
+                  : "Kg";
+
+              const data = {
+                nombre: nombreUsr,
+                telefono: document.getElementById("telefono").value,
+                tipo: tipoColab,
+                cantidadKg:
+                  parseFloat(document.getElementById("cantidadKg").value) || 0,
+                monto: parseFloat(document.getElementById("monto").value) || 0,
+                porciones:
+                  parseInt(document.getElementById("porcionesInput").value) || 0,
+                ingrediente: tipoColab === "ingredientes" ? ingSeleccionado : "",
+              };
+
+              try {
+                // Registro en Google Sheets
+                await fetch(URL, {
+                  method: "POST",
+                  mode: "no-cors",
+                  body: JSON.stringify(data),
+                });
+
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+                // --- MEJORA DEL MENSAJE DE WHATSAPP ---
+                let resumenAporte = "";
+                let icono = "";
+
+                if (tipoColab === "ingredientes") {
+                  icono = "🍲";
+                  resumenAporte = `*Insumo:* ${data.ingrediente}\n📍 *Cantidad:* ${data.cantidadKg} ${unidad}`;
+                } else if (tipoColab === "dinero") {
+                  icono = "💸";
+                  resumenAporte = `*Donación de Dinero*\n📍 *Monto:* $${data.monto.toLocaleString()}`;
+                } else if (tipoColab === "porciones") {
+                  icono = "🎟️";
+                  resumenAporte = `*Compra de Porciones*\n📍 *Cantidad:* ${data.porciones}\n📍 *Total:* $${(data.porciones * 8000).toLocaleString()}`;
+                }
+
+                const msjWA =
+                  `*NUEVO COMPROMISO - GRAN LOCRO 2026*\n\n` +
+                  `👤 *Nombre:* ${nombreUsr}\n` +
+                  `📞 *CONTACTO:* ${data.telefono}\n\n` +
+                  `${icono} ${resumenAporte}\n\n` +
+                  `_Este mensaje confirma mi registro a travéz de web oficial._\n` +
+                  `¡Muchas gracias! 🤝`;
+
+                const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${encodeURIComponent(msjWA)}`;
+                // ---------------------------------------
+
+                document.getElementById("formRegistro").reset();
+                localStorage.removeItem("locro_nombre");
+                localStorage.removeItem("locro_tel");
+                mostrarCampos();
+                resetCaptcha();
+
+                mensajeDiv.innerHTML = `
+            <div style="margin-top:20px; padding:20px; background:rgba(0,210,255,0.05); border-radius:15px; border:2px solid var(--primary); text-align:center;">
+              <p style="color:var(--success); font-weight:bold; margin-bottom:5px; font-size:1.1rem;">¡TODO LISTO!</p>
+              <p style="font-size:0.85rem; margin-bottom:20px; color:#b0bec5;">Tus datos fueron guardados. Hacé clic abajo para enviar el resumen al coordinador.</p>
+              <a href="${urlWA}" target="_blank"
+                 style="display:block; background:#25d366; color:white; text-decoration:none; padding:15px; border-radius:10px; font-weight:900; font-size:1rem; box-shadow: 0 4px 15px rgba(37,211,102,0.4); transition:0.3s;">
+                 📱 ENVIAR A WHATSAPP
+              </a>
+            </div>
+          `;
+
+                if (typeof cargarEstado === "function")
+                  setTimeout(cargarEstado, 2000);
+              } catch (error) {
+                mensajeDiv.innerHTML = `<p style="color:var(--danger)">❌ Error al registrar el compromiso.</p>`;
+              } finally {
+                btn.disabled = false;
+                btn.innerHTML = "REGISTRAR COMPROMISO";
+                panel.classList.remove("enviando-overlay");
+              }
+            }
+            function cargarEstado() {
+              fetch(URL)
+                .then((r) => r.json())
+                .then((data) => {
+                  datosActuales = data;
+                  renderizarLista();
+                })
+                .catch((e) => console.error("Error de carga", e));
+            }
+
+            function obtenerUnidad(i) {
+              if (i.includes("bolsa")) return "Bolsa";
+              if (i.includes("atados")) return "Atados";
+              if (i.includes("litros")) return "L";
+              if (i.includes("hormas")) return "Hormas";
+              if (i.includes("garrafas")) return "Garrafas";
+              return "Kg";
+            }
+
+            function renderizarLista() {
+              const contenedor = document.getElementById("estadoIngredientes");
+              if (!contenedor) return;
+              contenedor.innerHTML = "";
+              let totM = 0,
+                totA = 0;
+              const lista = Object.keys(objetivos)
+                .map((nombre) => {
+                  const val = parseFloat(datosActuales[nombre]) || 0,
+                    meta = objetivos[nombre].meta;
+                  totM += meta;
+                  totA += Math.min(val, meta);
+                  return {
+                    nombre,
+                    val,
+                    meta,
+                    porc: Math.min((val / meta) * 100, 100),
+                    icon: objetivos[nombre].icon,
+                  };
+                })
+                .sort((a, b) => a.porc - b.porc);
+
+              const totalG = (totA / totM) * 100;
+              const barraG = document.getElementById("barraGlobal");
+              const txtG = document.getElementById("txtGlobal");
+              if (barraG) barraG.style.width = totalG + "%";
+              if (txtG) txtG.innerText = totalG.toFixed(1) + "%";
+
+              lista.forEach((item, index) => {
+                if (filtroActual === "faltantes" && item.porc >= 100) return;
+                if (filtroActual === "listos" && item.porc < 100) return;
+                let falta = Math.max(item.meta - item.val, 0);
+                let clase =
+                  item.porc >= 100 ? "ok" : item.porc >= 60 ? "medio" : "falta";
+                let critico = index < 3 && item.porc < 100 ? "resaltar-critico" : "";
+                let casiListo =
+                  item.porc >= 90 && item.porc < 100 ? "casi-listo" : "";
+
+                contenedor.innerHTML += `<div class="estado-card ${clase} ${critico} ${casiListo}">
+                        <div class="estado-info">
+                            <span class="ingrediente-nombre">${item.icon} ${item.nombre}</span>
+                            <span class="falta-texto">${falta > 0 ? "Faltan " + falta.toFixed(1) + " " + obtenerUnidad(item.nombre) : "LISTO ✅"}</span>
+                        </div>
+                        <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
+                    </div>`;
+              });
+            }
       function iniciarCountdown() {
-        const fecha = new Date("May 10, 2026 12:30:00").getTime();
-        setInterval(() => {
-          const dist = fecha - new Date().getTime();
-          if (dist < 0) return;
-          document.getElementById("days").innerText = Math.floor(
-            dist / (1000 * 60 * 60 * 24),
-          )
-            .toString()
-            .padStart(2, "0");
-          document.getElementById("hours").innerText = Math.floor(
-            (dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-          )
-            .toString()
-            .padStart(2, "0");
-          document.getElementById("minutes").innerText = Math.floor(
-            (dist % (1000 * 60 * 60)) / (1000 * 60),
-          )
-            .toString()
-            .padStart(2, "0");
-          document.getElementById("seconds").innerText = Math.floor(
-            (dist % (1000 * 60)) / 1000,
-          )
-            .toString()
-            .padStart(2, "0");
-        }, 1000);
-      }
+              const fechaEvento = new Date("May 10, 2026 12:30:00").getTime();
 
-      function copiarAlias(texto, boton) {
-        navigator.clipboard.writeText(texto).then(() => {
-          const textoOriginal = boton.innerText;
-          boton.innerText = "¡COPIADO!";
-          boton.style.background = "var(--success)";
+              const intervalo = setInterval(function() {
+                const ahora = new Date().getTime();
+                const distancia = fechaEvento - ahora;
 
-          setTimeout(() => {
-            boton.innerText = textoOriginal;
-            boton.style.background = "var(--primary)";
-          }, 2000);
-        });
-      }
+                // Cálculos de tiempo
+                const dias = Math.floor(distancia / (1000 * 60 * 60 * 24));
+                const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+                const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
 
-      function setFiltro(f, btn) {
-        filtroActual = f;
-        document
-          .querySelectorAll(".btn-filtro")
-          .forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        renderizarLista();
-      }
+                // Actualización de la interfaz
+                document.getElementById("days").innerText = dias.toString().padStart(2, '0');
+                document.getElementById("hours").innerText = horas.toString().padStart(2, '0');
+                document.getElementById("minutes").innerText = minutos.toString().padStart(2, '0');
+                document.getElementById("seconds").innerText = segundos.toString().padStart(2, '0');
 
-      window.onload = () => {
-        loadDraft();
-        resetCaptcha();
-        cargarEstado();
-        iniciarCountdown();
-        setTimeout(cerrarModal, 3000);
-        setInterval(cargarEstado, 60000);
-      };
+                // Lógica de cierre cuando el contador llega a cero
+                if (distancia < 0) {
+                  clearInterval(intervalo);
+
+                  document.getElementById("days").innerText = "00";
+                  document.getElementById("hours").innerText = "00";
+                  document.getElementById("minutes").innerText = "00";
+                  document.getElementById("seconds").innerText = "00";
+
+                  document.getElementById("formRegistro").innerHTML = `
+                    <div style="text-align:center; padding:20px; border:2px dashed var(--accent); border-radius:15px; background: rgba(255,215,0,0.05); animation: fadeIn 0.5s ease;">
+                      <h3 style="color:var(--accent); margin-bottom:10px;">¡LOS PEDIDOS HAN CERRADO!</h3>
+                      <p>Estamos preparando todo para el Gran Locro. ¡Gracias a todos por colaborar!</p>
+                      <p style="margin-top:15px;">¿Consultas urgentes? <br>
+                      <a href="https://wa.me/${WHATSAPP_COORDINADOR}" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:none;">📱 Clic aquí para WhatsApp</a></p>
+                    </div>
+                  `;
+                }
+              }, 1000);
+            }
+              const fecha = new Date("May 10, 2026 12:30:00").getTime();
+              setInterval(() => {
+                const dist = fecha - new Date().getTime();
+                if (dist < 0) return;
+                document.getElementById("days").innerText = Math.floor(
+                  dist / (1000 * 60 * 60 * 24),
+                )
+                  .toString()
+                  .padStart(2, "0");
+                document.getElementById("hours").innerText = Math.floor(
+                  (dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+                )
+                  .toString()
+                  .padStart(2, "0");
+                document.getElementById("minutes").innerText = Math.floor(
+                  (dist % (1000 * 60 * 60)) / (1000 * 60),
+                )
+                  .toString()
+                  .padStart(2, "0");
+                document.getElementById("seconds").innerText = Math.floor(
+                  (dist % (1000 * 60)) / 1000,
+                )
+                  .toString()
+                  .padStart(2, "0");
+              }, 1000);
+            
+
+            function copiarAlias(texto, boton) {
+              navigator.clipboard.writeText(texto).then(() => {
+                const textoOriginal = boton.innerText;
+                boton.innerText = "¡COPIADO!";
+                boton.style.background = "var(--success)";
+
+                setTimeout(() => {
+                  boton.innerText = textoOriginal;
+                  boton.style.background = "var(--primary)";
+                }, 2000);
+              });
+            }
+
+            function setFiltro(f, btn) {
+              filtroActual = f;
+              document
+                .querySelectorAll(".btn-filtro")
+                .forEach((b) => b.classList.remove("active"));
+              btn.classList.add("active");
+              renderizarLista();
+            }
+
+            window.onload = () => {
+              loadDraft();
+              resetCaptcha();
+              cargarEstado();
+              iniciarCountdown();
+              setTimeout(cerrarModal, 3000);
+              setInterval(cargarEstado, 60000);
+            };
     </script>
   </body>
 </html>

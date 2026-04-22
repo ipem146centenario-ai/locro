@@ -1318,12 +1318,17 @@
         }, 1000);
       }
 
-      function copiarAlias(texto, btn) {
-        navigator.clipboard.writeText(texto);
-        if (navigator.vibrate) navigator.vibrate(50);
-        const old = btn.innerText;
-        btn.innerText = "¡OK!";
-        setTimeout(() => (btn.innerText = old), 2000);
+      function copiarAlias(texto, boton) {
+        navigator.clipboard.writeText(texto).then(() => {
+          const textoOriginal = boton.innerText;
+          boton.innerText = "¡COPIADO!";
+          boton.style.background = "var(--success)";
+
+          setTimeout(() => {
+            boton.innerText = textoOriginal;
+            boton.style.background = "var(--primary)";
+          }, 2000);
+        });
       }
 
       function setFiltro(f, btn) {

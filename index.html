@@ -80,7 +80,7 @@
       }
 
       /* Estilo de fila tipo lista (sin medallas) */
-      
+
       /* MODAL RANKING PRO */
       #rankingProModal {
         position: fixed;
@@ -95,7 +95,7 @@
         justify-content: center;
         align-items: center;
       }
-      
+
       /* CONTENIDO */
       .ranking-pro-box {
         width: 95%;
@@ -104,28 +104,68 @@
         border-radius: 20px;
         padding: 20px;
         border: 2px solid gold;
-       
+
         animation: zoomIn 0.3s ease;
       }
-      /* CONTENEDOR PRO MÁS PREMIUM */
-     
+      .anim-titulo-gracias {
+        text-align: center;
+        color: #ffd700;
+        font-size: 1rem;
+        text-transform: uppercase;
+        font-weight: 900;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
 
-      /* ITEMS */
-     
+        /* Gradiente metálico */
+        background: linear-gradient(
+          to right,
+          #ffd700 0%,
+          #fff 50%,
+          #ffd700 100%
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
 
-     
-      
+        /* ANIMACIONES */
+        /* shine: 3s infinito | pulse: 2s suave infinito */
+        animation:
+          shine 3s linear infinite,
+          latidoSuave 2s ease-in-out infinite;
+
+        text-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        display: block;
+      }
+
+      /* El brillo que recorre el texto de forma permanente */
+      @keyframes shine {
+        0% {
+          background-position: 0% center;
+        }
+        100% {
+          background-position: 200% center;
+        }
+      }
+
+      /* Un pequeño pulso de escala para que el título tenga "vida" */
+      @keyframes latidoSuave {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.03);
+        }
+      }
 
       /* TEXTO IZQUIERDA */
       .ranking-left {
         display: flex;
         flex-direction: column;
       }
-     
-      
 
       /* HEADERS */
-     
+
       @keyframes zoomIn {
         from {
           transform: scale(0.8);
@@ -138,13 +178,12 @@
       }
 
       /* TOP 1 DESTACADO */
-     
 
       /* BOTÓN CERRAR */
       .btn-cerrar-ranking {
         margin-top: 15px;
         background: rgb(2, 201, 78);
-        border:#25d366;
+        border: #25d366;
         padding: 10px;
         width: 100%;
         border-radius: 10px;
@@ -327,9 +366,6 @@
         font-size: 0.75rem;
       }
 
-     
-
-     
       @keyframes pulso-casi-listo {
         0% {
           opacity: 1;
@@ -1804,7 +1840,9 @@
     <button id="btnRankingPro" onclick="abrirRankingPro()">🏆</button>
     <div id="rankingProModal">
       <div class="ranking-pro-box">
-        <h2 style="text-align: center; color: gold">Donantes</h2>
+        <h2 class="anim-titulo-gracias">
+          👉 A nuestros colaboradores:<br />¡muchísimas gracias! 🙌💙
+        </h2>
 
         <h3>🎟️ Porciones</h3>
         <div id="rankingPorcionesPro"></div>

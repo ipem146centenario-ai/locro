@@ -33,6 +33,126 @@
         flex-direction: column;
         overflow: hidden;
       }
+      /* BOTÓN FLOTANTE RANKING */
+      #btnRankingPro {
+        position: fixed;
+        bottom: 130px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: none;
+        font-size: 26px;
+        cursor: pointer;
+        background: linear-gradient(135deg, gold, orange);
+        z-index: 10000;
+        animation: pulseRanking 2s infinite;
+      }
+
+      @keyframes pulseRanking {
+        0% {
+          box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 15px rgba(233, 18, 18, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+        }
+      }
+      /* Contenedores con scroll para el modal */
+      #rankingDineroPro,
+      #rankingPorcionesPro,
+      #rankingIngredientesPro {
+        max-height: 250px; /* Ajusta la altura a tu gusto */
+        overflow-y: auto;
+        padding-right: 10px;
+        margin-bottom: 20px;
+      }
+
+      /* Estilo de barra de desplazamiento para que combine con tu web */
+      #rankingIngredientesPro::-webkit-scrollbar {
+        width: 10px;
+      }
+      #rankingIngredientesPro::-webkit-scrollbar-thumb {
+        background: #f7f7f7;
+        border-radius: 10px;
+      }
+
+      /* Estilo de fila tipo lista (sin medallas) */
+      
+      /* MODAL RANKING PRO */
+      #rankingProModal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        z-index: 10001;
+        background: rgba(0, 10, 69, 0.9);
+        backdrop-filter: blur(10px);
+        justify-content: center;
+        align-items: center;
+      }
+      
+      /* CONTENIDO */
+      .ranking-pro-box {
+        width: 95%;
+        max-width: 600px;
+        background: #000000;
+        border-radius: 20px;
+        padding: 20px;
+        border: 2px solid gold;
+       
+        animation: zoomIn 0.3s ease;
+      }
+      /* CONTENEDOR PRO MÁS PREMIUM */
+     
+
+      /* ITEMS */
+     
+
+     
+      
+
+      /* TEXTO IZQUIERDA */
+      .ranking-left {
+        display: flex;
+        flex-direction: column;
+      }
+     
+      
+
+      /* HEADERS */
+     
+      @keyframes zoomIn {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      /* TOP 1 DESTACADO */
+     
+
+      /* BOTÓN CERRAR */
+      .btn-cerrar-ranking {
+        margin-top: 15px;
+        background: rgb(2, 201, 78);
+        border:#25d366;
+        padding: 10px;
+        width: 100%;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        color: yellow;
+        font-size: 20px;
+      }
 
       /* BOTÓN WHATSAPP FLOTANTE */
       .btn-wa-float {
@@ -198,13 +318,18 @@
           box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
         }
       }
-
-      .resaltar-critico {
-        animation: pulso-critico 2s infinite;
-        border: 2px solid var(--danger) !important;
-        background: rgba(255, 82, 82, 0.1) !important;
+      .ranking-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+        margin-bottom: 6px;
+        border-radius: 8px;
+        font-size: 0.75rem;
       }
 
+     
+
+     
       @keyframes pulso-casi-listo {
         0% {
           opacity: 1;
@@ -938,453 +1063,759 @@
     </footer>
 
     <script>
-            const PRECIO_PORCION = 8000;
-            const URL =
-              "https://script.google.com/macros/s/AKfycbwH4K3F8GO7wcg4kONTyfdQxgmWMefiZqSVy7S-svbF9rr5n1t0UY-t5OscJoLpR8bNhA/exec";
-            const WHATSAPP_COORDINADOR = "5493544586602";
+      const PRECIO_PORCION = 8000;
+      const URL =
+        "https://script.google.com/macros/s/AKfycbwyCcqEkAXH-Ko-tewjERJ3QDYd01t1BDI52gxh_HBt7BEf2T0Fcpv6OsthIUcWvwXpXA/exec";
+      const WHATSAPP_COORDINADOR = "5493544586602";
 
-            const objetivos = {
-              Maíz: { meta: 60, icon: "🌽" },
-              Porotos: { meta: 50, icon: "🫘" },
-              Chorizos: { meta: 20, icon: "🌭" },
-              "Zapallo criollo": { meta: 80, icon: "🎃" },
-              Falda: { meta: 60, icon: "🥩" },
-              Carnaza: { meta: 50, icon: "🍖" },
-              "Carne de cerdo (paleta)": { meta: 60, icon: "🐖" },
-              "Cueritos de cerdo": { meta: 25, icon: "🥓" },
-              Mondongo: { meta: 50, icon: "🍲" },
-              "Cebolla (1 bolsa)": { meta: 1, icon: "🧅" },
-              "Cebolla de verdeo (atados)": { meta: 10, icon: "🌿" },
-              "Aceite (litros)": { meta: 20, icon: "🧴" },
-              "Queso cremoso (hormas)": { meta: 3, icon: "🧀" },
-              "Grasa de cerdo": { meta: 5, icon: "🍯" },
-              "Sal gruesa": { meta: 5, icon: "🧂" },
-              Pimienta: { meta: 0.5, icon: "🧂" },
-              Pimentón: { meta: 0.5, icon: "🌶️" },
-              Orégano: { meta: 0.5, icon: "🌿" },
-              "Ají molido": { meta: 1, icon: "🌶️" },
-              "Gas (garrafas de 10kg)": { meta: 5, icon: "🔥" },
+      const objetivos = {
+        Maíz: { meta: 60, icon: "🌽" },
+        Porotos: { meta: 50, icon: "🫘" },
+        Chorizos: { meta: 20, icon: "🌭" },
+        "Zapallo criollo": { meta: 80, icon: "🎃" },
+        Falda: { meta: 60, icon: "🥩" },
+        Carnaza: { meta: 50, icon: "🍖" },
+        "Carne de cerdo (paleta)": { meta: 60, icon: "🐖" },
+        "Cueritos de cerdo": { meta: 25, icon: "🥓" },
+        Mondongo: { meta: 50, icon: "🍲" },
+        "Cebolla (1 bolsa)": { meta: 1, icon: "🧅" },
+        "Cebolla de verdeo (atados)": { meta: 10, icon: "🌿" },
+        "Aceite (litros)": { meta: 20, icon: "🧴" },
+        "Queso cremoso (hormas)": { meta: 3, icon: "🧀" },
+        "Grasa de cerdo": { meta: 5, icon: "🍯" },
+        "Sal gruesa": { meta: 5, icon: "🧂" },
+        Pimienta: { meta: 0.5, icon: "🧂" },
+        Pimentón: { meta: 0.5, icon: "🌶️" },
+        Orégano: { meta: 0.5, icon: "🌿" },
+        "Ají molido": { meta: 1, icon: "🌶️" },
+        "Gas (garrafas de 10kg)": { meta: 5, icon: "🔥" },
+      };
+
+      let captchaValidado = false,
+        datosActuales = {},
+        filtroActual = "todos";
+
+      function cerrarModal() {
+        const modal = document.getElementById("modalPrecio");
+        if (modal) {
+          modal.style.opacity = "0";
+          setTimeout(() => {
+            modal.style.display = "none";
+          }, 500);
+        }
+      }
+
+      function calcularTotalPorciones() {
+        const cant =
+          parseInt(document.getElementById("porcionesInput").value) || 0;
+        const total = cant * PRECIO_PORCION;
+        const txt = document.getElementById("txtTotalVenta");
+        txt.innerText =
+          cant > 0 ? `Total a transferir: $${total.toLocaleString()}` : "";
+        validarInput();
+      }
+
+      const selIng = document.getElementById("ingrediente");
+      Object.entries(objetivos).forEach(([nombre, info]) => {
+        let opt = document.createElement("option");
+        opt.value = nombre;
+        opt.text = `${info.icon} ${nombre}`;
+        selIng.add(opt);
+      });
+
+      function saveDraft() {
+        localStorage.setItem(
+          "locro_nombre",
+          document.getElementById("nombre").value,
+        );
+        localStorage.setItem(
+          "locro_tel",
+          document.getElementById("telefono").value,
+        );
+      }
+
+      function loadDraft() {
+        document.getElementById("nombre").value =
+          localStorage.getItem("locro_nombre") || "";
+        document.getElementById("telefono").value =
+          localStorage.getItem("locro_tel") || "";
+      }
+
+      /* FUNCIONES DEL SLIDER CAPTCHA */
+      function resetCaptcha() {
+        captchaValidado = false;
+        const slider = document.getElementById("captchaSlider");
+        const container = document.getElementById("sliderContainer");
+        const texto = document.getElementById("captchaTexto");
+        slider.value = 0;
+        slider.disabled = false;
+        container.classList.remove("slider-success");
+        texto.innerText = "Seguridad: Deslizá a la derecha";
+        texto.style.color = "var(--primary)";
+      }
+
+      function validarSlider(valor) {
+        if (valor >= 95) {
+          captchaValidado = true;
+
+          const slider = document.getElementById("captchaSlider");
+          const container = document.getElementById("sliderContainer");
+          const texto = document.getElementById("captchaTexto");
+          const btn = document.getElementById("btnEnviar");
+
+          slider.value = 100;
+          slider.disabled = true;
+
+          container.classList.add("slider-success");
+
+          texto.innerText = "✔️ VALIDADO CORRECTAMENTE";
+          texto.style.color = "var(--secondary)";
+
+          if (navigator.vibrate) navigator.vibrate(50);
+
+          // 🔥 Evita repetir animación
+          if (!btn.classList.contains("btn-validado")) {
+            btn.classList.add("btn-validado");
+
+            btn.style.transition = "transform 0.15s ease, box-shadow 0.3s ease";
+            btn.style.boxShadow = "0 0 20px var(--success)";
+
+            // animación tipo "pop"
+            btn.style.transform = "scale(1.15)";
+
+            setTimeout(() => {
+              btn.style.transform = "scale(0.95)";
+            }, 120);
+
+            setTimeout(() => {
+              btn.style.transform = "scale(1)";
+            }, 220);
+          }
+        }
+      }
+
+      function mostrarCampos() {
+        const t = document.getElementById("tipo").value;
+        document.getElementById("divIngredientes").style.display =
+          t === "ingredientes" ? "block" : "none";
+        document.getElementById("divDinero").style.display =
+          t === "dinero" ? "block" : "none";
+        document.getElementById("divPorciones").style.display =
+          t === "porciones" ? "block" : "none";
+        if (t === "ingredientes") actualizarMaximo();
+        validarInput();
+      }
+
+      function actualizarMaximo() {
+        const ing = document.getElementById("ingrediente").value;
+        const input = document.getElementById("cantidadKg");
+        const falta = Math.max(
+          objetivos[ing].meta - (datosActuales[ing] || 0),
+          0,
+        );
+        input.max = falta.toFixed(2);
+        input.placeholder =
+          falta > 0 ? `Máximo: ${falta.toFixed(1)} Unid/Kg` : "CUPO LLENO";
+        input.disabled = falta <= 0;
+        validarInput();
+      }
+
+      function validarInput() {
+        const tipo = document.getElementById("tipo").value,
+          btn = document.getElementById("btnEnviar"),
+          msg = document.getElementById("mensaje");
+        btn.disabled = false;
+        msg.innerText = "";
+        if (tipo === "ingredientes") {
+          const cant =
+            parseFloat(document.getElementById("cantidadKg").value) || 0;
+          const max =
+            parseFloat(document.getElementById("cantidadKg").max) || 0;
+          if (max <= 0) {
+            msg.innerText = "❌ Ingrediente completo.";
+            btn.disabled = true;
+          } else if (cant > max) {
+            msg.innerText = `⚠️ Máximo: ${max}`;
+            btn.disabled = true;
+          }
+        }
+      }
+
+      async function enviarDatos(e) {
+        e.preventDefault();
+        if (!captchaValidado) {
+          // Vibración (si está disponible)
+          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
+          const captchaBox = document.getElementById("captchaBox");
+          const captchaTexto = document.getElementById("captchaTexto");
+
+          // Guardamos el texto original
+          const textoOriginal = captchaTexto.innerText;
+
+          // Aplicamos efectos visuales de error
+          captchaBox.classList.add("shake-error");
+          captchaTexto.innerText = "⚠️ DESLIZÁ PARA VALIDAR";
+          captchaTexto.classList.add("texto-error");
+
+          // Quitamos los efectos después de 1.5 segundos
+          setTimeout(() => {
+            captchaBox.classList.remove("shake-error");
+            captchaTexto.classList.remove("texto-error");
+            // Solo restauramos el texto si el usuario aún no ha validado
+            if (!captchaValidado) {
+              captchaTexto.innerText = textoOriginal;
+            }
+          }, 1500);
+
+          return; // Detiene el envío
+        }
+
+        const btn = document.getElementById("btnEnviar");
+        const panel = document.getElementById("panelCentral");
+        const tipoColab = document.getElementById("tipo").value;
+        const nombreUsr = document.getElementById("nombre").value.toUpperCase();
+
+        btn.disabled = true;
+        btn.innerHTML = "⌛ ENVIANDO...";
+        panel.classList.add("enviando-overlay");
+
+        const data = {
+          nombre: nombreUsr,
+          telefono: document.getElementById("telefono").value,
+          tipo: tipoColab,
+          cantidadKg:
+            parseFloat(document.getElementById("cantidadKg").value) || 0,
+          monto: parseFloat(document.getElementById("monto").value) || 0,
+          porciones:
+            parseInt(document.getElementById("porcionesInput").value) || 0,
+        };
+
+        // SOLO incluir ingrediente si NO es dinero ni porciones
+        if (tipoColab === "ingredientes") {
+          data.ingrediente = document.getElementById("ingrediente").value;
+        }
+
+        try {
+          await fetch(URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(data),
+          });
+          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+          const textoWA = encodeURIComponent(
+            `¡Hola! Soy ${nombreUsr}. Hice mi pedido/compromiso para el Locro (${tipoColab}). ¡Muchas gracias!`,
+          );
+          const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${textoWA}`;
+
+          let avisoExtra =
+            tipoColab === "dinero" || tipoColab === "porciones"
+              ? `<br><a href="${urlWA}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">📱 CLIC AQUÍ para avisar por WhatsApp</a>`
+              : `<br><small style='color:var(--primary)'>Gracias por tu aporte solidario.</small>`;
+
+          document.getElementById("mensaje").innerHTML =
+            `<span style='color:var(--success)'>✅ COMPROMISO REGISTRADO.</span>${avisoExtra}`;
+          document.getElementById("formRegistro").reset();
+          document.getElementById("txtTotalVenta").innerText = "";
+          localStorage.removeItem("locro_nombre");
+          localStorage.removeItem("locro_tel");
+          mostrarCampos();
+          resetCaptcha();
+          setTimeout(cargarEstado, 2000);
+        } catch (e) {
+          document.getElementById("mensaje").innerText = "❌ Error al enviar.";
+        } finally {
+          btn.innerHTML = "REGISTRAR COMPROMISO";
+          btn.disabled = false;
+          panel.classList.remove("enviando-overlay");
+        }
+      }
+
+      function cargarEstado() {
+        fetch(URL)
+          .then((r) => r.json())
+          .then((data) => {
+            // 🧯 PROTECCIÓN: si el backend falla
+            if (!data) {
+              console.error("Sin datos");
+              return;
+            }
+
+            // 🧱 INGREDIENTES
+            datosActuales = data.ingredientes || data || {};
+            renderizarLista();
+
+            // 🏆 RANKINGS (UN SOLO FLUJO)
+            cargarRankingSeguro(data);
+          })
+          .catch((e) => {
+            console.error("Error de carga", e);
+          });
+
+        fetch(URL)
+          .then((r) => r.json())
+          .then((data) => {
+            // 🧯 PROTECCIÓN: si el backend falla
+            if (!data) {
+              console.error("Sin datos");
+              return;
+            }
+
+            // 🧱 INGREDIENTES
+            datosActuales = data.ingredientes || data || {};
+            renderizarLista();
+
+            // 🏆 RANKINGS (solo si existen)
+            if (!data.ranking) return;
+
+            // ======================
+            // 💸 DINERO
+            // ======================
+            if (
+              topAnterior.dinero &&
+              detectarNuevoTop(data.ranking.dinero, topAnterior.dinero)
+            ) {
+              lanzarConfettiTop();
+            }
+
+            renderRanking(data.ranking.dinero || [], "rankingDinero", "dinero");
+            topAnterior.dinero = data.ranking.dinero || [];
+
+            // ======================
+            // 🎟️ PORCIONES
+            // ======================
+            if (
+              topAnterior.porciones &&
+              detectarNuevoTop(data.ranking.porciones, topAnterior.porciones)
+            ) {
+              lanzarConfettiTop();
+            }
+
+            renderRanking(
+              data.ranking.porciones || [],
+              "rankingPorciones",
+              "porciones",
+            );
+            topAnterior.porciones = data.ranking.porciones || [];
+
+            // ======================
+            // 🍲 INGREDIENTES
+            // ======================
+            if (
+              topAnterior.ingredientes &&
+              detectarNuevoTop(
+                data.ranking.ingredientes,
+                topAnterior.ingredientes,
+              )
+            ) {
+              lanzarConfettiTop();
+            }
+
+            renderRanking(
+              data.ranking.ingredientes || [],
+              "rankingIngredientes",
+              "ingredientes",
+            );
+            topAnterior.ingredientes = data.ranking.ingredientes || [];
+          })
+          .catch((e) => {
+            console.error("Error de carga", e);
+          });
+
+        fetch(URL)
+          .then((r) => r.json())
+          .then((data) => {
+            // 🧱 INGREDIENTES (compatibilidad doble formato)
+            datosActuales = data.ingredientes || data;
+            renderizarLista();
+
+            // 🏆 RANKINGS
+            if (data.ranking) {
+              // 💸 DINERO
+              if (
+                topAnterior.dinero.length &&
+                detectarNuevoTop(data.ranking.dinero, topAnterior.dinero)
+              ) {
+                lanzarConfettiTop();
+              }
+
+              renderRanking(
+                data.ranking.dinero || [],
+                "rankingDinero",
+                "dinero",
+              );
+
+              topAnterior.dinero = [...(data.ranking.dinero || [])];
+
+              // 🎟️ PORCIONES
+              if (
+                topAnterior.porciones.length &&
+                detectarNuevoTop(data.ranking.porciones, topAnterior.porciones)
+              ) {
+                lanzarConfettiTop();
+              }
+
+              renderRanking(
+                data.ranking.porciones || [],
+                "rankingPorciones",
+                "porciones",
+              );
+
+              topAnterior.porciones = [...(data.ranking.porciones || [])];
+
+              // 🍲 INGREDIENTES
+              if (
+                topAnterior.ingredientes.length &&
+                detectarNuevoTop(
+                  data.ranking.ingredientes,
+                  topAnterior.ingredientes,
+                )
+              ) {
+                lanzarConfettiTop();
+              }
+
+              renderRanking(
+                data.ranking.ingredientes || [],
+                "rankingIngredientes",
+                "ingredientes",
+              );
+
+              topAnterior.ingredientes = [...(data.ranking.ingredientes || [])];
+            }
+          })
+          .catch((e) => console.error("Error de carga", e));
+      }
+
+      function obtenerUnidad(i) {
+        if (i.includes("bolsa")) return "Bolsa";
+        if (i.includes("atados")) return "Atados";
+        if (i.includes("litros")) return "L";
+        if (i.includes("hormas")) return "Hormas";
+        if (i.includes("garrafas")) return "Garrafas";
+        return "Kg";
+      }
+
+      function renderizarLista() {
+        const contenedor = document.getElementById("estadoIngredientes");
+        if (!contenedor) return;
+        contenedor.innerHTML = "";
+        let totM = 0,
+          totA = 0;
+        const lista = Object.keys(objetivos)
+          .map((nombre) => {
+            const val = parseFloat(datosActuales[nombre]) || 0,
+              meta = objetivos[nombre].meta;
+            totM += meta;
+            totA += Math.min(val, meta);
+            return {
+              nombre,
+              val,
+              meta,
+              porc: Math.min((val / meta) * 100, 100),
+              icon: objetivos[nombre].icon,
             };
+          })
+          .sort((a, b) => a.porc - b.porc);
 
-            let captchaValidado = false,
-              datosActuales = {},
-              filtroActual = "todos";
+        const totalG = (totA / totM) * 100;
+        const barraG = document.getElementById("barraGlobal");
+        const txtG = document.getElementById("txtGlobal");
+        if (barraG) barraG.style.width = totalG + "%";
+        if (txtG) txtG.innerText = totalG.toFixed(1) + "%";
 
-            function cerrarModal() {
-              const modal = document.getElementById("modalPrecio");
-              if (modal) {
-                modal.style.opacity = "0";
-                setTimeout(() => {
-                  modal.style.display = "none";
-                }, 500);
-              }
-            }
+        lista.forEach((item, index) => {
+          if (filtroActual === "faltantes" && item.porc >= 100) return;
+          if (filtroActual === "listos" && item.porc < 100) return;
+          let falta = Math.max(item.meta - item.val, 0);
+          let clase =
+            item.porc >= 100 ? "ok" : item.porc >= 60 ? "medio" : "falta";
+          let critico = index < 3 && item.porc < 100 ? "resaltar-critico" : "";
+          let casiListo =
+            item.porc >= 90 && item.porc < 100 ? "casi-listo" : "";
 
-            function calcularTotalPorciones() {
-              const cant =
-                parseInt(document.getElementById("porcionesInput").value) || 0;
-              const total = cant * PRECIO_PORCION;
-              const txt = document.getElementById("txtTotalVenta");
-              txt.innerText =
-                cant > 0 ? `Total a transferir: $${total.toLocaleString()}` : "";
-              validarInput();
-            }
+          contenedor.innerHTML += `<div class="estado-card ${clase} ${critico} ${casiListo}">
+                  <div class="estado-info">
+                      <span class="ingrediente-nombre">${item.icon} ${item.nombre}</span>
+                      <span class="falta-texto">${falta > 0 ? "Faltan " + falta.toFixed(1) + " " + obtenerUnidad(item.nombre) : "LISTO ✅"}</span>
+                  </div>
+                  <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
+              </div>`;
+        });
+      }
 
-            const selIng = document.getElementById("ingrediente");
-            Object.entries(objetivos).forEach(([nombre, info]) => {
-              let opt = document.createElement("option");
-              opt.value = nombre;
-              opt.text = `${info.icon} ${nombre}`;
-              selIng.add(opt);
-            });
-
-            function saveDraft() {
-              localStorage.setItem(
-                "locro_nombre",
-                document.getElementById("nombre").value,
-              );
-              localStorage.setItem(
-                "locro_tel",
-                document.getElementById("telefono").value,
-              );
-            }
-
-            function loadDraft() {
-              document.getElementById("nombre").value =
-                localStorage.getItem("locro_nombre") || "";
-              document.getElementById("telefono").value =
-                localStorage.getItem("locro_tel") || "";
-            }
-
-            /* FUNCIONES DEL SLIDER CAPTCHA */
-            function resetCaptcha() {
-              captchaValidado = false;
-              const slider = document.getElementById("captchaSlider");
-              const container = document.getElementById("sliderContainer");
-              const texto = document.getElementById("captchaTexto");
-              slider.value = 0;
-              slider.disabled = false;
-              container.classList.remove("slider-success");
-              texto.innerText = "Deslizá para validar";
-              texto.style.color = "var(--primary)";
-            }
-
-            function validarSlider(valor) {
-              if (valor >= 95) {
-                captchaValidado = true;
-
-                const slider = document.getElementById("captchaSlider");
-                const container = document.getElementById("sliderContainer");
-                const texto = document.getElementById("captchaTexto");
-                const btn = document.getElementById("btnEnviar");
-
-                slider.value = 100;
-                slider.disabled = true;
-
-                container.classList.add("slider-success");
-
-                texto.innerText = "✔️ VALIDADO CORRECTAMENTE";
-                texto.style.color = "var(--secondary)";
-
-                if (navigator.vibrate) navigator.vibrate(50);
-
-                // 🔥 Evita repetir animación
-                if (!btn.classList.contains("btn-validado")) {
-                  btn.classList.add("btn-validado");
-
-                  btn.style.transition = "transform 0.15s ease, box-shadow 0.3s ease";
-                  btn.style.boxShadow = "0 0 20px var(--success)";
-
-                  // animación tipo "pop"
-                  btn.style.transform = "scale(1.15)";
-
-                  setTimeout(() => {
-                    btn.style.transform = "scale(0.95)";
-                  }, 120);
-
-                  setTimeout(() => {
-                    btn.style.transform = "scale(1)";
-                  }, 220);
-                }
-              }
-            }
-
-            function mostrarCampos() {
-              const t = document.getElementById("tipo").value;
-              document.getElementById("divIngredientes").style.display =
-                t === "ingredientes" ? "block" : "none";
-              document.getElementById("divDinero").style.display =
-                t === "dinero" ? "block" : "none";
-              document.getElementById("divPorciones").style.display =
-                t === "porciones" ? "block" : "none";
-              if (t === "ingredientes") actualizarMaximo();
-              validarInput();
-            }
-
-            function actualizarMaximo() {
-              const ing = document.getElementById("ingrediente").value;
-              const input = document.getElementById("cantidadKg");
-              const falta = Math.max(
-                objetivos[ing].meta - (datosActuales[ing] || 0),
-                0,
-              );
-              input.max = falta.toFixed(2);
-              input.placeholder =
-                falta > 0 ? `Máximo: ${falta.toFixed(1)} Unid/Kg` : "CUPO LLENO";
-              input.disabled = falta <= 0;
-              validarInput();
-            }
-
-            function validarInput() {
-              const tipo = document.getElementById("tipo").value,
-                btn = document.getElementById("btnEnviar"),
-                msg = document.getElementById("mensaje");
-              btn.disabled = false;
-              msg.innerText = "";
-              if (tipo === "ingredientes") {
-                const cant =
-                  parseFloat(document.getElementById("cantidadKg").value) || 0;
-                const max =
-                  parseFloat(document.getElementById("cantidadKg").max) || 0;
-                if (max <= 0) {
-                  msg.innerText = "❌ Ingrediente completo.";
-                  btn.disabled = true;
-                } else if (cant > max) {
-                  msg.innerText = `⚠️ Máximo: ${max}`;
-                  btn.disabled = true;
-                }
-              }
-            }
-
-            async function enviarDatos(e) {
-              e.preventDefault();
-
-              if (!captchaValidado) {
-                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-                const captchaBox = document.getElementById("captchaBox");
-                const captchaTexto = document.getElementById("captchaTexto");
-                captchaBox.classList.add("shake-error");
-                captchaTexto.innerText = "⚠️ DESLIZÁ PARA VALIDAR";
-                setTimeout(() => captchaBox.classList.remove("shake-error"), 1500);
-                return;
-              }
-
-              const btn = document.getElementById("btnEnviar");
-              const panel = document.getElementById("panelCentral");
-              const mensajeDiv = document.getElementById("mensaje");
-              const tipoColab = document.getElementById("tipo").value;
-              const nombreUsr = document.getElementById("nombre").value.toUpperCase();
-
-              btn.disabled = true;
-              btn.innerHTML = "⌛ PROCESANDO...";
-              panel.classList.add("enviando-overlay");
-
-              // Definimos la unidad de medida según el tipo de ingrediente
-              const ingSeleccionado = document.getElementById("ingrediente").value;
-              const unidad =
-                ingSeleccionado.includes("Cebolla") ||
-                ingSeleccionado.includes("Queso") ||
-                ingSeleccionado.includes("Gas")
-                  ? "Unid/Atado"
-                  : "Kg";
-
-              const data = {
-                nombre: nombreUsr,
-                telefono: document.getElementById("telefono").value,
-                tipo: tipoColab,
-                cantidadKg:
-                  parseFloat(document.getElementById("cantidadKg").value) || 0,
-                monto: parseFloat(document.getElementById("monto").value) || 0,
-                porciones:
-                  parseInt(document.getElementById("porcionesInput").value) || 0,
-                ingrediente: tipoColab === "ingredientes" ? ingSeleccionado : "",
-              };
-
-              try {
-                // Registro en Google Sheets
-                await fetch(URL, {
-                  method: "POST",
-                  mode: "no-cors",
-                  body: JSON.stringify(data),
-                });
-
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-
-                // --- MEJORA DEL MENSAJE DE WHATSAPP ---
-                let resumenAporte = "";
-                let icono = "";
-
-                if (tipoColab === "ingredientes") {
-                  icono = "🍲";
-                  resumenAporte = `*Insumo:* ${data.ingrediente}\n📍 *Cantidad:* ${data.cantidadKg} ${unidad}`;
-                } else if (tipoColab === "dinero") {
-                  icono = "💸";
-                  resumenAporte = `*Donación de Dinero*\n📍 *Monto:* $${data.monto.toLocaleString()}`;
-                } else if (tipoColab === "porciones") {
-                  icono = "🎟️";
-                  resumenAporte = `*Compra de Porciones*\n📍 *Cantidad:* ${data.porciones}\n📍 *Total:* $${(data.porciones * 8000).toLocaleString()}`;
-                }
-
-                const msjWA =
-                  `*NUEVO COMPROMISO - GRAN LOCRO 2026*\n\n` +
-                  `👤 *Nombre:* ${nombreUsr}\n` +
-                  `📞 *CONTACTO:* ${data.telefono}\n\n` +
-                  `${icono} ${resumenAporte}\n\n` +
-                  `_Este mensaje confirma mi registro a travéz de web oficial._\n` +
-                  `¡Muchas gracias! 🤝`;
-
-                const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${encodeURIComponent(msjWA)}`;
-                // ---------------------------------------
-
-                document.getElementById("formRegistro").reset();
-                localStorage.removeItem("locro_nombre");
-                localStorage.removeItem("locro_tel");
-                mostrarCampos();
-                resetCaptcha();
-
-                mensajeDiv.innerHTML = `
-            <div style="margin-top:20px; padding:20px; background:rgba(0,210,255,0.05); border-radius:15px; border:2px solid var(--primary); text-align:center;">
-              <p style="color:var(--success); font-weight:bold; margin-bottom:5px; font-size:1.1rem;">¡TODO LISTO!</p>
-              <p style="font-size:0.85rem; margin-bottom:20px; color:#b0bec5;">Tus datos fueron guardados. Hacé clic abajo para enviar el resumen al coordinador.</p>
-              <a href="${urlWA}" target="_blank"
-                 style="display:block; background:#25d366; color:white; text-decoration:none; padding:15px; border-radius:10px; font-weight:900; font-size:1rem; box-shadow: 0 4px 15px rgba(37,211,102,0.4); transition:0.3s;">
-                 📱 ENVIAR A WHATSAPP
-              </a>
-            </div>
-          `;
-
-                if (typeof cargarEstado === "function")
-                  setTimeout(cargarEstado, 2000);
-              } catch (error) {
-                mensajeDiv.innerHTML = `<p style="color:var(--danger)">❌ Error al registrar el compromiso.</p>`;
-              } finally {
-                btn.disabled = false;
-                btn.innerHTML = "REGISTRAR COMPROMISO";
-                panel.classList.remove("enviando-overlay");
-              }
-            }
-            function cargarEstado() {
-              fetch(URL)
-                .then((r) => r.json())
-                .then((data) => {
-                  datosActuales = data;
-                  renderizarLista();
-                })
-                .catch((e) => console.error("Error de carga", e));
-            }
-
-            function obtenerUnidad(i) {
-              if (i.includes("bolsa")) return "Bolsa";
-              if (i.includes("atados")) return "Atados";
-              if (i.includes("litros")) return "L";
-              if (i.includes("hormas")) return "Hormas";
-              if (i.includes("garrafas")) return "Garrafas";
-              return "Kg";
-            }
-
-            function renderizarLista() {
-              const contenedor = document.getElementById("estadoIngredientes");
-              if (!contenedor) return;
-              contenedor.innerHTML = "";
-              let totM = 0,
-                totA = 0;
-              const lista = Object.keys(objetivos)
-                .map((nombre) => {
-                  const val = parseFloat(datosActuales[nombre]) || 0,
-                    meta = objetivos[nombre].meta;
-                  totM += meta;
-                  totA += Math.min(val, meta);
-                  return {
-                    nombre,
-                    val,
-                    meta,
-                    porc: Math.min((val / meta) * 100, 100),
-                    icon: objetivos[nombre].icon,
-                  };
-                })
-                .sort((a, b) => a.porc - b.porc);
-
-              const totalG = (totA / totM) * 100;
-              const barraG = document.getElementById("barraGlobal");
-              const txtG = document.getElementById("txtGlobal");
-              if (barraG) barraG.style.width = totalG + "%";
-              if (txtG) txtG.innerText = totalG.toFixed(1) + "%";
-
-              lista.forEach((item, index) => {
-                if (filtroActual === "faltantes" && item.porc >= 100) return;
-                if (filtroActual === "listos" && item.porc < 100) return;
-                let falta = Math.max(item.meta - item.val, 0);
-                let clase =
-                  item.porc >= 100 ? "ok" : item.porc >= 60 ? "medio" : "falta";
-                let critico = index < 3 && item.porc < 100 ? "resaltar-critico" : "";
-                let casiListo =
-                  item.porc >= 90 && item.porc < 100 ? "casi-listo" : "";
-
-                contenedor.innerHTML += `<div class="estado-card ${clase} ${critico} ${casiListo}">
-                        <div class="estado-info">
-                            <span class="ingrediente-nombre">${item.icon} ${item.nombre}</span>
-                            <span class="falta-texto">${falta > 0 ? "Faltan " + falta.toFixed(1) + " " + obtenerUnidad(item.nombre) : "LISTO ✅"}</span>
-                        </div>
-                        <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
-                    </div>`;
-              });
-            }
       function iniciarCountdown() {
-              const fechaEvento = new Date("May 10, 2026 12:30:00").getTime();
+        const fecha = new Date("May 10, 2026 12:30:00").getTime();
+        setInterval(() => {
+          const dist = fecha - new Date().getTime();
+          if (dist < 0) return;
+          document.getElementById("days").innerText = Math.floor(
+            dist / (1000 * 60 * 60 * 24),
+          )
+            .toString()
+            .padStart(2, "0");
+          document.getElementById("hours").innerText = Math.floor(
+            (dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+          )
+            .toString()
+            .padStart(2, "0");
+          document.getElementById("minutes").innerText = Math.floor(
+            (dist % (1000 * 60 * 60)) / (1000 * 60),
+          )
+            .toString()
+            .padStart(2, "0");
+          document.getElementById("seconds").innerText = Math.floor(
+            (dist % (1000 * 60)) / 1000,
+          )
+            .toString()
+            .padStart(2, "0");
+        }, 1000);
+      }
 
-              const intervalo = setInterval(function() {
-                const ahora = new Date().getTime();
-                const distancia = fechaEvento - ahora;
+      function copiarAlias(texto, btn) {
+        navigator.clipboard.writeText(texto);
+        if (navigator.vibrate) navigator.vibrate(50);
+        const old = btn.innerText;
+        btn.innerText = "¡OK!";
+        setTimeout(() => (btn.innerText = old), 2000);
+      }
 
-                // Cálculos de tiempo
-                const dias = Math.floor(distancia / (1000 * 60 * 60 * 24));
-                const horas = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutos = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
-                const segundos = Math.floor((distancia % (1000 * 60)) / 1000);
+      function setFiltro(f, btn) {
+        filtroActual = f;
+        document
+          .querySelectorAll(".btn-filtro")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        renderizarLista();
+      }
 
-                // Actualización de la interfaz
-                document.getElementById("days").innerText = dias.toString().padStart(2, '0');
-                document.getElementById("hours").innerText = horas.toString().padStart(2, '0');
-                document.getElementById("minutes").innerText = minutos.toString().padStart(2, '0');
-                document.getElementById("seconds").innerText = segundos.toString().padStart(2, '0');
+      window.onload = () => {
+        loadDraft();
+        resetCaptcha();
+        cargarEstado();
+        iniciarCountdown();
+        setTimeout(cerrarModal, 3000);
+        setInterval(cargarEstado, 60000);
+      };
+      function obtenerMedalla(i) {
+        if (i === 0) return "🥇";
+        if (i === 1) return "🥈";
+        if (i === 2) return "🥉";
+        return "";
+      }
 
-                // Lógica de cierre cuando el contador llega a cero
-                if (distancia < 0) {
-                  clearInterval(intervalo);
+      /* RENDER PRO CORREGIDO */
+      function renderRankingPro(lista, contenedorId, formato) {
+        const cont = document.getElementById(contenedorId);
+        if (!cont) return;
 
-                  document.getElementById("days").innerText = "00";
-                  document.getElementById("hours").innerText = "00";
-                  document.getElementById("minutes").innerText = "00";
-                  document.getElementById("seconds").innerText = "00";
+        cont.innerHTML = "";
 
-                  document.getElementById("formRegistro").innerHTML = `
-                    <div style="text-align:center; padding:20px; border:2px dashed var(--accent); border-radius:15px; background: rgba(255,215,0,0.05); animation: fadeIn 0.5s ease;">
-                      <h3 style="color:var(--accent); margin-bottom:10px;">¡LOS PEDIDOS HAN CERRADO!</h3>
-                      <p>Estamos preparando todo para el Gran Locro. ¡Gracias a todos por colaborar!</p>
-                      <p style="margin-top:15px;">¿Consultas urgentes? <br>
-                      <a href="https://wa.me/${WHATSAPP_COORDINADOR}" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:none;">📱 Clic aquí para WhatsApp</a></p>
-                    </div>
-                  `;
-                }
-              }, 1000);
+        // Quitamos el .slice(0, 10) para que muestre a TODOS con el scroll
+        lista.forEach((d) => {
+          let valorDerecha = "";
+          let detalleDebajo = "";
+
+          if (formato === "dinero") {
+            valorDerecha = `$${d.total.toLocaleString()}`;
+          } else if (formato === "porciones") {
+            valorDerecha = `${d.total} porc.`;
+          } else {
+            // Para ingredientes
+            valorDerecha = `${d.total} kg`;
+            if (d.detalle) {
+              // Mostramos lo que donó (ej: "2 kg de Harina")
+              detalleDebajo = `<div style="font-size: 0.75rem; color: #00e5ff; margin-top: 2px;">📦 ${d.detalle}</div>`;
             }
-              const fecha = new Date("May 10, 2026 12:30:00").getTime();
-              setInterval(() => {
-                const dist = fecha - new Date().getTime();
-                if (dist < 0) return;
-                document.getElementById("days").innerText = Math.floor(
-                  dist / (1000 * 60 * 60 * 24),
-                )
-                  .toString()
-                  .padStart(2, "0");
-                document.getElementById("hours").innerText = Math.floor(
-                  (dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-                )
-                  .toString()
-                  .padStart(2, "0");
-                document.getElementById("minutes").innerText = Math.floor(
-                  (dist % (1000 * 60 * 60)) / (1000 * 60),
-                )
-                  .toString()
-                  .padStart(2, "0");
-                document.getElementById("seconds").innerText = Math.floor(
-                  (dist % (1000 * 60)) / 1000,
-                )
-                  .toString()
-                  .padStart(2, "0");
-              }, 1000);
-            
+          }
 
-            function copiarAlias(texto, boton) {
-              navigator.clipboard.writeText(texto).then(() => {
-                const textoOriginal = boton.innerText;
-                boton.innerText = "¡COPIADO!";
-                boton.style.background = "var(--success)";
+          cont.innerHTML += `
+      <div class="lista-item-simple">
+        <div style="display: flex; flex-direction: column; text-align: left;">
+          <span style="font-weight: bold; color: #fff; font-size: 0.9rem;">${d.nombre}</span>
+          ${detalleDebajo}
+        </div>
+        <strong style="color: #ffd700; font-size: 0.9rem; margin-left: 10px;">${valorDerecha}</strong>
+      </div>
+    `;
+        });
+      }
+      function obtenerMedalla(i) {
+        return ""; // Lista limpia sin iconos
+      }
 
-                setTimeout(() => {
-                  boton.innerText = textoOriginal;
-                  boton.style.background = "var(--primary)";
-                }, 2000);
-              });
+      function renderRanking(lista, contenedorId, formato = "dinero") {
+        const cont = document.getElementById(contenedorId);
+        if (!cont) return;
+
+        cont.innerHTML = "";
+
+        lista.sort((a, b) => b.total - a.total);
+
+        lista.slice(0, 10).forEach((d, i) => {
+          let clase =
+            i === 0 ? "top1" : i === 1 ? "top2" : i === 2 ? "top3" : "";
+
+          let valor =
+            formato === "dinero"
+              ? `$${d.total.toLocaleString()}`
+              : formato === "porciones"
+                ? `${d.total} porciones`
+                : `${d.total} kg`;
+
+          cont.innerHTML += `
+      <div class="ranking-item ${clase}">
+        <span>
+          <span class="medalla">${obtenerMedalla(i)}</span>
+          ${d.nombre}
+        </span>
+        <strong>${valor}</strong>
+      </div>
+    `;
+        });
+      }
+      function detectarNuevoTop(nuevoTop, viejoTop) {
+        const nuevos = nuevoTop.slice(0, 3).map((d) => d.nombre);
+        const viejos = viejoTop.slice(0, 3).map((d) => d.nombre);
+
+        return nuevos.some((n) => !viejos.includes(n));
+      }
+      function lanzarConfettiTop() {
+        confetti({
+          particleCount: 200,
+          spread: 90,
+          origin: { y: 0.5 },
+        });
+      }
+      // ===============================
+      // 🏆 RANKING FIX (AGREGADO)
+      // ===============================
+
+      let topAnterior = {
+        dinero: [],
+        porciones: [],
+        ingredientes: [],
+      };
+
+      function safeArray(arr) {
+        return Array.isArray(arr) ? arr : [];
+      }
+
+      function cargarRankingSeguro(data) {
+        if (!data || !data.ranking) return;
+
+        const ranking = data.ranking;
+
+        // 💸 DINERO
+        const dinero = safeArray(ranking.dinero);
+        if (
+          topAnterior.dinero.length &&
+          detectarNuevoTop(dinero, topAnterior.dinero)
+        ) {
+          lanzarConfettiTop();
+        }
+        renderRanking(dinero, "rankingDinero", "dinero");
+        topAnterior.dinero = [...dinero];
+
+        // 🎟️ PORCIONES
+        const porciones = safeArray(ranking.porciones);
+        if (
+          topAnterior.porciones.length &&
+          detectarNuevoTop(porciones, topAnterior.porciones)
+        ) {
+          lanzarConfettiTop();
+        }
+        renderRanking(porciones, "rankingPorciones", "porciones");
+        topAnterior.porciones = [...porciones];
+
+        // 🍲 INGREDIENTES
+        const ingredientes = safeArray(ranking.ingredientes);
+        if (
+          topAnterior.ingredientes.length &&
+          detectarNuevoTop(ingredientes, topAnterior.ingredientes)
+        ) {
+          lanzarConfettiTop();
+        }
+        renderRanking(ingredientes, "rankingIngredientes", "ingredientes");
+        topAnterior.ingredientes = [...ingredientes];
+      }
+      function abrirRankingPro() {
+        document.getElementById("rankingProModal").style.display = "flex";
+
+        // renderiza con efecto pro
+        renderRankingPro(topAnterior.dinero, "rankingDineroPro", "dinero");
+        renderRankingPro(
+          topAnterior.porciones,
+          "rankingPorcionesPro",
+          "porciones",
+        );
+        renderRankingPro(
+          topAnterior.ingredientes,
+          "rankingIngredientesPro",
+          "ingredientes",
+        );
+      }
+
+      function cerrarRankingPro() {
+        document.getElementById("rankingProModal").style.display = "none";
+      }
+
+      /* RENDER PRO CORREGIDO */
+      function renderRankingPro(lista, contenedorId, formato) {
+        const cont = document.getElementById(contenedorId);
+        if (!cont) return;
+
+        cont.innerHTML = "";
+
+        // Ordenar siempre por total
+        lista.sort((a, b) => b.total - a.total);
+
+        lista.slice(0, 10).forEach((d, i) => {
+          let valor = "";
+          let detalleHTML = "";
+
+          if (formato === "dinero") {
+            valor = `$${d.total.toLocaleString()}`;
+          } else if (formato === "porciones") {
+            valor = `${d.total} porciones`;
+          } else {
+            // Para ingredientes, usamos el total para la derecha y el detalle para abajo
+            valor = `${d.total} kg`;
+            if (d.detalle) {
+              // El detalle que viene del server es "2 kg de Harina"
+              detalleHTML = `<div style="font-size: 0.7rem; color: #00e5ff; margin-top: 2px; opacity: 0.8;">🍲 ${d.detalle}</div>`;
             }
+          }
 
-            function setFiltro(f, btn) {
-              filtroActual = f;
-              document
-                .querySelectorAll(".btn-filtro")
-                .forEach((b) => b.classList.remove("active"));
-              btn.classList.add("active");
-              renderizarLista();
-            }
+          let clase = i === 0 ? "top1-pro" : "";
 
-            window.onload = () => {
-              loadDraft();
-              resetCaptcha();
-              cargarEstado();
-              iniciarCountdown();
-              setTimeout(cerrarModal, 3000);
-              setInterval(cargarEstado, 60000);
-            };
+          cont.innerHTML += `
+      <div class="ranking-item ${clase}" style="display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 5px;">
+        <div style="display: flex; flex-direction: column; text-align: left;">
+          <span style="font-weight: bold;">${obtenerMedalla(i)} ${d.nombre}</span>
+          ${detalleHTML}
+        </div>
+        <strong style="color: gold; min-width: 80px; text-align: right;">${valor}</strong>
+      </div>
+    `;
+        });
+      }
     </script>
+    <button id="btnRankingPro" onclick="abrirRankingPro()">🏆</button>
+    <div id="rankingProModal">
+      <div class="ranking-pro-box">
+        <h2 style="text-align: center; color: gold">Donantes</h2>
+
+        <h3>🎟️ Porciones</h3>
+        <div id="rankingPorcionesPro"></div>
+
+        <h3>🍲 Ingredientes</h3>
+        <div id="rankingIngredientesPro"></div>
+
+        <button class="btn-cerrar-ranking" onclick="cerrarRankingPro()">
+          CERRAR
+        </button>
+      </div>
+    </div>
   </body>
 </html>

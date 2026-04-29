@@ -1126,75 +1126,117 @@
         document.getElementById("modalConfirmacion").style.display = "none";
       }
 
-       async function enviarDatos(e) {
+      async function enviarDatos(e) {
         e.preventDefault();
-
+        
+        // 1. Validación de Captcha
         if (!captchaValidado) {
-          document.getElementById("captchaBox").classList.add("shake-error");
-          setTimeout(
-            () =>
-              document
-                .getElementById("captchaBox")
-                .classList.remove("shake-error"),
-            500,
-          );
+          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+          const captchaBox = document.getElementById("captchaBox");
+          const captchaTexto = document.getElementById("captchaTexto");
+          const textoOriginal = captchaTexto.innerText;
+          captchaBox.classList.add("shake-error");
+          captchaTexto.innerText = "⚠️ DESLIZÁ PARA VALIDAR";
+          captchaTexto.classList.add("texto-error");
+          setTimeout(() => {
+            captchaBox.classList.remove("shake-error");
+            captchaTexto.classList.remove("texto-error");
+            if (!captchaValidado) captchaTexto.innerText = textoOriginal;
+          }, 1500);
           return;
         }
 
         const tipoColab = document.getElementById("tipo").value;
         const modal = document.getElementById("modalConfirmacion");
         const textoModal = document.getElementById("textoConfirmarMonto");
+        
         let mensajeConfirmacion = "";
         let campoAResetear = null;
 
-        // Configurar mensaje según el tipo
+        // 2. Lógica de confirmación según el tipo de donación
         if (tipoColab === "dinero") {
-          const montoVal = document.getElementById("monto").value;
-          mensajeConfirmacion = `¿Confirmas tu donación de $${montoVal}?`;
+          const monto = document.getElementById("monto").value;
+          mensajeConfirmacion = `¿Estás seguro que deseas colaborar con $${monto}?`;
           campoAResetear = document.getElementById("monto");
-        } else if (tipoColab === "ingredientes") {
+        } 
+        else if (tipoColab === "ingredientes") {
           const ing = document.getElementById("ingrediente").value;
           const cant = document.getElementById("cantidadKg").value;
-          mensajeConfirmacion = `¿Confirmas la donación de ${cant} ${obtenerUnidad(ing)} de ${ing}?`;
+          mensajeConfirmacion = `¿Confirmas la donación de ${cant} unidad/es de ${ing}?`;
           campoAResetear = document.getElementById("cantidadKg");
-        } else if (tipoColab === "porciones") {
+        } 
+        else if (tipoColab === "porciones") {
           const cantP = document.getElementById("porcionesInput").value;
-          mensajeConfirmacion = `¿Confirmas el pedido de ${cantP} porción/es?`;
+          const totalP = cantP * PRECIO_PORCION;
+          mensajeConfirmacion = `¿Confirmas el pedido de ${cantP} porción/es por un total de $${totalP.toLocaleString()}?`;
           campoAResetear = document.getElementById("porcionesInput");
         }
 
-        // MOSTRAR MODAL Y ESPERAR
+        // Ejecutar Modal si hay algo que confirmar
         if (mensajeConfirmacion !== "") {
           textoModal.innerText = mensajeConfirmacion;
           modal.style.display = "flex";
 
           const confirmar = await new Promise((resolve) => {
-            document.getElementById("btnConfirmarSi").onclick = () => {
-              cerrarConfirmacion();
-              resolve(true);
-            };
-            document.getElementById("btnConfirmarNo").onclick = () => {
-              cerrarConfirmacion();
-              if (campoAResetear) {
-                campoAResetear.value = "";
+            document.getElementById("btnConfirmarSi").onclick = () => { cerrarConfirmacion(); resolve(true); };
+            document.getElementById("btnConfirmarNo").onclick = () => { 
+              cerrarConfirmacion(); 
+              if(campoAResetear) {
+                campoAResetear.value = ""; 
                 campoAResetear.focus();
               }
-              resolve(false);
+              resolve(false); 
             };
           });
           if (!confirmar) return;
         }
 
-        // PROCESO DE ENVÍO FINAL
+        // 3. Proceso de Envío
         const btn = document.getElementById("btnEnviar");
-        btn.disabled = true;
-        btn.innerHTML = "ENVIANDO...";
+        const panel = document.getElementById("panelCentral");
+        const nombreUsr = document.getElementById("nombre").value.toUpperCase();
 
-        // Aquí iría tu fetch a Google Sheets...
-        setTimeout(() => {
-          alert("Registro completado con éxito");
-          location.reload();
-        }, 1500);
+        btn.disabled = true;
+        btn.innerHTML = "⌛ ENVIANDO...";
+        panel.classList.add("enviando-overlay");
+
+        const data = {
+          nombre: nombreUsr,
+          telefono: document.getElementById("telefono").value,
+          tipo: tipoColab,
+          cantidadKg: parseFloat(document.getElementById("cantidadKg").value) || 0,
+          monto: parseFloat(document.getElementById("monto").value) || 0,
+          porciones: parseInt(document.getElementById("porcionesInput").value) || 0,
+        };
+        
+        if (tipoColab === "ingredientes") data.ingrediente = document.getElementById("ingrediente").value;
+
+        try {
+          await fetch(URL, { method: "POST", mode: "no-cors", body: JSON.stringify(data) });
+          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+          
+          const textoWA = encodeURIComponent(`¡Hola! Soy ${nombreUsr}. Registré mi aporte para el Locro (${tipoColab}).`);
+          const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${textoWA}`;
+          
+          let avisoExtra = (tipoColab === "dinero" || tipoColab === "porciones")
+            ? `<br><a href="${urlWA}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">📱 CLIC AQUÍ para avisar por WhatsApp</a>`
+            : `<br><small style='color:var(--primary)'>Gracias por tu aporte solidario.</small>`;
+
+          document.getElementById("mensaje").innerHTML = `<span style='color:var(--success)'>✅ REGISTRADO CON ÉXITO.</span>${avisoExtra}`;
+          document.getElementById("formRegistro").reset();
+          document.getElementById("txtTotalVenta").innerText = "";
+          localStorage.removeItem("locro_nombre"); 
+          localStorage.removeItem("locro_tel");
+          mostrarCampos(); 
+          resetCaptcha(); 
+          setTimeout(cargarEstado, 2000);
+        } catch (e) {
+          document.getElementById("mensaje").innerText = "❌ Error al enviar.";
+        } finally {
+          btn.innerHTML = "REGISTRAR COMPROMISO"; 
+          btn.disabled = false; 
+          panel.classList.remove("enviando-overlay");
+        }
       }
       
       function cargarEstado() {

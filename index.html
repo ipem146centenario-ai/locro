@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="es">
   <head>
@@ -55,7 +54,30 @@
         transition: 0.3s;
       }
 
-      .btn-wa-float:hover {
+      /* NUEVO: BOTÓN LISTA DONANTES FLOTANTE */
+      .btn-list-float {
+        position: fixed;
+        bottom: 130px;
+        right: 20px;
+        background: var(--primary);
+        color: var(--secondary);
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        z-index: 10000;
+        text-decoration: none;
+        font-size: 24px;
+        cursor: pointer;
+        transition: 0.3s;
+        border: none;
+      }
+
+      .btn-wa-float:hover,
+      .btn-list-float:hover {
         transform: scale(1.1);
       }
 
@@ -82,6 +104,23 @@
         text-align: center;
         box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
         max-width: 90%;
+        max-height: 85vh; /* Ajuste para scroll interno */
+        overflow-y: auto;
+      }
+
+      /* Estilos para la lista de donantes */
+      .lista-donantes {
+        text-align: left;
+        margin: 15px 0;
+        font-size: 0.9rem;
+      }
+      .donante-item {
+        background: rgba(255, 255, 255, 0.1);
+        margin-bottom: 5px;
+        padding: 8px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
       }
 
       .modal-content h2 {
@@ -398,24 +437,120 @@
         outline: none;
       }
 
-      button#btnEnviar {
-        background: var(--primary);
-        color: var(--secondary);
-        border: none;
-        padding: 16px;
-        border-radius: 10px;
-        font-weight: 900;
-        cursor: pointer;
-        text-transform: uppercase;
-        width: 100%;
-      }
+button#btnEnviar {
+  width: 100%;
+  padding: 16px 18px;
 
-      button#btnEnviar:disabled {
-        background: #444;
-        color: #777;
-        cursor: not-allowed;
-      }
+  border: none;
+  border-radius: 14px;
 
+  font-weight: 900;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  color: #001a2b;
+
+  background: linear-gradient(
+    45deg,
+    #00d2ff,
+    #00ffb3,
+    #ffd700,
+    #00d2ff
+  );
+  background-size: 300% 300%;
+
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  box-shadow:
+    0 0 15px rgba(0, 210, 255, 0.5),
+    0 0 30px rgba(0, 255, 179, 0.3);
+
+  animation: gradMove 4s ease infinite, pulseGlow 2s infinite;
+  transition: all 0.3s ease;
+}
+
+/* 🔥 movimiento del gradiente */
+@keyframes gradMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 💥 pulso externo */
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.4),
+                0 0 25px rgba(0, 255, 179, 0.3);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(0, 210, 255, 0),
+                0 0 40px rgba(0, 255, 179, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 210, 255, 0),
+                0 0 25px rgba(0, 255, 179, 0.3);
+  }
+}
+
+/* ✨ brillo deslizante */
+button#btnEnviar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 100%;
+  height: 100%;
+
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.5),
+    transparent
+  );
+
+  transform: skewX(-20deg);
+}
+
+button#btnEnviar:hover::before {
+  left: 120%;
+  transition: 0.6s;
+}
+
+/* 🚀 hover fuerte */
+button#btnEnviar:hover:not(:disabled) {
+  transform: scale(1.06);
+  filter: brightness(1.15);
+}
+
+/* ❌ disabled */
+button#btnEnviar:disabled {
+  background: #333;
+  color: #777;
+  box-shadow: none;
+  cursor: not-allowed;
+  animation: none;
+  filter: grayscale(1);
+}
+
+/* ✅ estado validado (tu JS ya lo usa) */
+.btn-validado {
+  animation: successPulse 1.2s infinite;
+}
+
+@keyframes successPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 18px rgba(0, 230, 118, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
+  }
+}
       footer {
         background: rgba(0, 0, 0, 0.6);
         padding: 10px;
@@ -520,9 +655,22 @@
       </div>
     </div>
 
+    <!-- NUEVO: Modal de Lista de Colaboradores -->
+    <div id="modalDonantes" class="modal-overlay" style="display: none">
+      <div class="modal-content">
+        <h2>📋 Colaboradores ¡Muchas Gracias!</h2>
+        <div id="contenidoDonantes" class="lista-donantes">
+          <p style="text-align: center">Cargando lista...</p>
+        </div>
+        <button class="btn-cerrar-modal" onclick="toggleModalDonantes()">
+          CERRAR
+        </button>
+      </div>
+    </div>
+
     <div id="modalConfirmacion" class="modal-overlay" style="display: none">
       <div class="modal-content" style="border-color: var(--success)">
-        <h2 style="color: var(--success)"> 🤝​ ¿Confirmar? 🤝​</h2>
+        <h2 style="color: var(--success)">🤝​ ¿Confirmar? 🤝​</h2>
         <p
           id="textoConfirmarMonto"
           style="font-size: 1.2rem; margin: 20px 0"
@@ -942,6 +1090,15 @@
       </section>
     </div>
 
+    <!-- NUEVO: BOTÓN FLOTANTE DE LISTA -->
+    <button
+      onclick="toggleModalDonantes()"
+      class="btn-list-float"
+      title="Ver Colaboradores"
+    >
+      📋
+    </button>
+
     <a
       href="https://wa.me/5493544586602?text=Hola!%20Hago%20mi%20pedido%20o%20consulta%20para%20el%20Gran%20Locro"
       target="_blank"
@@ -956,12 +1113,12 @@
         de la escuela
       </div>
       <div><h6>Diseño y programación Dpto de Informática - 2026</h6></div>
-    </footer>
+    </footer> 
 
     <script>
       const PRECIO_PORCION = 8000;
       const URL =
-        "https://script.google.com/macros/s/AKfycbwH4K3F8GO7wcg4kONTyfdQxgmWMefiZqSVy7S-svbF9rr5n1t0UY-t5OscJoLpR8bNhA/exec";
+        "https://script.google.com/macros/s/AKfycbzTBqDp8FzBPTGxwUCnpNYemTwrz6xqP0fv8FEyjeH8lnyGYwpKjV5uNB57Zn9vQyq2hw/exec";
       const WHATSAPP_COORDINADOR = "5493544586602";
 
       const objetivos = {
@@ -999,6 +1156,63 @@
             modal.style.display = "none";
           }, 500);
         }
+      }
+
+      /* NUEVO: Funciones para el Modal de Donantes */
+      function toggleModalDonantes() {
+        const modal = document.getElementById("modalDonantes");
+        if (modal.style.display === "none") {
+          modal.style.display = "flex";
+          actualizarListaDonantes();
+        } else {
+          modal.style.display = "none";
+        }
+      }
+
+      function actualizarListaDonantes() {
+        const cont = document.getElementById("contenidoDonantes");
+
+        const lista = datosActuales.colaboradores || [];
+
+        if (lista.length === 0) {
+          cont.innerHTML = `<p style="text-align:center">Aún no hay colaboradores</p>`;
+          return;
+        }
+
+        cont.innerHTML = lista
+          .map((c) => {
+            let color = "";
+            let bg = "";
+
+            if (c.detalle.includes("💸")) {
+              color = "#00e676"; // verde dinero
+              bg = "rgba(0,230,118,0.1)";
+            } else if (c.detalle.includes("🍲")) {
+              color = "#00d2ff"; // azul ingredientes
+              bg = "rgba(0,210,255,0.1)";
+            } else if (c.detalle.includes("🎟️")) {
+              color = "#ffd700"; // dorado porciones
+              bg = "rgba(255,215,0,0.1)";
+            }
+
+            return `
+      <div class="donante-item" style="
+        background:${bg};
+        border-left:4px solid ${color};
+        padding:8px;
+        border-radius:6px;
+        margin-bottom:6px;
+        display:flex;
+        justify-content:space-between;
+      ">
+        <span><strong>${c.nombre}</strong></span>
+        <span style="color:${color}; font-weight:bold;">
+          ${c.detalle}
+        </span>
+      </div>
+    `;
+          })
+          .join("");
       }
 
       function calcularTotalPorciones() {
@@ -1122,15 +1336,13 @@
         }
       }
 
-      // NUEVO: Función para cerrar modal de confirmación
       function cerrarConfirmacion() {
         document.getElementById("modalConfirmacion").style.display = "none";
       }
 
       async function enviarDatos(e) {
         e.preventDefault();
-        
-        // 1. Validación de Captcha
+
         if (!captchaValidado) {
           if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
           const captchaBox = document.getElementById("captchaBox");
@@ -1150,49 +1362,47 @@
         const tipoColab = document.getElementById("tipo").value;
         const modal = document.getElementById("modalConfirmacion");
         const textoModal = document.getElementById("textoConfirmarMonto");
-        
+
         let mensajeConfirmacion = "";
         let campoAResetear = null;
 
-        // 2. Lógica de confirmación según el tipo de donación
         if (tipoColab === "dinero") {
           const monto = document.getElementById("monto").value;
           mensajeConfirmacion = `¿Estás seguro que deseas colaborar con $${monto}?`;
           campoAResetear = document.getElementById("monto");
-        } 
-        else if (tipoColab === "ingredientes") {
+        } else if (tipoColab === "ingredientes") {
           const ing = document.getElementById("ingrediente").value;
           const cant = document.getElementById("cantidadKg").value;
           mensajeConfirmacion = `¿Confirmas la donación de ${cant} unidad/es de ${ing}?`;
           campoAResetear = document.getElementById("cantidadKg");
-        } 
-        else if (tipoColab === "porciones") {
+        } else if (tipoColab === "porciones") {
           const cantP = document.getElementById("porcionesInput").value;
           const totalP = cantP * PRECIO_PORCION;
           mensajeConfirmacion = `¿Confirmas el pedido de ${cantP} porción/es por un total de $${totalP.toLocaleString()}?`;
           campoAResetear = document.getElementById("porcionesInput");
         }
 
-        // Ejecutar Modal si hay algo que confirmar
         if (mensajeConfirmacion !== "") {
           textoModal.innerText = mensajeConfirmacion;
           modal.style.display = "flex";
 
           const confirmar = await new Promise((resolve) => {
-            document.getElementById("btnConfirmarSi").onclick = () => { cerrarConfirmacion(); resolve(true); };
-            document.getElementById("btnConfirmarNo").onclick = () => { 
-              cerrarConfirmacion(); 
-              if(campoAResetear) {
-                campoAResetear.value = ""; 
+            document.getElementById("btnConfirmarSi").onclick = () => {
+              cerrarConfirmacion();
+              resolve(true);
+            };
+            document.getElementById("btnConfirmarNo").onclick = () => {
+              cerrarConfirmacion();
+              if (campoAResetear) {
+                campoAResetear.value = "";
                 campoAResetear.focus();
               }
-              resolve(false); 
+              resolve(false);
             };
           });
           if (!confirmar) return;
         }
 
-        // 3. Proceso de Envío
         const btn = document.getElementById("btnEnviar");
         const panel = document.getElementById("panelCentral");
         const nombreUsr = document.getElementById("nombre").value.toUpperCase();
@@ -1205,42 +1415,53 @@
           nombre: nombreUsr,
           telefono: document.getElementById("telefono").value,
           tipo: tipoColab,
-          cantidadKg: parseFloat(document.getElementById("cantidadKg").value) || 0,
+          cantidadKg:
+            parseFloat(document.getElementById("cantidadKg").value) || 0,
           monto: parseFloat(document.getElementById("monto").value) || 0,
-          porciones: parseInt(document.getElementById("porcionesInput").value) || 0,
+          porciones:
+            parseInt(document.getElementById("porcionesInput").value) || 0,
         };
-        
-        if (tipoColab === "ingredientes") data.ingrediente = document.getElementById("ingrediente").value;
+
+        if (tipoColab === "ingredientes")
+          data.ingrediente = document.getElementById("ingrediente").value;
 
         try {
-          await fetch(URL, { method: "POST", mode: "no-cors", body: JSON.stringify(data) });
+          await fetch(URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(data),
+          });
           confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-          
-          const textoWA = encodeURIComponent(`¡Hola! Soy ${nombreUsr}. Registré mi aporte para el Locro (${tipoColab}).`);
-          const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${textoWA}`;
-          
-          let avisoExtra = (tipoColab === "dinero" || tipoColab === "porciones")
-            ? `<br><a href="${urlWA}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">📱 CLIC AQUÍ para avisar por WhatsApp</a>`
-            : `<br><small style='color:var(--primary)'>Gracias por tu aporte solidario.</small>`;
 
-          document.getElementById("mensaje").innerHTML = `<span style='color:var(--success)'>✅ REGISTRADO CON ÉXITO.</span>${avisoExtra}`;
+          const textoWA = encodeURIComponent(
+            `¡Hola! Soy ${nombreUsr}. Registré mi aporte para el Locro (${tipoColab}).`,
+          );
+          const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${textoWA}`;
+
+          let avisoExtra =
+            tipoColab === "dinero" || tipoColab === "porciones"
+              ? `<br><a href="${urlWA}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">📱 CLIC AQUÍ para avisar por WhatsApp</a>`
+              : `<br><small style='color:var(--primary)'>Gracias por tu aporte solidario.</small>`;
+
+          document.getElementById("mensaje").innerHTML =
+            `<span style='color:var(--success)'>✅ REGISTRADO CON ÉXITO.</span>${avisoExtra}`;
           document.getElementById("formRegistro").reset();
           document.getElementById("txtTotalVenta").innerText = "";
-          localStorage.removeItem("locro_nombre"); 
+          localStorage.removeItem("locro_nombre");
           localStorage.removeItem("locro_tel");
-          mostrarCampos(); 
-          resetCaptcha(); 
+          mostrarCampos();
+          resetCaptcha();
           setTimeout(cargarEstado, 2000);
         } catch (e) {
           document.getElementById("mensaje").innerText = "❌ Error al enviar.";
         } finally {
-          btn.innerHTML = "REGISTRAR COMPROMISO"; 
-          btn.disabled = false; 
+          btn.innerHTML = "REGISTRAR COMPROMISO";
+          btn.disabled = false;
           panel.classList.remove("enviando-overlay");
         }
       }
-      
-      function cargarEstado() {
+
+   function cargarEstado() {
         fetch(URL)
           .then((r) => r.json())
           .then((data) => {

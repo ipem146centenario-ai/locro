@@ -1,800 +1,813 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Locro - IPEM 146 "Centenario"</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
-      :root {
-        --primary: #00d2ff;
-        --secondary: #003366;
-        --bg-dark: #000c1a;
-        --accent: #ffd700;
-        --success: #00e676;
-        --danger: #ff5252;
-        --glass: rgba(255, 255, 255, 0.05);
-        --glass-border: rgba(255, 255, 255, 0.15);
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Locro - IPEM 146 "Centenario"</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --primary: #00d2ff;
+      --secondary: #003366;
+      --bg-dark: #000c1a;
+      --accent: #ffd700;
+      --success: #00e676;
+      --danger: #ff5252;
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      color: #e0f2f1;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, #003366 100%) fixed;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* BOTÓN WHATSAPP FLOTANTE */
+    .btn-wa-float {
+      position: fixed;
+      bottom: 60px;
+      right: 20px;
+      background: #25d366;
+      color: white;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      z-index: 10000;
+      text-decoration: none;
+      font-size: 24px;
+      transition: 0.3s;
+    }
+
+    /* NUEVO: BOTÓN LISTA DONANTES FLOTANTE */
+    .btn-list-float {
+      position: fixed;
+      bottom: 130px;
+      right: 20px;
+      background: var(--primary);
+      color: var(--secondary);
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      z-index: 10000;
+      text-decoration: none;
+      font-size: 24px;
+      cursor: pointer;
+      transition: 0.3s;
+      border: none;
+    }
+
+    .btn-wa-float:hover,
+    .btn-list-float:hover {
+      transform: scale(1.1);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+
+    .modal-content {
+      background: var(--secondary);
+      border: 2px solid var(--primary);
+      padding: 2rem;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+      max-width: 90%;
+      max-height: 85vh;
+      /* Ajuste para scroll interno */
+      overflow-y: auto;
+    }
+
+    /* Estilos para la lista de donantes */
+    .lista-donantes {
+      text-align: left;
+      margin: 15px 0;
+      font-size: 0.9rem;
+    }
+
+    .donante-item {
+      background: rgba(255, 255, 255, 0.1);
+      margin-bottom: 5px;
+      padding: 8px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .modal-content h2 {
+      font-size: 2rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      border: none;
+    }
+
+    .precio-destacado {
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--success);
+      display: block;
+      margin: 10px 0;
+    }
+
+    .incluye-queso {
+      font-size: 1.2rem;
+      color: #fff;
+      display: block;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .btn-cerrar-modal {
+      background: var(--primary);
+      color: var(--secondary);
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    header {
+      padding: 1rem;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    header h1 {
+      font-size: 1.2rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .app-container {
+      display: grid;
+      grid-template-columns: 320px 1fr 340px;
+      gap: 15px;
+      padding: 15px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .panel {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .enviando-overlay {
+      opacity: 0.5;
+      pointer-events: none;
+      filter: grayscale(0.5);
+    }
+
+    h2 {
+      font-size: 0.9rem;
+      margin-bottom: 0.8rem;
+      color: var(--primary);
+      border-bottom: 1px solid var(--glass-border);
+      padding-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    @keyframes shimmer {
+      0% {
+        opacity: 0.3;
       }
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
+      50% {
+        opacity: 0.6;
       }
 
+      100% {
+        opacity: 0.3;
+      }
+    }
+
+    .skeleton {
+      height: 60px;
+      background: var(--glass);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes pulso-critico {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+      }
+    }
+
+    .resaltar-critico {
+      animation: pulso-critico 2s infinite;
+      border: 2px solid var(--danger) !important;
+      background: rgba(255, 82, 82, 0.1) !important;
+    }
+
+    @keyframes pulso-casi-listo {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.7;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .casi-listo {
+      animation: pulso-casi-listo 3s infinite;
+      border-left-color: var(--accent) !important;
+    }
+
+    @keyframes autoScroll {
+
+      0%,
+      15% {
+        transform: translateY(0);
+      }
+
+      40%,
+      60% {
+        transform: translateY(-30%);
+      }
+
+      85%,
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    .scroll-automatico {
+      display: flex;
+      flex-direction: column;
+      animation: autoScroll 40s ease-in-out infinite;
+    }
+
+    .scroll-automatico:hover {
+      animation-play-state: paused;
+    }
+
+    .filtros-container {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .btn-filtro {
+      flex: 1;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: white;
+      padding: 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.65rem;
+      transition: 0.3s;
+    }
+
+    .btn-filtro.active {
+      background: var(--primary);
+      color: var(--secondary);
+      font-weight: bold;
+    }
+
+    .estado-card {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border-left: 4px solid transparent;
+      transition: 0.2s;
+    }
+
+    .estado-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 5px;
+    }
+
+    .ingrediente-nombre {
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .falta-texto {
+      font-size: 0.7rem;
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    .barra-bg {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .barra-fill {
+      height: 100%;
+      transition: width 1.5s cubic-bezier(0.1, 0, 0.1, 1);
+    }
+
+    .ok {
+      border-left-color: var(--success);
+    }
+
+    .ok .barra-fill {
+      background: var(--success);
+    }
+
+    .medio {
+      border-left-color: var(--primary);
+    }
+
+    .medio .barra-fill {
+      background: var(--primary);
+    }
+
+    .falta {
+      border-left-color: var(--danger);
+    }
+
+    .falta .barra-fill {
+      background: var(--danger);
+    }
+
+    .barra-global-container {
+      margin-bottom: 15px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+    }
+
+    #captchaBox {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .slider-container {
+      width: 100%;
+      height: 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 20px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .slider-text {
+      font-size: 1.2rem;
+      color: var(--primary);
+      z-index: 1;
+    }
+
+    #captchaSlider {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 100%;
+      height: 24px;
+      background: transparent;
+      position: absolute;
+      z-index: 2;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    #captchaSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 50px;
+      height: 40px;
+      background: var(--primary);
+      border-radius: 20px;
+      box-shadow: 0 0 10px var(--primary);
+    }
+
+    .slider-success {
+      background: rgba(5, 255, 68, 0.943) !important;
+    }
+
+    input,
+    select {
+      width: 100%;
+      background: #fff;
+      border: 2px solid transparent;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      color: #002244;
+      font-weight: 700;
+      outline: none;
+    }
+
+    button#btnEnviar {
+      width: 100%;
+      padding: 16px 18px;
+
+      border: none;
+      border-radius: 14px;
+
+      font-weight: 900;
+      font-size: 1.05rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+
+      color: #001a2b;
+
+      background: linear-gradient(45deg,
+          #00d2ff,
+          #00ffb3,
+          #ffd700,
+          #00d2ff);
+      background-size: 300% 300%;
+
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+
+      box-shadow:
+        0 0 15px rgba(0, 210, 255, 0.5),
+        0 0 30px rgba(0, 255, 179, 0.3);
+
+      animation: gradMove 4s ease infinite, pulseGlow 2s infinite;
+      transition: all 0.3s ease;
+    }
+
+    /* 🔥 movimiento del gradiente */
+    @keyframes gradMove {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* 💥 pulso externo */
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.4),
+          0 0 25px rgba(0, 255, 179, 0.3);
+      }
+
+      70% {
+        box-shadow: 0 0 0 15px rgba(0, 210, 255, 0),
+          0 0 40px rgba(0, 255, 179, 0.2);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 210, 255, 0),
+          0 0 25px rgba(0, 255, 179, 0.3);
+      }
+    }
+
+    /* ✨ brillo deslizante */
+    button#btnEnviar::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 100%;
+      height: 100%;
+
+      background: linear-gradient(120deg,
+          transparent,
+          rgba(255, 255, 255, 0.5),
+          transparent);
+
+      transform: skewX(-20deg);
+    }
+
+    button#btnEnviar:hover::before {
+      left: 120%;
+      transition: 0.6s;
+    }
+
+    /* 🚀 hover fuerte */
+    button#btnEnviar:hover:not(:disabled) {
+      transform: scale(1.06);
+      filter: brightness(1.15);
+    }
+
+    /* ❌ disabled */
+    button#btnEnviar:disabled {
+      background: #333;
+      color: #777;
+      box-shadow: none;
+      cursor: not-allowed;
+      animation: none;
+      filter: grayscale(1);
+    }
+
+    /* ✅ estado validado (tu JS ya lo usa) */
+    .btn-validado {
+      animation: successPulse 1.2s infinite;
+    }
+
+    @keyframes successPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.6);
+      }
+
+      70% {
+        box-shadow: 0 0 0 18px rgba(0, 230, 118, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
+      }
+    }
+
+    footer {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px;
+      border-top: 1px solid var(--glass-border);
+      overflow: hidden;
+    }
+
+    .marquee-text {
+      display: inline-block;
+      animation: marquee 35s linear infinite;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: var(--success);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    @keyframes marquee {
+      0% {
+        transform: translateX(100%);
+      }
+
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
+    @media (max-width: 1100px) {
       body {
-        font-family: "Inter", sans-serif;
-        color: #e0f2f1;
-        background: linear-gradient(135deg, var(--bg-dark) 0%, #003366 100%)
-          fixed;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-
-      /* BOTÓN WHATSAPP FLOTANTE */
-      .btn-wa-float {
-        position: fixed;
-        bottom: 60px;
-        right: 20px;
-        background: #25d366;
-        color: white;
-        width: 55px;
-        height: 55px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        z-index: 10000;
-        text-decoration: none;
-        font-size: 24px;
-        transition: 0.3s;
-      }
-
-      /* NUEVO: BOTÓN LISTA DONANTES FLOTANTE */
-      .btn-list-float {
-        position: fixed;
-        bottom: 130px;
-        right: 20px;
-        background: var(--primary);
-        color: var(--secondary);
-        width: 55px;
-        height: 55px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        z-index: 10000;
-        text-decoration: none;
-        font-size: 24px;
-        cursor: pointer;
-        transition: 0.3s;
-        border: none;
-      }
-
-      .btn-wa-float:hover,
-      .btn-list-float:hover {
-        transform: scale(1.1);
-      }
-
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(8px);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        transition: opacity 0.5s ease;
-      }
-
-      .modal-content {
-        background: var(--secondary);
-        border: 2px solid var(--primary);
-        padding: 2rem;
-        border-radius: 20px;
-        text-align: center;
-        box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
-        max-width: 90%;
-        max-height: 85vh; /* Ajuste para scroll interno */
         overflow-y: auto;
-      }
-
-      /* Estilos para la lista de donantes */
-      .lista-donantes {
-        text-align: left;
-        margin: 15px 0;
-        font-size: 0.9rem;
-      }
-      .donante-item {
-        background: rgba(255, 255, 255, 0.1);
-        margin-bottom: 5px;
-        padding: 8px;
-        border-radius: 5px;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .modal-content h2 {
-        font-size: 2rem;
-        color: var(--accent);
-        margin-bottom: 1rem;
-        border: none;
-      }
-
-      .precio-destacado {
-        font-size: 3.5rem;
-        font-weight: 900;
-        color: var(--success);
-        display: block;
-        margin: 10px 0;
-      }
-
-      .incluye-queso {
-        font-size: 1.2rem;
-        color: #fff;
-        display: block;
-        margin-bottom: 20px;
-        font-style: italic;
-      }
-
-      .btn-cerrar-modal {
-        background: var(--primary);
-        color: var(--secondary);
-        border: none;
-        padding: 12px 30px;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-        font-size: 1rem;
-      }
-
-      header {
-        padding: 1rem;
-        text-align: center;
-        background: rgba(0, 0, 0, 0.4);
-        border-bottom: 1px solid var(--glass-border);
-      }
-
-      header h1 {
-        font-size: 1.2rem;
-        color: var(--primary);
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        height: auto;
       }
 
       .app-container {
-        display: grid;
-        grid-template-columns: 320px 1fr 340px;
-        gap: 15px;
-        padding: 15px;
-        flex: 1;
-        overflow: hidden;
+        grid-template-columns: 1fr;
       }
 
       .panel {
-        background: var(--glass);
-        backdrop-filter: blur(20px);
-        border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        padding: 1.2rem;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        position: relative;
-      }
-
-      .enviando-overlay {
-        opacity: 0.5;
-        pointer-events: none;
-        filter: grayscale(0.5);
-      }
-
-      h2 {
-        font-size: 0.9rem;
-        margin-bottom: 0.8rem;
-        color: var(--primary);
-        border-bottom: 1px solid var(--glass-border);
-        padding-bottom: 6px;
-        text-transform: uppercase;
-      }
-
-      @keyframes shimmer {
-        0% {
-          opacity: 0.3;
-        }
-        50% {
-          opacity: 0.6;
-        }
-        100% {
-          opacity: 0.3;
-        }
-      }
-
-      .skeleton {
-        height: 60px;
-        background: var(--glass);
-        border-radius: 10px;
-        margin-bottom: 10px;
-        animation: shimmer 1.5s infinite;
-      }
-
-      @keyframes pulso-critico {
-        0% {
-          box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.4);
-        }
-        70% {
-          box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
-        }
-        100% {
-          box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
-        }
-      }
-
-      .resaltar-critico {
-        animation: pulso-critico 2s infinite;
-        border: 2px solid var(--danger) !important;
-        background: rgba(255, 82, 82, 0.1) !important;
-      }
-
-      @keyframes pulso-casi-listo {
-        0% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.7;
-        }
-        100% {
-          opacity: 1;
-        }
-      }
-
-      .casi-listo {
-        animation: pulso-casi-listo 3s infinite;
-        border-left-color: var(--accent) !important;
-      }
-
-      @keyframes autoScroll {
-        0%,
-        15% {
-          transform: translateY(0);
-        }
-        40%,
-        60% {
-          transform: translateY(-30%);
-        }
-        85%,
-        100% {
-          transform: translateY(0);
-        }
+        max-height: 550px;
       }
 
       .scroll-automatico {
-        display: flex;
-        flex-direction: column;
-        animation: autoScroll 40s ease-in-out infinite;
+        animation: none;
+      }
+    }
+
+    h6 {
+      text-align: center;
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
       }
 
-      .scroll-automatico:hover {
-        animation-play-state: paused;
+      25% {
+        transform: translateX(-5px);
       }
 
-      .filtros-container {
-        display: flex;
-        gap: 5px;
-        margin-bottom: 10px;
+      75% {
+        transform: translateX(5px);
+      }
+    }
+
+    .shake-error {
+      animation: shake 0.3s ease-in-out 0s 2;
+      border: 1px solid var(--danger) !important;
+      box-shadow: 0 0 10px rgba(255, 82, 82, 0.3);
+    }
+
+    .texto-error {
+      color: var(--danger) !important;
+      transition: all 0.3s;
+    }
+
+    .btn-validado {
+      animation: pulseSuccess 1.8s infinite;
+    }
+
+    @keyframes pulseSuccess {
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4);
       }
 
-      .btn-filtro {
-        flex: 1;
-        background: var(--glass);
-        border: 1px solid var(--glass-border);
-        color: white;
-        padding: 6px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.65rem;
-        transition: 0.3s;
+      70% {
+        box-shadow: 0 0 0 12px rgba(0, 230, 118, 0);
       }
 
-      .btn-filtro.active {
-        background: var(--primary);
-        color: var(--secondary);
-        font-weight: bold;
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
       }
+    }
+  </style>
+</head>
 
-      .estado-card {
-        background: rgba(0, 0, 0, 0.3);
-        padding: 12px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        border-left: 4px solid transparent;
-        transition: 0.2s;
-      }
+<body>
+  <div id="modalPrecio" class="modal-overlay">
+    <div class="modal-content">
+      <h2>🍲 Porción de Locro</h2>
+      <span class="precio-destacado">$8.000</span>
+      <span class="incluye-queso">(Incluye queso)</span>
+      <p>Gran Locro IPEM 146 - 10 de Mayo</p>
+      <p style="margin-top: 10px; font-size: 0.9rem">
+        Hacé tu pedido con anticipación al <strong>3544-586602</strong>
+      </p>
+      <br />
+      <button class="btn-cerrar-modal" onclick="cerrarModal()">
+        ENTENDIDO
+      </button>
+    </div>
+  </div>
 
-      .estado-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 5px;
-      }
+  <!-- NUEVO: Modal de Lista de Colaboradores -->
+  <div id="modalDonantes" class="modal-overlay" style="display: none">
+    <div class="modal-content">
+      <h2>📋 Colaboradores ¡Muchas Gracias!</h2>
+      <div id="contenidoDonantes" class="lista-donantes">
+        <p style="text-align: center">Cargando lista...</p>
+      </div>
+      <button class="btn-cerrar-modal" onclick="toggleModalDonantes()">
+        CERRAR
+      </button>
+    </div>
+  </div>
 
-      .ingrediente-nombre {
-        font-size: 0.8rem;
-        font-weight: bold;
-        color: var(--primary);
-      }
-
-      .falta-texto {
-        font-size: 0.7rem;
-        color: var(--accent);
-        font-weight: 900;
-      }
-
-      .barra-bg {
-        height: 8px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-        overflow: hidden;
-        position: relative;
-      }
-
-      .barra-fill {
-        height: 100%;
-        transition: width 1.5s cubic-bezier(0.1, 0, 0.1, 1);
-      }
-
-      .ok {
-        border-left-color: var(--success);
-      }
-      .ok .barra-fill {
-        background: var(--success);
-      }
-      .medio {
-        border-left-color: var(--primary);
-      }
-      .medio .barra-fill {
-        background: var(--primary);
-      }
-      .falta {
-        border-left-color: var(--danger);
-      }
-      .falta .barra-fill {
-        background: var(--danger);
-      }
-
-      .barra-global-container {
-        margin-bottom: 15px;
-        padding: 10px;
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 10px;
-      }
-
-      #captchaBox {
-        background: rgba(0, 0, 0, 0.3);
-        padding: 10px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        border: 1px solid var(--glass-border);
-      }
-      .slider-container {
-        width: 100%;
-        height: 20px;
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 20px;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-      }
-      .slider-text {
-        font-size: 1.2rem;
-        color: var(--primary);
-        z-index: 1;
-      }
-      #captchaSlider {
-        appearance: none;
-        -webkit-appearance: none;
-        width: 100%;
-        height: 24px;
-        background: transparent;
-        position: absolute;
-        z-index: 2;
-        cursor: pointer;
-        margin: 0;
-      }
-      #captchaSlider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 50px;
-        height: 40px;
-        background: var(--primary);
-        border-radius: 20px;
-        box-shadow: 0 0 10px var(--primary);
-      }
-      .slider-success {
-        background: rgba(5, 255, 68, 0.943) !important;
-      }
-
-      input,
-      select {
-        width: 100%;
-        background: #fff;
-        border: 2px solid transparent;
-        padding: 12px;
-        border-radius: 10px;
-        margin-bottom: 12px;
-        color: #002244;
-        font-weight: 700;
-        outline: none;
-      }
-
-button#btnEnviar {
-  width: 100%;
-  padding: 16px 18px;
-
-  border: none;
-  border-radius: 14px;
-
-  font-weight: 900;
-  font-size: 1.05rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-
-  color: #001a2b;
-
-  background: linear-gradient(
-    45deg,
-    #00d2ff,
-    #00ffb3,
-    #ffd700,
-    #00d2ff
-  );
-  background-size: 300% 300%;
-
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-
-  box-shadow:
-    0 0 15px rgba(0, 210, 255, 0.5),
-    0 0 30px rgba(0, 255, 179, 0.3);
-
-  animation: gradMove 4s ease infinite, pulseGlow 2s infinite;
-  transition: all 0.3s ease;
-}
-
-/* 🔥 movimiento del gradiente */
-@keyframes gradMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* 💥 pulso externo */
-@keyframes pulseGlow {
-  0% {
-    box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.4),
-                0 0 25px rgba(0, 255, 179, 0.3);
-  }
-  70% {
-    box-shadow: 0 0 0 15px rgba(0, 210, 255, 0),
-                0 0 40px rgba(0, 255, 179, 0.2);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 210, 255, 0),
-                0 0 25px rgba(0, 255, 179, 0.3);
-  }
-}
-
-/* ✨ brillo deslizante */
-button#btnEnviar::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -120%;
-  width: 100%;
-  height: 100%;
-
-  background: linear-gradient(
-    120deg,
-    transparent,
-    rgba(255,255,255,0.5),
-    transparent
-  );
-
-  transform: skewX(-20deg);
-}
-
-button#btnEnviar:hover::before {
-  left: 120%;
-  transition: 0.6s;
-}
-
-/* 🚀 hover fuerte */
-button#btnEnviar:hover:not(:disabled) {
-  transform: scale(1.06);
-  filter: brightness(1.15);
-}
-
-/* ❌ disabled */
-button#btnEnviar:disabled {
-  background: #333;
-  color: #777;
-  box-shadow: none;
-  cursor: not-allowed;
-  animation: none;
-  filter: grayscale(1);
-}
-
-/* ✅ estado validado (tu JS ya lo usa) */
-.btn-validado {
-  animation: successPulse 1.2s infinite;
-}
-
-@keyframes successPulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.6);
-  }
-  70% {
-    box-shadow: 0 0 0 18px rgba(0, 230, 118, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
-  }
-}
-      footer {
-        background: rgba(0, 0, 0, 0.6);
-        padding: 10px;
-        border-top: 1px solid var(--glass-border);
-        overflow: hidden;
-      }
-
-      .marquee-text {
-        display: inline-block;
-        animation: marquee 35s linear infinite;
-        font-size: 0.8rem;
-        font-weight: bold;
-        color: var(--success);
-        text-transform: uppercase;
-        white-space: nowrap;
-      }
-
-      @keyframes marquee {
-        0% {
-          transform: translateX(100%);
-        }
-        100% {
-          transform: translateX(-100%);
-        }
-      }
-
-      @media (max-width: 1100px) {
-        body {
-          overflow-y: auto;
-          height: auto;
-        }
-        .app-container {
-          grid-template-columns: 1fr;
-        }
-        .panel {
-          max-height: 550px;
-        }
-        .scroll-automatico {
-          animation: none;
-        }
-      }
-
-      h6 {
-        text-align: center;
-        font-family: "Courier New", Courier, monospace;
-      }
-
-      @keyframes shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        25% {
-          transform: translateX(-5px);
-        }
-        75% {
-          transform: translateX(5px);
-        }
-      }
-
-      .shake-error {
-        animation: shake 0.3s ease-in-out 0s 2;
-        border: 1px solid var(--danger) !important;
-        box-shadow: 0 0 10px rgba(255, 82, 82, 0.3);
-      }
-
-      .texto-error {
-        color: var(--danger) !important;
-        transition: all 0.3s;
-      }
-      .btn-validado {
-        animation: pulseSuccess 1.8s infinite;
-      }
-      @keyframes pulseSuccess {
-        0% {
-          box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4);
-        }
-        70% {
-          box-shadow: 0 0 0 12px rgba(0, 230, 118, 0);
-        }
-        100% {
-          box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="modalPrecio" class="modal-overlay">
-      <div class="modal-content">
-        <h2>🍲 Porción de Locro</h2>
-        <span class="precio-destacado">$8.000</span>
-        <span class="incluye-queso">(Incluye queso)</span>
-        <p>Gran Locro IPEM 146 - 10 de Mayo</p>
-        <p style="margin-top: 10px; font-size: 0.9rem">
-          Hacé tu pedido con anticipación al <strong>3544-586602</strong>
-        </p>
-        <br />
-        <button class="btn-cerrar-modal" onclick="cerrarModal()">
-          ENTENDIDO
+  <div id="modalConfirmacion" class="modal-overlay" style="display: none">
+    <div class="modal-content" style="border-color: var(--success)">
+      <h2 style="color: var(--success)">🤝​ ¿Confirmar? 🤝​</h2>
+      <p id="textoConfirmarMonto" style="font-size: 1.2rem; margin: 20px 0"></p>
+      <div style="display: flex; gap: 10px; justify-content: center">
+        <button class="btn-cerrar-modal" id="btnConfirmarSi" style="background: var(--success)">
+          SÍ, DONAR
+        </button>
+        <button class="btn-cerrar-modal" id="btnConfirmarNo" style="background: var(--danger); color: white">
+          CANCELAR
         </button>
       </div>
     </div>
+  </div>
 
-    <!-- NUEVO: Modal de Lista de Colaboradores -->
-    <div id="modalDonantes" class="modal-overlay" style="display: none">
-      <div class="modal-content">
-        <h2>📋 Colaboradores ¡Muchas Gracias!</h2>
-        <div id="contenidoDonantes" class="lista-donantes">
-          <p style="text-align: center">Cargando lista...</p>
-        </div>
-        <button class="btn-cerrar-modal" onclick="toggleModalDonantes()">
-          CERRAR
-        </button>
-      </div>
-    </div>
+  <header>
+    <h1>IPEM 146 "Centenario" - Gran Locro 2026</h1>
+  </header>
 
-    <div id="modalConfirmacion" class="modal-overlay" style="display: none">
-      <div class="modal-content" style="border-color: var(--success)">
-        <h2 style="color: var(--success)">🤝​ ¿Confirmar? 🤝​</h2>
-        <p
-          id="textoConfirmarMonto"
-          style="font-size: 1.2rem; margin: 20px 0"
-        ></p>
-        <div style="display: flex; gap: 10px; justify-content: center">
-          <button
-            class="btn-cerrar-modal"
-            id="btnConfirmarSi"
-            style="background: var(--success)"
-          >
-            SÍ, DONAR
-          </button>
-          <button
-            class="btn-cerrar-modal"
-            id="btnConfirmarNo"
-            style="background: var(--danger); color: white"
-          >
-            CANCELAR
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <header>
-      <h1>IPEM 146 "Centenario" - Gran Locro 2026</h1>
-    </header>
-
-    <div class="app-container">
-      <aside class="panel">
-        <h2>🤝 Información y Cuentas</h2>
-        <div style="flex: 1; overflow-y: auto">
-          <div class="scroll-automatico">
-            <div class="instrucciones-box">
-              <div
-                style="
+  <div class="app-container">
+    <aside class="panel">
+      <h2>🤝 Información y Cuentas</h2>
+      <div style="flex: 1; overflow-y: auto">
+        <div class="scroll-automatico">
+          <div class="instrucciones-box">
+            <div style="
                   background: rgba(255, 255, 255, 0.03);
                   padding: 10px;
                   border-radius: 8px;
                   margin-bottom: 12px;
-                "
-              >
-                <p
-                  style="
+                ">
+              <p style="
                     color: var(--primary);
                     font-weight: bold;
                     font-size: 0.75rem;
                     text-transform: uppercase;
-                  "
-                >
-                  Paso 1
-                </p>
-                <p>
-                  📝 <strong>Registrate:</strong> Completá el formulario
-                  central.
-                </p>
-              </div>
-              <div
-                style="
+                  ">
+                Paso 1
+              </p>
+              <p>
+                📝 <strong>Registrate:</strong> Completá el formulario
+                central.
+              </p>
+            </div>
+            <div style="
                   background: rgba(255, 255, 255, 0.03);
                   padding: 10px;
                   border-radius: 8px;
                   margin-bottom: 12px;
-                "
-              >
-                <p
-                  style="
+                ">
+              <p style="
                     color: var(--primary);
                     font-weight: bold;
                     font-size: 0.75rem;
                     text-transform: uppercase;
-                  "
-                >
-                  Paso 2
-                </p>
-                <p>
-                  🍲 <strong>Elegí tu aporte:</strong> Doná insumos, dinero o
-                  comprá porciones.
-                </p>
-              </div>
-              <div
-                style="
+                  ">
+                Paso 2
+              </p>
+              <p>
+                🍲 <strong>Elegí tu aporte:</strong> Doná insumos, dinero o
+                comprá porciones.
+              </p>
+            </div>
+            <div style="
                   background: rgba(255, 255, 255, 0.03);
                   padding: 10px;
                   border-radius: 8px;
                   margin-bottom: 12px;
-                "
-              >
-                <p
-                  style="
+                ">
+              <p style="
                     color: var(--primary);
                     font-weight: bold;
                     font-size: 0.75rem;
                     text-transform: uppercase;
-                  "
-                >
-                  Paso 3
-                </p>
-                <p>
-                  🍲 <strong>Entrega/retiro:</strong> Acercate a dirección.
-                  <strong>El 10 de mayo ¡Traer recipiente!</strong>
-                </p>
-              </div>
-              <div
-                style="
+                  ">
+                Paso 3
+              </p>
+              <p>
+                🍲 <strong>Entrega/retiro:</strong> Acercate a dirección.
+                <strong>El 10 de mayo ¡Traer recipiente!</strong>
+              </p>
+            </div>
+            <div style="
                   background: rgba(0, 229, 118, 0.1);
                   padding: 10px;
                   border-radius: 8px;
                   margin-bottom: 15px;
                   border: 1px solid var(--success);
-                "
-              >
-                <p
-                  style="
+                ">
+              <p style="
                     color: var(--success);
                     font-weight: bold;
                     font-size: 0.95rem;
-                  "
-                >
-                  VALOR PORCIÓN: $8.000 (c/ queso)
-                </p>
-              </div>
+                  ">
+                VALOR PORCIÓN: $8.000 (c/ queso)
+              </p>
+            </div>
 
-              <div
-                style="
+            <div style="
                   background: rgba(0, 0, 0, 0.4);
                   padding: 10px;
                   border-radius: 8px;
@@ -803,22 +816,15 @@ button#btnEnviar:disabled {
                   display: flex;
                   justify-content: space-between;
                   align-items: center;
-                "
-              >
-                <div>
-                  <small style="opacity: 0.7">LOURDES ROMINA TORRES LOPEZ</small
-                  ><br /><span
-                    style="
+                ">
+              <div>
+                <small style="opacity: 0.7">LOURDES ROMINA TORRES LOPEZ</small><br /><span style="
                       color: var(--accent);
                       font-family: monospace;
                       font-weight: bold;
-                    "
-                    >lou.romina.tl</span
-                  >
-                </div>
-                <button
-                  onclick="copiarAlias('lou.romina.tl', this)"
-                  style="
+                    ">lou.romina.tl</span>
+              </div>
+              <button onclick="copiarAlias('lou.romina.tl', this)" style="
                     background: var(--primary);
                     border: none;
                     padding: 5px;
@@ -826,13 +832,11 @@ button#btnEnviar:disabled {
                     font-weight: bold;
                     cursor: pointer;
                     font-size: 0.6rem;
-                  "
-                >
-                  COPIAR
-                </button>
-              </div>
-              <div
-                style="
+                  ">
+                COPIAR
+              </button>
+            </div>
+            <div style="
                   background: rgba(0, 0, 0, 0.4);
                   padding: 10px;
                   border-radius: 8px;
@@ -841,22 +845,15 @@ button#btnEnviar:disabled {
                   display: flex;
                   justify-content: space-between;
                   align-items: center;
-                "
-              >
-                <div>
-                  <small style="opacity: 0.7">GLADYS YOHANA VALLEJOS</small
-                  ><br /><span
-                    style="
+                ">
+              <div>
+                <small style="opacity: 0.7">GLADYS YOHANA VALLEJOS</small><br /><span style="
                       color: var(--accent);
                       font-family: monospace;
                       font-weight: bold;
-                    "
-                    >GVALLEJOS8964.NX.ARS</span
-                  >
-                </div>
-                <button
-                  onclick="copiarAlias('GVALLEJOS8964.NX.ARS', this)"
-                  style="
+                    ">GVALLEJOS8964.NX.ARS</span>
+              </div>
+              <button onclick="copiarAlias('GVALLEJOS8964.NX.ARS', this)" style="
                     background: var(--primary);
                     border: none;
                     padding: 5px;
@@ -864,13 +861,11 @@ button#btnEnviar:disabled {
                     font-weight: bold;
                     cursor: pointer;
                     font-size: 0.6rem;
-                  "
-                >
-                  COPIAR
-                </button>
-              </div>
-              <div
-                style="
+                  ">
+                COPIAR
+              </button>
+            </div>
+            <div style="
                   background: rgba(0, 0, 0, 0.4);
                   padding: 10px;
                   border-radius: 8px;
@@ -879,22 +874,15 @@ button#btnEnviar:disabled {
                   display: flex;
                   justify-content: space-between;
                   align-items: center;
-                "
-              >
-                <div>
-                  <small style="opacity: 0.7">MARIA ADRIANA CORDOBA</small
-                  ><br /><span
-                    style="
+                ">
+              <div>
+                <small style="opacity: 0.7">MARIA ADRIANA CORDOBA</small><br /><span style="
                       color: var(--accent);
                       font-family: monospace;
                       font-weight: bold;
-                    "
-                    >adrianacordoba1203</span
-                  >
-                </div>
-                <button
-                  onclick="copiarAlias('adrianacordoba1203', this)"
-                  style="
+                    ">adrianacordoba1203</span>
+              </div>
+              <button onclick="copiarAlias('adrianacordoba1203', this)" style="
                     background: var(--primary);
                     border: none;
                     padding: 5px;
@@ -902,300 +890,228 @@ button#btnEnviar:disabled {
                     font-weight: bold;
                     cursor: pointer;
                     font-size: 0.6rem;
-                  "
-                >
-                  COPIAR
-                </button>
-              </div>
+                  ">
+                COPIAR
+              </button>
             </div>
           </div>
         </div>
-      </aside>
+      </div>
+    </aside>
 
-      <main class="panel" id="panelCentral">
-        <div
-          id="countdown"
-          style="
+    <main class="panel" id="panelCentral">
+      <div id="countdown" style="
             margin-bottom: 15px;
             padding: 12px;
             background: rgba(0, 0, 0, 0.4);
             border-radius: 12px;
             border: 1px solid var(--primary);
             text-align: center;
-          "
-        >
-          <div style="display: flex; justify-content: center; gap: 12px">
-            <div>
-              <span id="days">00</span><br /><small style="font-size: 0.5rem"
-                >DÍAS</small
-              >
-            </div>
-            <div style="color: var(--primary)">:</div>
-            <div>
-              <span id="hours">00</span><br /><small style="font-size: 0.5rem"
-                >HORAS</small
-              >
-            </div>
-            <div style="color: var(--primary)">:</div>
-            <div>
-              <span id="minutes">00</span><br /><small style="font-size: 0.5rem"
-                >MIN</small
-              >
-            </div>
-            <div style="color: var(--primary)">:</div>
-            <div>
-              <span id="seconds" style="color: var(--success)">00</span
-              ><br /><small style="font-size: 0.5rem">SEG</small>
-            </div>
+          ">
+        <div style="display: flex; justify-content: center; gap: 12px">
+          <div>
+            <span id="days">00</span><br /><small style="font-size: 0.5rem">DÍAS</small>
+          </div>
+          <div style="color: var(--primary)">:</div>
+          <div>
+            <span id="hours">00</span><br /><small style="font-size: 0.5rem">HORAS</small>
+          </div>
+          <div style="color: var(--primary)">:</div>
+          <div>
+            <span id="minutes">00</span><br /><small style="font-size: 0.5rem">MIN</small>
+          </div>
+          <div style="color: var(--primary)">:</div>
+          <div>
+            <span id="seconds" style="color: var(--success)">00</span><br /><small style="font-size: 0.5rem">SEG</small>
           </div>
         </div>
+      </div>
 
-        <form id="formRegistro" onsubmit="enviarDatos(event)">
-          <input
-            id="nombre"
-            placeholder="Nombre y Apellido"
-            required
-            oninput="saveDraft()"
-          />
-          <input
-            type="tel"
-            id="telefono"
-            placeholder="WhatsApp (ej: 3544555555)"
-            required
-            inputmode="tel"
-            oninput="
+      <form id="formRegistro" onsubmit="enviarDatos(event)">
+        <input id="nombre" placeholder="Nombre y Apellido" required oninput="saveDraft()" />
+        <input type="tel" id="telefono" placeholder="WhatsApp (ej: 3544555555)" required inputmode="tel" oninput="
               this.value = this.value.replace(/[^0-9]/g, '');
               saveDraft();
-            "
-            minlength="10"
-          />
+            " minlength="10" />
 
-          <select id="tipo" onchange="mostrarCampos()" required>
-            <option value="">¿Cómo colaborarás?</option>
-            <option value="ingredientes">Insumos/Ingredientes 🍲</option>
-            <option value="dinero">Donar Dinero 💸</option>
-            <option value="porciones">
-              Comprar Porciones ($8000 c/queso) 🎟️
-            </option>
-          </select>
+        <select id="tipo" onchange="mostrarCampos()" required>
+          <option value="">¿Cómo colaborarás?</option>
+          <option value="ingredientes">Insumos/Ingredientes 🍲</option>
+          <option value="dinero">Donar Dinero 💸</option>
+          <option value="porciones">
+            Comprar Porciones ($8000 c/queso) 🎟️
+          </option>
+        </select>
 
-          <div id="divIngredientes" style="display: none">
-            <select id="ingrediente" onchange="actualizarMaximo()"></select>
-            <input
-              type="number"
-              step="0.01"
-              id="cantidadKg"
-              placeholder="Cantidad"
-              oninput="validarInput()"
-              inputmode="decimal"
-            />
-          </div>
+        <div id="divIngredientes" style="display: none">
+          <select id="ingrediente" onchange="actualizarMaximo()"></select>
+          <input type="number" step="0.01" id="cantidadKg" placeholder="Cantidad" oninput="validarInput()"
+            inputmode="decimal" />
+        </div>
 
-          <div id="divDinero" style="display: none">
-            <input
-              type="number"
-              id="monto"
-              placeholder="Monto $"
-              oninput="validarInput()"
-              inputmode="numeric"
-            />
-          </div>
+        <div id="divDinero" style="display: none">
+          <input type="number" id="monto" placeholder="Monto $" oninput="validarInput()" inputmode="numeric" />
+        </div>
 
-          <div id="divPorciones" style="display: none">
-            <input
-              type="number"
-              id="porcionesInput"
-              placeholder="Cantidad de porciones"
-              oninput="calcularTotalPorciones()"
-              inputmode="numeric"
-            />
-            <p
-              id="txtTotalVenta"
-              style="
+        <div id="divPorciones" style="display: none">
+          <input type="number" id="porcionesInput" placeholder="Cantidad de porciones"
+            oninput="calcularTotalPorciones()" inputmode="numeric" />
+          <p id="txtTotalVenta" style="
                 color: var(--success);
                 font-weight: bold;
                 margin-bottom: 10px;
                 text-align: center;
                 font-size: 0.9rem;
-              "
-            ></p>
+              "></p>
+        </div>
+
+        <div id="captchaBox">
+          <div class="slider-container" id="sliderContainer">
+            <span class="slider-text" id="captchaTexto">Deslizá para validar ➔</span>
+            <input type="range" id="captchaSlider" min="0" max="100" value="0" oninput="validarSlider(this.value)" />
           </div>
+        </div>
 
-          <div id="captchaBox">
-            <div class="slider-container" id="sliderContainer">
-              <span class="slider-text" id="captchaTexto"
-                >Deslizá para validar ➔</span
-              >
-              <input
-                type="range"
-                id="captchaSlider"
-                min="0"
-                max="100"
-                value="0"
-                oninput="validarSlider(this.value)"
-              />
-            </div>
-          </div>
+        <button type="submit" id="btnEnviar">Registrar Compromiso</button>
+        <div id="mensaje" style="text-align: center; margin-top: 10px; font-size: 0.8rem"></div>
+      </form>
+    </main>
 
-          <button type="submit" id="btnEnviar">Registrar Compromiso</button>
-          <div
-            id="mensaje"
-            style="text-align: center; margin-top: 10px; font-size: 0.8rem"
-          ></div>
-        </form>
-      </main>
-
-      <section class="panel">
-        <h2>📊 Estado Actual</h2>
-        <div class="barra-global-container">
-          <div
-            style="
+    <section class="panel">
+      <h2>📊 Estado Actual</h2>
+      <div class="barra-global-container">
+        <div style="
               display: flex;
               justify-content: space-between;
               font-size: 0.7rem;
               margin-bottom: 5px;
-            "
-          >
-            <span>PROGRESO GENERAL</span>
-            <span
-              id="txtGlobal"
-              style="color: var(--success); font-weight: bold"
-              >0%</span
-            >
-          </div>
-          <div class="barra-bg">
-            <div
-              id="barraGlobal"
-              class="barra-fill"
-              style="background: var(--success); width: 0%"
-            ></div>
-          </div>
+            ">
+          <span>PROGRESO GENERAL</span>
+          <span id="txtGlobal" style="color: var(--success); font-weight: bold">0%</span>
         </div>
-        <div class="filtros-container">
-          <button class="btn-filtro active" onclick="setFiltro('todos', this)">
-            Todos
-          </button>
-          <button class="btn-filtro" onclick="setFiltro('faltantes', this)">
-            Faltan
-          </button>
-          <button class="btn-filtro" onclick="setFiltro('listos', this)">
-            Listos
-          </button>
+        <div class="barra-bg">
+          <div id="barraGlobal" class="barra-fill" style="background: var(--success); width: 0%"></div>
         </div>
-        <div id="estadoIngredientes" style="overflow-y: auto; flex: 1">
-          <div class="skeleton"></div>
-          <div class="skeleton"></div>
-          <div class="skeleton"></div>
-        </div>
-      </section>
-    </div>
-
-    <!-- NUEVO: BOTÓN FLOTANTE DE LISTA -->
-    <button
-      onclick="toggleModalDonantes()"
-      class="btn-list-float"
-      title="Ver Colaboradores"
-    >
-      📋
-    </button>
-
-    <a
-      href="https://wa.me/5493544586602?text=Hola!%20Hago%20mi%20pedido%20o%20consulta%20para%20el%20Gran%20Locro"
-      target="_blank"
-      class="btn-wa-float"
-      >💬</a
-    >
-
-    <footer>
-      <div class="marquee-text">
-        IPEM 146 "Centenario" - Cooperación Solidaria para el Gran Locro del 10
-        de Mayo - ¡Sumate con tu aporte! - Entrega desde las 12:30 hs en el SUM
-        de la escuela
       </div>
-      <div><h6>Diseño y programación Dpto de Informática - 2026</h6></div>
-    </footer> 
+      <div class="filtros-container">
+        <button class="btn-filtro active" onclick="setFiltro('todos', this)">
+          Todos
+        </button>
+        <button class="btn-filtro" onclick="setFiltro('faltantes', this)">
+          Faltan
+        </button>
+        <button class="btn-filtro" onclick="setFiltro('listos', this)">
+          Listos
+        </button>
+      </div>
+      <div id="estadoIngredientes" style="overflow-y: auto; flex: 1">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+      </div>
+    </section>
+  </div>
 
-    <script>
-      const PRECIO_PORCION = 8000;
-      const URL =
-        "https://script.google.com/macros/s/AKfycbzTBqDp8FzBPTGxwUCnpNYemTwrz6xqP0fv8FEyjeH8lnyGYwpKjV5uNB57Zn9vQyq2hw/exec";
-      const WHATSAPP_COORDINADOR = "5493544586602";
+  <!-- NUEVO: BOTÓN FLOTANTE DE LISTA -->
+  <button onclick="toggleModalDonantes()" class="btn-list-float" title="Ver Colaboradores">
+    📋
+  </button>
 
-      const objetivos = {
-        Maíz: { meta: 60, icon: "🌽" },
-        Porotos: { meta: 50, icon: "🫘" },
-        Chorizos: { meta: 20, icon: "🌭" },
-        "Zapallo criollo": { meta: 80, icon: "🎃" },
-        Falda: { meta: 60, icon: "🥩" },
-        Carnaza: { meta: 50, icon: "🍖" },
-        "Carne de cerdo (paleta)": { meta: 60, icon: "🐖" },
-        "Cueritos de cerdo": { meta: 25, icon: "🥓" },
-        Mondongo: { meta: 50, icon: "🍲" },
-        "Cebolla (1 bolsa)": { meta: 1, icon: "🧅" },
-        "Cebolla de verdeo (atados)": { meta: 10, icon: "🌿" },
-        "Aceite (litros)": { meta: 20, icon: "🧴" },
-        "Queso cremoso (hormas)": { meta: 3, icon: "🧀" },
-        "Grasa de cerdo": { meta: 5, icon: "🍯" },
-        "Sal gruesa": { meta: 5, icon: "🧂" },
-        Pimienta: { meta: 0.5, icon: "🧂" },
-        Pimentón: { meta: 0.5, icon: "🌶️" },
-        Orégano: { meta: 0.5, icon: "🌿" },
-        "Ají molido": { meta: 1, icon: "🌶️" },
-        "Gas (garrafas de 10kg)": { meta: 5, icon: "🔥" },
-      };
+  <a href="https://wa.me/5493544586602?text=Hola!%20Hago%20mi%20pedido%20o%20consulta%20para%20el%20Gran%20Locro"
+    target="_blank" class="btn-wa-float">💬</a>
 
-      let captchaValidado = false,
-        datosActuales = {},
-        filtroActual = "todos";
+  <footer>
+    <div class="marquee-text">
+      IPEM 146 "Centenario" - Cooperación Solidaria para el Gran Locro del 10
+      de Mayo - ¡Sumate con tu aporte! - Entrega desde las 12:30 hs en el SUM
+      de la escuela
+    </div>
+    <div>
+      <h6>Diseño y programación Dpto de Informática - 2026</h6>
+    </div>
+  </footer>
 
-      function cerrarModal() {
-        const modal = document.getElementById("modalPrecio");
-        if (modal) {
-          modal.style.opacity = "0";
-          setTimeout(() => {
-            modal.style.display = "none";
-          }, 500);
-        }
-      }
+  <script>
+    const PRECIO_PORCION = 8000;
+    const URL =
+      "https://script.google.com/macros/s/AKfycbzSda5OCxJ3UjDtiTvmE7ZscNsieo75bkz_yvcQLS1z451LiYoI4BnLC_Q3qS2XwIcEAg/exec";
+    const WHATSAPP_COORDINADOR = "5493544586602";
 
-      /* NUEVO: Funciones para el Modal de Donantes */
-      function toggleModalDonantes() {
-        const modal = document.getElementById("modalDonantes");
-        if (modal.style.display === "none") {
-          modal.style.display = "flex";
-          actualizarListaDonantes();
-        } else {
+    const objetivos = {
+      Maíz: { meta: 60, icon: "🌽" },
+      Porotos: { meta: 50, icon: "🫘" },
+      Chorizos: { meta: 20, icon: "🌭" },
+      "Zapallo criollo": { meta: 80, icon: "🎃" },
+      Falda: { meta: 60, icon: "🥩" },
+      Carnaza: { meta: 50, icon: "🍖" },
+      "Carne de cerdo (paleta)": { meta: 60, icon: "🐖" },
+      "Cueritos de cerdo": { meta: 25, icon: "🥓" },
+      Mondongo: { meta: 50, icon: "🍲" },
+      "Cebolla (1 bolsa)": { meta: 1, icon: "🧅" },
+      "Cebolla de verdeo (atados)": { meta: 10, icon: "🌿" },
+      "Aceite (litros)": { meta: 20, icon: "🧴" },
+      "Queso cremoso (hormas)": { meta: 3, icon: "🧀" },
+      "Grasa de cerdo": { meta: 5, icon: "🍯" },
+      "Sal gruesa": { meta: 5, icon: "🧂" },
+      Pimienta: { meta: 0.5, icon: "🧂" },
+      Pimentón: { meta: 0.5, icon: "🌶️" },
+      Orégano: { meta: 0.5, icon: "🌿" },
+      "Ají molido": { meta: 1, icon: "🌶️" },
+      "Gas (garrafas de 10kg)": { meta: 5, icon: "🔥" },
+    };
+
+    let captchaValidado = false,
+      datosActuales = {},
+      filtroActual = "todos";
+
+    function cerrarModal() {
+      const modal = document.getElementById("modalPrecio");
+      if (modal) {
+        modal.style.opacity = "0";
+        setTimeout(() => {
           modal.style.display = "none";
-        }
+        }, 500);
+      }
+    }
+
+    /* NUEVO: Funciones para el Modal de Donantes */
+    function toggleModalDonantes() {
+      const modal = document.getElementById("modalDonantes");
+      if (modal.style.display === "none") {
+        modal.style.display = "flex";
+        actualizarListaDonantes();
+      } else {
+        modal.style.display = "none";
+      }
+    }
+
+    function actualizarListaDonantes() {
+      const cont = document.getElementById("contenidoDonantes");
+
+      const lista = datosActuales.colaboradores || [];
+
+      if (lista.length === 0) {
+        cont.innerHTML = `<p style="text-align:center">Aún no hay colaboradores</p>`;
+        return;
       }
 
-      function actualizarListaDonantes() {
-        const cont = document.getElementById("contenidoDonantes");
+      cont.innerHTML = lista
+        .map((c) => {
+          let color = "";
+          let bg = "";
 
-        const lista = datosActuales.colaboradores || [];
+          if (c.detalle.includes("💸")) {
+            color = "#00e676"; // verde dinero
+            bg = "rgba(0,230,118,0.1)";
+          } else if (c.detalle.includes("🍲")) {
+            color = "#00d2ff"; // azul ingredientes
+            bg = "rgba(0,210,255,0.1)";
+          } else if (c.detalle.includes("🎟️")) {
+            color = "#ffd700"; // dorado porciones
+            bg = "rgba(255,215,0,0.1)";
+          }
 
-        if (lista.length === 0) {
-          cont.innerHTML = `<p style="text-align:center">Aún no hay colaboradores</p>`;
-          return;
-        }
-
-        cont.innerHTML = lista
-          .map((c) => {
-            let color = "";
-            let bg = "";
-
-            if (c.detalle.includes("💸")) {
-              color = "#00e676"; // verde dinero
-              bg = "rgba(0,230,118,0.1)";
-            } else if (c.detalle.includes("🍲")) {
-              color = "#00d2ff"; // azul ingredientes
-              bg = "rgba(0,210,255,0.1)";
-            } else if (c.detalle.includes("🎟️")) {
-              color = "#ffd700"; // dorado porciones
-              bg = "rgba(255,215,0,0.1)";
-            }
-
-            return `
+          return `
       <div class="donante-item" style="
         background:${bg};
         border-left:4px solid ${color};
@@ -1211,374 +1127,379 @@ button#btnEnviar:disabled {
         </span>
       </div>
     `;
-          })
-          .join("");
-      }
+        })
+        .join("");
+    }
 
-      function calcularTotalPorciones() {
-        const cant =
-          parseInt(document.getElementById("porcionesInput").value) || 0;
-        const total = cant * PRECIO_PORCION;
-        const txt = document.getElementById("txtTotalVenta");
-        txt.innerText =
-          cant > 0 ? `Total a transferir: $${total.toLocaleString()}` : "";
-        validarInput();
-      }
+    function calcularTotalPorciones() {
+      const cant =
+        parseInt(document.getElementById("porcionesInput").value) || 0;
+      const total = cant * PRECIO_PORCION;
+      const txt = document.getElementById("txtTotalVenta");
+      txt.innerText =
+        cant > 0 ? `Total a transferir: $${total.toLocaleString()}` : "";
+      validarInput();
+    }
 
-      const selIng = document.getElementById("ingrediente");
-      Object.entries(objetivos).forEach(([nombre, info]) => {
-        let opt = document.createElement("option");
-        opt.value = nombre;
-        opt.text = `${info.icon} ${nombre}`;
-        selIng.add(opt);
-      });
+    const selIng = document.getElementById("ingrediente");
+    Object.entries(objetivos).forEach(([nombre, info]) => {
+      let opt = document.createElement("option");
+      opt.value = nombre;
+      opt.text = `${info.icon} ${nombre}`;
+      selIng.add(opt);
+    });
 
-      function saveDraft() {
-        localStorage.setItem(
-          "locro_nombre",
-          document.getElementById("nombre").value,
-        );
-        localStorage.setItem(
-          "locro_tel",
-          document.getElementById("telefono").value,
-        );
-      }
+    function saveDraft() {
+      localStorage.setItem(
+        "locro_nombre",
+        document.getElementById("nombre").value,
+      );
+      localStorage.setItem(
+        "locro_tel",
+        document.getElementById("telefono").value,
+      );
+    }
 
-      function loadDraft() {
-        document.getElementById("nombre").value =
-          localStorage.getItem("locro_nombre") || "";
-        document.getElementById("telefono").value =
-          localStorage.getItem("locro_tel") || "";
-      }
+    function loadDraft() {
+      document.getElementById("nombre").value =
+        localStorage.getItem("locro_nombre") || "";
+      document.getElementById("telefono").value =
+        localStorage.getItem("locro_tel") || "";
+    }
 
-      function resetCaptcha() {
-        captchaValidado = false;
+    function resetCaptcha() {
+      captchaValidado = false;
+      const slider = document.getElementById("captchaSlider");
+      const container = document.getElementById("sliderContainer");
+      const texto = document.getElementById("captchaTexto");
+      slider.value = 0;
+      slider.disabled = false;
+      container.classList.remove("slider-success");
+      texto.innerText = "Seguridad: Deslizá a la derecha";
+      texto.style.color = "var(--primary)";
+    }
+
+    function validarSlider(valor) {
+      if (valor >= 95) {
+        captchaValidado = true;
         const slider = document.getElementById("captchaSlider");
         const container = document.getElementById("sliderContainer");
         const texto = document.getElementById("captchaTexto");
-        slider.value = 0;
-        slider.disabled = false;
-        container.classList.remove("slider-success");
-        texto.innerText = "Seguridad: Deslizá a la derecha";
-        texto.style.color = "var(--primary)";
-      }
-
-      function validarSlider(valor) {
-        if (valor >= 95) {
-          captchaValidado = true;
-          const slider = document.getElementById("captchaSlider");
-          const container = document.getElementById("sliderContainer");
-          const texto = document.getElementById("captchaTexto");
-          const btn = document.getElementById("btnEnviar");
-
-          slider.value = 100;
-          slider.disabled = true;
-          container.classList.add("slider-success");
-          texto.innerText = "✔️ VALIDADO CORRECTAMENTE";
-          texto.style.color = "var(--secondary)";
-
-          if (navigator.vibrate) navigator.vibrate(50);
-          if (!btn.classList.contains("btn-validado")) {
-            btn.classList.add("btn-validado");
-            btn.style.boxShadow = "0 0 20px var(--success)";
-            btn.style.transform = "scale(1.15)";
-            setTimeout(() => {
-              btn.style.transform = "scale(1)";
-            }, 220);
-          }
-        }
-      }
-
-      function mostrarCampos() {
-        const t = document.getElementById("tipo").value;
-        document.getElementById("divIngredientes").style.display =
-          t === "ingredientes" ? "block" : "none";
-        document.getElementById("divDinero").style.display =
-          t === "dinero" ? "block" : "none";
-        document.getElementById("divPorciones").style.display =
-          t === "porciones" ? "block" : "none";
-        if (t === "ingredientes") actualizarMaximo();
-        validarInput();
-      }
-
-      function actualizarMaximo() {
-        const ing = document.getElementById("ingrediente").value;
-        const input = document.getElementById("cantidadKg");
-        const falta = Math.max(
-          objetivos[ing].meta - (datosActuales[ing] || 0),
-          0,
-        );
-        input.max = falta.toFixed(2);
-        input.placeholder =
-          falta > 0 ? `Máximo: ${falta.toFixed(1)} Unid/Kg` : "CUPO LLENO";
-        input.disabled = falta <= 0;
-        validarInput();
-      }
-
-      function validarInput() {
-        const tipo = document.getElementById("tipo").value,
-          btn = document.getElementById("btnEnviar"),
-          msg = document.getElementById("mensaje");
-        btn.disabled = false;
-        msg.innerText = "";
-        if (tipo === "ingredientes") {
-          const cant =
-            parseFloat(document.getElementById("cantidadKg").value) || 0;
-          const max =
-            parseFloat(document.getElementById("cantidadKg").max) || 0;
-          if (max <= 0) {
-            msg.innerText = "❌ Ingrediente completo.";
-            btn.disabled = true;
-          } else if (cant > max) {
-            msg.innerText = `⚠️ Máximo: ${max}`;
-            btn.disabled = true;
-          }
-        }
-      }
-
-      function cerrarConfirmacion() {
-        document.getElementById("modalConfirmacion").style.display = "none";
-      }
-
-      async function enviarDatos(e) {
-        e.preventDefault();
-
-        if (!captchaValidado) {
-          if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-          const captchaBox = document.getElementById("captchaBox");
-          const captchaTexto = document.getElementById("captchaTexto");
-          const textoOriginal = captchaTexto.innerText;
-          captchaBox.classList.add("shake-error");
-          captchaTexto.innerText = "⚠️ DESLIZÁ PARA VALIDAR";
-          captchaTexto.classList.add("texto-error");
-          setTimeout(() => {
-            captchaBox.classList.remove("shake-error");
-            captchaTexto.classList.remove("texto-error");
-            if (!captchaValidado) captchaTexto.innerText = textoOriginal;
-          }, 1500);
-          return;
-        }
-
-        const tipoColab = document.getElementById("tipo").value;
-        const modal = document.getElementById("modalConfirmacion");
-        const textoModal = document.getElementById("textoConfirmarMonto");
-
-        let mensajeConfirmacion = "";
-        let campoAResetear = null;
-
-        if (tipoColab === "dinero") {
-          const monto = document.getElementById("monto").value;
-          mensajeConfirmacion = `¿Estás seguro que deseas colaborar con $${monto}?`;
-          campoAResetear = document.getElementById("monto");
-        } else if (tipoColab === "ingredientes") {
-          const ing = document.getElementById("ingrediente").value;
-          const cant = document.getElementById("cantidadKg").value;
-          mensajeConfirmacion = `¿Confirmas la donación de ${cant} unidad/es de ${ing}?`;
-          campoAResetear = document.getElementById("cantidadKg");
-        } else if (tipoColab === "porciones") {
-          const cantP = document.getElementById("porcionesInput").value;
-          const totalP = cantP * PRECIO_PORCION;
-          mensajeConfirmacion = `¿Confirmas el pedido de ${cantP} porción/es por un total de $${totalP.toLocaleString()}?`;
-          campoAResetear = document.getElementById("porcionesInput");
-        }
-
-        if (mensajeConfirmacion !== "") {
-          textoModal.innerText = mensajeConfirmacion;
-          modal.style.display = "flex";
-
-          const confirmar = await new Promise((resolve) => {
-            document.getElementById("btnConfirmarSi").onclick = () => {
-              cerrarConfirmacion();
-              resolve(true);
-            };
-            document.getElementById("btnConfirmarNo").onclick = () => {
-              cerrarConfirmacion();
-              if (campoAResetear) {
-                campoAResetear.value = "";
-                campoAResetear.focus();
-              }
-              resolve(false);
-            };
-          });
-          if (!confirmar) return;
-        }
-
         const btn = document.getElementById("btnEnviar");
-        const panel = document.getElementById("panelCentral");
-        const nombreUsr = document.getElementById("nombre").value.toUpperCase();
 
-        btn.disabled = true;
-        btn.innerHTML = "⌛ ENVIANDO...";
-        panel.classList.add("enviando-overlay");
+        slider.value = 100;
+        slider.disabled = true;
+        container.classList.add("slider-success");
+        texto.innerText = "✔️ VALIDADO CORRECTAMENTE";
+        texto.style.color = "var(--secondary)";
 
-        const data = {
-          nombre: nombreUsr,
-          telefono: document.getElementById("telefono").value,
-          tipo: tipoColab,
-          cantidadKg:
-            parseFloat(document.getElementById("cantidadKg").value) || 0,
-          monto: parseFloat(document.getElementById("monto").value) || 0,
-          porciones:
-            parseInt(document.getElementById("porcionesInput").value) || 0,
-        };
-
-        if (tipoColab === "ingredientes")
-          data.ingrediente = document.getElementById("ingrediente").value;
-
-        try {
-          await fetch(URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify(data),
-          });
-          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-
-          const textoWA = encodeURIComponent(
-            `¡Hola! Soy ${nombreUsr}. Registré mi aporte para el Locro (${tipoColab}).`,
-          );
-          const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${textoWA}`;
-
-          let avisoExtra =
-            tipoColab === "dinero" || tipoColab === "porciones"
-              ? `<br><a href="${urlWA}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">📱 CLIC AQUÍ para avisar por WhatsApp</a>`
-              : `<br><small style='color:var(--primary)'>Gracias por tu aporte solidario.</small>`;
-
-          document.getElementById("mensaje").innerHTML =
-            `<span style='color:var(--success)'>✅ REGISTRADO CON ÉXITO.</span>${avisoExtra}`;
-          document.getElementById("formRegistro").reset();
-          document.getElementById("txtTotalVenta").innerText = "";
-          localStorage.removeItem("locro_nombre");
-          localStorage.removeItem("locro_tel");
-          mostrarCampos();
-          resetCaptcha();
-          setTimeout(cargarEstado, 2000);
-        } catch (e) {
-          document.getElementById("mensaje").innerText = "❌ Error al enviar.";
-        } finally {
-          btn.innerHTML = "REGISTRAR COMPROMISO";
-          btn.disabled = false;
-          panel.classList.remove("enviando-overlay");
+        if (navigator.vibrate) navigator.vibrate(50);
+        if (!btn.classList.contains("btn-validado")) {
+          btn.classList.add("btn-validado");
+          btn.style.boxShadow = "0 0 20px var(--success)";
+          btn.style.transform = "scale(1.15)";
+          setTimeout(() => {
+            btn.style.transform = "scale(1)";
+          }, 220);
         }
       }
+    }
 
-   function cargarEstado() {
-        fetch(URL)
-          .then((r) => r.json())
-          .then((data) => {
-            datosActuales = data;
-            renderizarLista();
-          })
-          .catch((e) => console.error(e));
+    function mostrarCampos() {
+      const t = document.getElementById("tipo").value;
+      document.getElementById("divIngredientes").style.display =
+        t === "ingredientes" ? "block" : "none";
+      document.getElementById("divDinero").style.display =
+        t === "dinero" ? "block" : "none";
+      document.getElementById("divPorciones").style.display =
+        t === "porciones" ? "block" : "none";
+      if (t === "ingredientes") actualizarMaximo();
+      validarInput();
+    }
+
+    function actualizarMaximo() {
+      const ing = document.getElementById("ingrediente").value;
+      const input = document.getElementById("cantidadKg");
+      const falta = Math.max(
+        objetivos[ing].meta - (datosActuales[ing] || 0),
+        0,
+      );
+      input.max = falta.toFixed(2);
+      input.placeholder =
+        falta > 0 ? `Máximo: ${falta.toFixed(1)} Unid/Kg` : "CUPO LLENO";
+      input.disabled = falta <= 0;
+      validarInput();
+    }
+
+    function validarInput() {
+      const tipo = document.getElementById("tipo").value,
+        btn = document.getElementById("btnEnviar"),
+        msg = document.getElementById("mensaje");
+      btn.disabled = false;
+      msg.innerText = "";
+      if (tipo === "ingredientes") {
+        const cant =
+          parseFloat(document.getElementById("cantidadKg").value) || 0;
+        const max =
+          parseFloat(document.getElementById("cantidadKg").max) || 0;
+        if (max <= 0) {
+          msg.innerText = "❌ Ingrediente completo.";
+          btn.disabled = true;
+        } else if (cant > max) {
+          msg.innerText = `⚠️ Máximo: ${max}`;
+          btn.disabled = true;
+        }
+      }
+    }
+
+    function cerrarConfirmacion() {
+      document.getElementById("modalConfirmacion").style.display = "none";
+    }
+
+    async function enviarDatos(e) {
+      e.preventDefault();
+
+      if (!captchaValidado) {
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        const captchaBox = document.getElementById("captchaBox");
+        const captchaTexto = document.getElementById("captchaTexto");
+        const textoOriginal = captchaTexto.innerText;
+        captchaBox.classList.add("shake-error");
+        captchaTexto.innerText = "⚠️ DESLIZÁ PARA VALIDAR";
+        captchaTexto.classList.add("texto-error");
+        setTimeout(() => {
+          captchaBox.classList.remove("shake-error");
+          captchaTexto.classList.remove("texto-error");
+          if (!captchaValidado) captchaTexto.innerText = textoOriginal;
+        }, 1500);
+        return;
       }
 
-      function obtenerUnidad(i) {
-        if (i.includes("bolsa")) return "Bolsa";
-        if (i.includes("atados")) return "Atados";
-        if (i.includes("litros")) return "L";
-        if (i.includes("hormas")) return "Hormas";
-        if (i.includes("garrafas")) return "Garrafas";
-        return "Kg";
+      const tipoColab = document.getElementById("tipo").value;
+      const modal = document.getElementById("modalConfirmacion");
+      const textoModal = document.getElementById("textoConfirmarMonto");
+
+      let mensajeConfirmacion = "";
+      let campoAResetear = null;
+
+      if (tipoColab === "dinero") {
+        const monto = document.getElementById("monto").value;
+        mensajeConfirmacion = `¿Estás seguro que deseas colaborar con $${monto}?`;
+        campoAResetear = document.getElementById("monto");
+      } else if (tipoColab === "ingredientes") {
+        const ing = document.getElementById("ingrediente").value;
+        const cant = document.getElementById("cantidadKg").value;
+        mensajeConfirmacion = `¿Confirmas la donación de ${cant} unidad/es de ${ing}?`;
+        campoAResetear = document.getElementById("cantidadKg");
+      } else if (tipoColab === "porciones") {
+        const cantP = document.getElementById("porcionesInput").value;
+        const totalP = cantP * PRECIO_PORCION;
+        mensajeConfirmacion = `¿Confirmas el pedido de ${cantP} porción/es por un total de $${totalP.toLocaleString()}?`;
+        campoAResetear = document.getElementById("porcionesInput");
       }
 
-      function renderizarLista() {
-        const contenedor = document.getElementById("estadoIngredientes");
-        if (!contenedor) return;
-        contenedor.innerHTML = "";
-        let totM = 0,
-          totA = 0;
-        const lista = Object.keys(objetivos)
-          .map((nombre) => {
-            const val = parseFloat(datosActuales[nombre]) || 0,
-              meta = objetivos[nombre].meta;
-            totM += meta;
-            totA += Math.min(val, meta);
-            return {
-              nombre,
-              val,
-              meta,
-              porc: Math.min((val / meta) * 100, 100),
-              icon: objetivos[nombre].icon,
-            };
-          })
-          .sort((a, b) => a.porc - b.porc);
+      if (mensajeConfirmacion !== "") {
+        textoModal.innerText = mensajeConfirmacion;
+        modal.style.display = "flex";
 
-        const totalG = (totA / totM) * 100;
-        document.getElementById("barraGlobal").style.width = totalG + "%";
-        document.getElementById("txtGlobal").innerText =
-          totalG.toFixed(1) + "%";
+        const confirmar = await new Promise((resolve) => {
+          document.getElementById("btnConfirmarSi").onclick = () => {
+            cerrarConfirmacion();
+            resolve(true);
+          };
+          document.getElementById("btnConfirmarNo").onclick = () => {
+            cerrarConfirmacion();
+            if (campoAResetear) {
+              campoAResetear.value = "";
+              campoAResetear.focus();
+            }
+            resolve(false);
+          };
+        });
+        if (!confirmar) return;
+      }
 
-        lista.forEach((item, index) => {
-          if (filtroActual === "faltantes" && item.porc >= 100) return;
-          if (filtroActual === "listos" && item.porc < 100) return;
-          let falta = Math.max(item.meta - item.val, 0);
-          let clase =
-            item.porc >= 100 ? "ok" : item.porc >= 60 ? "medio" : "falta";
-          let critico = index < 3 && item.porc < 100 ? "resaltar-critico" : "";
-          let casiListo =
-            item.porc >= 90 && item.porc < 100 ? "casi-listo" : "";
-          contenedor.innerHTML += `<div class="estado-card ${clase} ${critico} ${casiListo}">
+      const btn = document.getElementById("btnEnviar");
+      const panel = document.getElementById("panelCentral");
+      const nombreUsr = document.getElementById("nombre").value.toUpperCase();
+
+      btn.disabled = true;
+      btn.innerHTML = "⌛ ENVIANDO...";
+      panel.classList.add("enviando-overlay");
+
+      const data = {
+        nombre: nombreUsr,
+        telefono: document.getElementById("telefono").value,
+        tipo: tipoColab,
+        cantidadKg:
+          parseFloat(document.getElementById("cantidadKg").value) || 0,
+        monto: parseFloat(document.getElementById("monto").value) || 0,
+        porciones:
+          parseInt(document.getElementById("porcionesInput").value) || 0,
+      };
+
+      if (tipoColab === "ingredientes")
+        data.ingrediente = document.getElementById("ingrediente").value;
+
+      try {
+        // Eliminamos mode: "no-cors" para que el cuerpo del JSON llegue al servidor
+        await fetch(URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams(data),
+        });
+
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+        const textoWA = encodeURIComponent(
+          `¡Hola! Soy ${nombreUsr}. Registré mi aporte para el Locro (${tipoColab}).`,
+        );
+        const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${textoWA}`;
+
+        let avisoExtra =
+          tipoColab === "dinero" || tipoColab === "porciones"
+            ? `<br><a href="${urlWA}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">📱 CLIC AQUÍ para avisar por WhatsApp</a>`
+            : `<br><small style='color:var(--primary)'>Gracias por tu aporte solidario.</small>`;
+
+        document.getElementById("mensaje").innerHTML =
+          `<span style='color:var(--success)'>✅ REGISTRADO CON ÉXITO.</span>${avisoExtra}`;
+        document.getElementById("formRegistro").reset();
+        document.getElementById("txtTotalVenta").innerText = "";
+        localStorage.removeItem("locro_nombre");
+        localStorage.removeItem("locro_tel");
+        mostrarCampos();
+        resetCaptcha();
+        setTimeout(cargarEstado, 2000);
+      } catch (e) {
+        document.getElementById("mensaje").innerText = "❌ Error al enviar.";
+      } finally {
+        btn.innerHTML = "REGISTRAR COMPROMISO";
+        btn.disabled = false;
+        panel.classList.remove("enviando-overlay");
+      }
+    }
+
+    function cargarEstado() {
+      fetch(URL)
+        .then((r) => r.json())
+        .then((data) => {
+          datosActuales = data;
+          renderizarLista();
+        })
+        .catch((e) => console.error(e));
+    }
+
+    function obtenerUnidad(i) {
+      if (i.includes("bolsa")) return "Bolsa";
+      if (i.includes("atados")) return "Atados";
+      if (i.includes("litros")) return "L";
+      if (i.includes("hormas")) return "Hormas";
+      if (i.includes("garrafas")) return "Garrafas";
+      return "Kg";
+    }
+
+    function renderizarLista() {
+      const contenedor = document.getElementById("estadoIngredientes");
+      if (!contenedor) return;
+      contenedor.innerHTML = "";
+      let totM = 0,
+        totA = 0;
+      const lista = Object.keys(objetivos)
+        .map((nombre) => {
+          const val = parseFloat(datosActuales[nombre]) || 0,
+            meta = objetivos[nombre].meta;
+          totM += meta;
+          totA += Math.min(val, meta);
+          return {
+            nombre,
+            val,
+            meta,
+            porc: Math.min((val / meta) * 100, 100),
+            icon: objetivos[nombre].icon,
+          };
+        })
+        .sort((a, b) => a.porc - b.porc);
+
+      const totalG = (totA / totM) * 100;
+      document.getElementById("barraGlobal").style.width = totalG + "%";
+      document.getElementById("txtGlobal").innerText =
+        totalG.toFixed(1) + "%";
+
+      lista.forEach((item, index) => {
+        if (filtroActual === "faltantes" && item.porc >= 100) return;
+        if (filtroActual === "listos" && item.porc < 100) return;
+        let falta = Math.max(item.meta - item.val, 0);
+        let clase =
+          item.porc >= 100 ? "ok" : item.porc >= 60 ? "medio" : "falta";
+        let critico = index < 3 && item.porc < 100 ? "resaltar-critico" : "";
+        let casiListo =
+          item.porc >= 90 && item.porc < 100 ? "casi-listo" : "";
+        contenedor.innerHTML += `<div class="estado-card ${clase} ${critico} ${casiListo}">
                   <div class="estado-info">
                       <span class="ingrediente-nombre">${item.icon} ${item.nombre}</span>
                       <span class="falta-texto">${falta > 0 ? "Faltan " + falta.toFixed(1) + " " + obtenerUnidad(item.nombre) : "LISTO ✅"}</span>
                   </div>
                   <div class="barra-bg"><div class="barra-fill" style="width:${item.porc}%"></div></div>
               </div>`;
-        });
-      }
+      });
+    }
 
-      function iniciarCountdown() {
-        const fecha = new Date("May 10, 2026 12:30:00").getTime();
-        setInterval(() => {
-          const dist = fecha - new Date().getTime();
-          if (dist < 0) return;
-          document.getElementById("days").innerText = Math.floor(
-            dist / (1000 * 60 * 60 * 24),
-          )
-            .toString()
-            .padStart(2, "0");
-          document.getElementById("hours").innerText = Math.floor(
-            (dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-          )
-            .toString()
-            .padStart(2, "0");
-          document.getElementById("minutes").innerText = Math.floor(
-            (dist % (1000 * 60 * 60)) / (1000 * 60),
-          )
-            .toString()
-            .padStart(2, "0");
-          document.getElementById("seconds").innerText = Math.floor(
-            (dist % (1000 * 60)) / 1000,
-          )
-            .toString()
-            .padStart(2, "0");
-        }, 1000);
-      }
+    function iniciarCountdown() {
+      const fecha = new Date("May 10, 2026 12:30:00").getTime();
+      setInterval(() => {
+        const dist = fecha - new Date().getTime();
+        if (dist < 0) return;
+        document.getElementById("days").innerText = Math.floor(
+          dist / (1000 * 60 * 60 * 24),
+        )
+          .toString()
+          .padStart(2, "0");
+        document.getElementById("hours").innerText = Math.floor(
+          (dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        )
+          .toString()
+          .padStart(2, "0");
+        document.getElementById("minutes").innerText = Math.floor(
+          (dist % (1000 * 60 * 60)) / (1000 * 60),
+        )
+          .toString()
+          .padStart(2, "0");
+        document.getElementById("seconds").innerText = Math.floor(
+          (dist % (1000 * 60)) / 1000,
+        )
+          .toString()
+          .padStart(2, "0");
+      }, 1000);
+    }
 
-      function copiarAlias(texto, btn) {
-        navigator.clipboard.writeText(texto);
-        if (navigator.vibrate) navigator.vibrate(50);
-        const old = btn.innerText;
-        btn.innerText = "¡OK!";
-        setTimeout(() => (btn.innerText = old), 2000);
-      }
+    function copiarAlias(texto, btn) {
+      navigator.clipboard.writeText(texto);
+      if (navigator.vibrate) navigator.vibrate(50);
+      const old = btn.innerText;
+      btn.innerText = "¡OK!";
+      setTimeout(() => (btn.innerText = old), 2000);
+    }
 
-      function setFiltro(f, btn) {
-        filtroActual = f;
-        document
-          .querySelectorAll(".btn-filtro")
-          .forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        renderizarLista();
-      }
+    function setFiltro(f, btn) {
+      filtroActual = f;
+      document
+        .querySelectorAll(".btn-filtro")
+        .forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderizarLista();
+    }
 
-      window.onload = () => {
-        loadDraft();
-        resetCaptcha();
-        cargarEstado();
-        iniciarCountdown();
-        setTimeout(cerrarModal, 3000);
-        setInterval(cargarEstado, 60000);
-      };
-    </script>
-  </body>
+    window.onload = () => {
+      loadDraft();
+      resetCaptcha();
+      cargarEstado();
+      iniciarCountdown();
+      setTimeout(cerrarModal, 3000);
+      setInterval(cargarEstado, 60000);
+    };
+  </script>
+</body>
+
 </html>

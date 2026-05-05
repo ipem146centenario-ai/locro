@@ -1255,7 +1255,6 @@
     function cerrarConfirmacion() {
       document.getElementById("modalConfirmacion").style.display = "none";
     }
-
     async function enviarDatos(e) {
       e.preventDefault();
 
@@ -1299,34 +1298,81 @@
         const json = await res.json();
         if (!json.ok) throw new Error("Error servidor");
 
-        // 🎉 EFECTO
+        // 🎉 Animación
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
 
-        // 🔥 MENSAJE WHATSAPP COMPLETO
-        const textoWA = encodeURIComponent(
-          `📢 LOCRO IPEM 146
+        // 📅 Fecha
+        const fecha = new Date().toLocaleString("es-AR");
 
-👤 Nombre: ${nombreUsr}
-📱 Tel: ${data.telefono}
-📦 Tipo: ${tipoColab}
-💰 Monto: $${data.monto || 0}
-🍲 Cantidad: ${data.cantidadKg || 0}
-🎟️ Porciones: ${data.porciones || 0}
+        // 🧠 MENSAJE INTELIGENTE
+        let mensaje = "";
 
-✅ Ya registré mi aporte`
-        );
+        if (tipoColab === "dinero") {
+          mensaje = `📢 *LOCRO IPEM 146*
 
+💸 *DONACIÓN DE DINERO*
+
+👤 *Nombre:* ${nombreUsr}
+📱 *Teléfono:* ${data.telefono}
+💰 *Monto:* $${data.monto}
+
+🗓️ *Fecha:* ${fecha}
+
+🙏 Gracias por colaborar!
+
+📌 Por favor enviar comprobante de transferencia.`;
+        }
+
+        else if (tipoColab === "ingredientes") {
+          mensaje = `📢 *LOCRO IPEM 146*
+
+🍲 *DONACIÓN DE INGREDIENTES*
+
+👤 *Nombre:* ${nombreUsr}
+📱 *Teléfono:* ${data.telefono}
+📦 *Ingrediente:* ${data.ingrediente}
+⚖️ *Cantidad:* ${data.cantidadKg}
+
+🗓️ *Fecha:* ${fecha}
+
+🙏 Gracias por tu aporte solidario!
+
+📌 Coordinar entrega con la institución.`;
+        }
+
+        else if (tipoColab === "porciones") {
+          const total = data.porciones * PRECIO_PORCION;
+
+          mensaje = `📢 *LOCRO IPEM 146*
+
+🎟️ *COMPRA DE PORCIONES*
+
+👤 *Nombre:* ${nombreUsr}
+📱 *Teléfono:* ${data.telefono}
+🍽️ *Porciones:* ${data.porciones}
+💰 *Total:* $${total.toLocaleString()}
+
+📅 *Retiro:* 10 de mayo
+🕒 *Horario:* Desde 12:30 hs
+
+🗓️ *Fecha:* ${fecha}
+
+📌 Enviar comprobante de pago.`;
+        }
+
+        const textoWA = encodeURIComponent(mensaje);
         const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${textoWA}`;
 
-        // 🚀 ABRE WHATSAPP SOLO
+        // 🚀 Abrir WhatsApp automático
         setTimeout(() => {
           window.open(urlWA, "_blank");
         }, 1000);
 
-        // ✅ MENSAJE EN PANTALLA
+        // ✅ Mensaje en pantalla
         document.getElementById("mensaje").innerHTML =
           `<span style='color:var(--success)'>✅ REGISTRADO CON ÉXITO.</span>`;
 
+        // 🔄 Reset
         document.getElementById("formRegistro").reset();
         document.getElementById("txtTotalVenta").innerText = "";
 
@@ -1346,7 +1392,6 @@
         panel.classList.remove("enviando-overlay");
       }
     }
-
     function cargarEstado() {
       fetch(URL)
         .then((r) => r.json())

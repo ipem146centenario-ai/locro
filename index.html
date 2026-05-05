@@ -1260,68 +1260,15 @@
       e.preventDefault();
 
       if (!captchaValidado) {
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-        const captchaBox = document.getElementById("captchaBox");
-        const captchaTexto = document.getElementById("captchaTexto");
-        const textoOriginal = captchaTexto.innerText;
-        captchaBox.classList.add("shake-error");
-        captchaTexto.innerText = "⚠️ DESLIZÁ PARA VALIDAR";
-        captchaTexto.classList.add("texto-error");
-        setTimeout(() => {
-          captchaBox.classList.remove("shake-error");
-          captchaTexto.classList.remove("texto-error");
-          if (!captchaValidado) captchaTexto.innerText = textoOriginal;
-        }, 1500);
+        alert("Validá el captcha");
         return;
       }
 
       const tipoColab = document.getElementById("tipo").value;
-      const modal = document.getElementById("modalConfirmacion");
-      const textoModal = document.getElementById("textoConfirmarMonto");
-
-      let mensajeConfirmacion = "";
-      let campoAResetear = null;
-
-      if (tipoColab === "dinero") {
-        const monto = document.getElementById("monto").value;
-        mensajeConfirmacion = `¿Estás seguro que deseas colaborar con $${monto}?`;
-        campoAResetear = document.getElementById("monto");
-      } else if (tipoColab === "ingredientes") {
-        const ing = document.getElementById("ingrediente").value;
-        const cant = document.getElementById("cantidadKg").value;
-        mensajeConfirmacion = `¿Confirmas la donación de ${cant} unidad/es de ${ing}?`;
-        campoAResetear = document.getElementById("cantidadKg");
-      } else if (tipoColab === "porciones") {
-        const cantP = document.getElementById("porcionesInput").value;
-        const totalP = cantP * PRECIO_PORCION;
-        mensajeConfirmacion = `¿Confirmas el pedido de ${cantP} porción/es por un total de $${totalP.toLocaleString()}?`;
-        campoAResetear = document.getElementById("porcionesInput");
-      }
-
-      if (mensajeConfirmacion !== "") {
-        textoModal.innerText = mensajeConfirmacion;
-        modal.style.display = "flex";
-
-        const confirmar = await new Promise((resolve) => {
-          document.getElementById("btnConfirmarSi").onclick = () => {
-            cerrarConfirmacion();
-            resolve(true);
-          };
-          document.getElementById("btnConfirmarNo").onclick = () => {
-            cerrarConfirmacion();
-            if (campoAResetear) {
-              campoAResetear.value = "";
-              campoAResetear.focus();
-            }
-            resolve(false);
-          };
-        });
-        if (!confirmar) return;
-      }
+      const nombreUsr = document.getElementById("nombre").value.toUpperCase();
 
       const btn = document.getElementById("btnEnviar");
       const panel = document.getElementById("panelCentral");
-      const nombreUsr = document.getElementById("nombre").value.toUpperCase();
 
       btn.disabled = true;
       btn.innerHTML = "⌛ ENVIANDO...";
@@ -1331,19 +1278,17 @@
         nombre: nombreUsr,
         telefono: document.getElementById("telefono").value,
         tipo: tipoColab,
-        cantidadKg:
-          parseFloat(document.getElementById("cantidadKg").value) || 0,
+        cantidadKg: parseFloat(document.getElementById("cantidadKg").value) || 0,
         monto: parseFloat(document.getElementById("monto").value) || 0,
-        porciones:
-          parseInt(document.getElementById("porcionesInput").value) || 0,
+        porciones: parseInt(document.getElementById("porcionesInput").value) || 0,
       };
 
-      if (tipoColab === "ingredientes")
+      if (tipoColab === "ingredientes") {
         data.ingrediente = document.getElementById("ingrediente").value;
+      }
 
       try {
-        // Eliminamos mode: "no-cors" para que el cuerpo del JSON llegue al servidor
-        await fetch(URL, {
+        const res = await fetch(URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -1351,27 +1296,48 @@
           body: new URLSearchParams(data),
         });
 
+        const json = await res.json();
+        if (!json.ok) throw new Error("Error servidor");
+
+        // 🎉 EFECTO
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
 
+        // 🔥 MENSAJE WHATSAPP COMPLETO
         const textoWA = encodeURIComponent(
-          `¡Hola! Soy ${nombreUsr}. Registré mi aporte para el Locro (${tipoColab}).`,
+          `📢 LOCRO IPEM 146
+
+👤 Nombre: ${nombreUsr}
+📱 Tel: ${data.telefono}
+📦 Tipo: ${tipoColab}
+💰 Monto: $${data.monto || 0}
+🍲 Cantidad: ${data.cantidadKg || 0}
+🎟️ Porciones: ${data.porciones || 0}
+
+✅ Ya registré mi aporte`
         );
+
         const urlWA = `https://wa.me/${WHATSAPP_COORDINADOR}?text=${textoWA}`;
 
-        let avisoExtra =
-          tipoColab === "dinero" || tipoColab === "porciones"
-            ? `<br><a href="${urlWA}" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:bold;">📱 CLIC AQUÍ para avisar por WhatsApp</a>`
-            : `<br><small style='color:var(--primary)'>Gracias por tu aporte solidario.</small>`;
+        // 🚀 ABRE WHATSAPP SOLO
+        setTimeout(() => {
+          window.open(urlWA, "_blank");
+        }, 1000);
 
+        // ✅ MENSAJE EN PANTALLA
         document.getElementById("mensaje").innerHTML =
-          `<span style='color:var(--success)'>✅ REGISTRADO CON ÉXITO.</span>${avisoExtra}`;
+          `<span style='color:var(--success)'>✅ REGISTRADO CON ÉXITO.</span>`;
+
         document.getElementById("formRegistro").reset();
         document.getElementById("txtTotalVenta").innerText = "";
+
         localStorage.removeItem("locro_nombre");
         localStorage.removeItem("locro_tel");
+
         mostrarCampos();
         resetCaptcha();
+
         setTimeout(cargarEstado, 2000);
+
       } catch (e) {
         document.getElementById("mensaje").innerText = "❌ Error al enviar.";
       } finally {
